@@ -96,7 +96,7 @@ export default function SendOfferModal({
 
           <div className="border-b border-gray-200 pb-4">
             <div className="space-y-2">
-              {(expanded ? products : products.slice(0, 3)).map((product, index) => <div className="flex flex-row  gap-x-4">
+              {(expanded ? products : products.slice(0, 3)).map((product, index) => <div key={product?.id} className="flex flex-row  gap-x-4">
                 <div className="relative">
                   <Image
                     src={product?.images[0]?.url || defaultImg?.product}

@@ -10,11 +10,16 @@ import { useCurrency } from '@/hooks/useCurrency'
 
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 
-function OfferView({ offerItems, open,
-    setOpen, }: {
-        offerItems: IOfferItem[], open: boolean;
-        setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    }) {
+function OfferView({
+    offerItems,
+    open,
+    setOpen,
+    title = "Offer Items"
+}: {
+    offerItems: IOfferItem[], open: boolean;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    title?: string;
+}) {
     const { format } = useCurrency();
 
     return (
@@ -23,7 +28,7 @@ function OfferView({ offerItems, open,
             <DialogContent className="w-[700px] rounded-none overflow-y-auto max-h-screen">
 
                 <DialogHeader className="border-b border-gray-200 pb-3.5">
-                    <h2 className="text-base font-medium text-center">Offer items</h2>
+                    <h2 className="text-base font-medium text-center">{title}</h2>
                 </DialogHeader>
 
                 {offerItems?.map((item) => (
@@ -52,7 +57,7 @@ function OfferView({ offerItems, open,
                                 </div>
                             </div>
 
-                            <ChevronRight className='group-hover:translate-x-1 transition-transform duration-200' />
+                            <ChevronRight className='group-hover:translate-x-1 transition-transform duration-200 text-gray-700 size-5' />
                         </div>
                     </Link>
                 ))}

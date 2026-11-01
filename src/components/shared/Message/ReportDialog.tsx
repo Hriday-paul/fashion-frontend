@@ -71,9 +71,9 @@ export function ReportDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild className="cursor-pointer px-2 mt-1">
-        <div className="flex flex-row gap-x-2 items-center">
-          <Ban className="text-destructive size-5" />
+      <DialogTrigger asChild className="cursor-pointer px-2">
+        <div className="flex flex-row gap-x-1.5 items-center">
+          <Ban className="text-destructive size-4" />
           <p className='font-medium'>Report</p>
         </div>
       </DialogTrigger>

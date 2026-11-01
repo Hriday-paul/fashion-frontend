@@ -38,6 +38,12 @@ function NewMessages({ chatId, scrollToBottom, setUpdatedMsgs, updatedMsgs }: { 
             // socket?.emit(`seen`, { chatId: res?.chatId })
         });
 
+        //seen msg
+        socket.on(`seen-message`, () => {
+
+            //mark all messages as seen
+        });
+
 
         socket?.on(`io-error`, (res) => {
             console.log("---------------error res---------------", res)

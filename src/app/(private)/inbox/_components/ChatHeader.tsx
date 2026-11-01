@@ -15,6 +15,8 @@ import SendOfferModal from '@/components/shared/Modal/SendOfferModal';
 import { BuyFromChat } from '@/lib/Actions/Product.api';
 import { toast } from 'sonner';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
+import OfferView from '@/components/shared/Message/OfferView';
+import { useCurrency } from '@/hooks/useCurrency';
 
 function formatLastActive(date: Date | string) {
     const activeDate = moment(date);
@@ -47,13 +49,16 @@ function ChatHeader({ chatId }: { chatId: string }) {
         isSuccess ? <div>
 
             <div className="border-b border-gray-200 flex items-center justify-center px-4 py-2.5">
-                <div className="flex items-center gap-x-3">
+                <div className="flex items-center gap-x-3 w-full justify-center">
 
                     <Link href={`/member/${userData?.data?.user?.userName}`}>
                         <div className="lg:flex-grow">
                             <h3 className="text-base font-semibold">{userData?.data?.user?.userName || 'Unknown'}</h3>
                         </div>
                     </Link>
+                </div>
+                <div>
+                    <ReportDialog />
                 </div>
             </div>
 
@@ -102,13 +107,12 @@ const ChatHeaderDetails = ({ data, chatId }: { data: ChatHeaderDetailsProps, cha
             {!data?.isUnavailable && <ActionButtons items={data?.items} sellerId={data?.user?.id} chatId={data?.id || chatId} />}
         </div>
 
-        {openItemDetails && <div className='w-full bg-white absolute top-0 left-0 z-10 shadow'>
+        {/* {openItemDetails && <div className='w-full bg-white absolute top-0 left-0 z-10 shadow'>
             <div className='flex flex-row justify-between items-center p-2 border-b border-gray-100'>
                 <p className='font-semibold'>Details</p>
                 <Button className='cursor-pointer' onClick={() => setOpenItemDetails(false)} variant="ghost"><X size={24} /></Button>
             </div>
 
-            {/* //===========items=============== */}
             <div className='space-y-3'>
                 {data?.items?.map((item) => (
                     <Link key={item?.id} href={`/shop/${item?.product?.id}`}>
@@ -126,7 +130,6 @@ const ChatHeaderDetails = ({ data, chatId }: { data: ChatHeaderDetailsProps, cha
                 ))}
             </div>
 
-            {/* //ad more items */}
             <Link href={`/member/${data?.user?.userName}/bundle`} className='w-full'>
                 <div className='flex flex-row gap-x-2 items-center justify-between p-2.5 hover:bg-gray-50 duration-150'>
                     <div className='flex flex-row gap-x-2 items-center'>
@@ -159,23 +162,26 @@ const ChatHeaderDetails = ({ data, chatId }: { data: ChatHeaderDetailsProps, cha
                 <ReportDialog />
             </div>
 
-        </div>}
+        </div>} */}
 
         {data?.isUnavailable && <div className='bg-red-700 text-white p-1.5 text-center text-sm font-semibold'>
             Some items in this chat are no longer available.
         </div>}
 
+        <OfferView offerItems={data?.items as any} open={openItemDetails} setOpen={setOpenItemDetails} title={"Chat Items"} />
+
     </div>
 }
 
 const SingleItemHeader = ({ data }: { data: ChatHeaderDetailsProps }) => {
+    const { format } = useCurrency();
     const product = data?.items[0]?.product;
     return <div>
         <div className='flex flex-row gap-x-2 items-start'>
             <Image src={product?.images?.[0]?.url || ''} alt={product?.title || 'Product Image'} className='w-12 h-12 object-cover rounded' width={500} height={500} />
             <div>
                 <h3 className='text-base font-semibold'>{product?.title}</h3>
-                <p className='text-sm text-gray-600'>${product?.finalPrice} <span>+ service fee</span></p>
+                <p className='text-sm text-gray-600'>{format(product?.finalPrice)} <span>+ service fee</span></p>
             </div>
         </div>
 
@@ -183,6 +189,7 @@ const SingleItemHeader = ({ data }: { data: ChatHeaderDetailsProps }) => {
 }
 
 const MultipleItemsHeader = ({ data }: { data: ChatHeaderDetailsProps }) => {
+    const { format } = useCurrency();
     const itemsCount = data?.items?.length;
 
     const firstProduct = data?.items[0]?.product;
@@ -197,7 +204,7 @@ const MultipleItemsHeader = ({ data }: { data: ChatHeaderDetailsProps }) => {
             </div>
             <div>
                 <p className='text-base font-semibold'>{itemsCount} items</p>
-                <p className='text-sm font-medium text-gray-600'>${data?.itemsPrice} + service fee</p>
+                <p className='text-sm font-medium text-gray-600'>{format(data?.itemsPrice)} + service fee</p>
             </div>
         </div>
 
