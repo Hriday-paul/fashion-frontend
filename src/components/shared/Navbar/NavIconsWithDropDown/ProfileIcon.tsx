@@ -145,6 +145,22 @@ export default function ProfileIcon() {
       roles: [UserRole.CHARITY_SHOP],
     },
     {
+      icon: <Handshake className="size-5" />,
+      name: "Monetory Contribution",
+      link: "/profile/donation-contribution",
+      roles: SELLER_ROLES.filter(
+        (role) => role !== UserRole.CHARITY_SHOP
+      ),
+    },
+    {
+      icon: <Shirt className="size-5" />,
+      name: "Cloth Donation",
+      link: "/profile/donation-contribution/cloth-donation",
+      roles: SELLER_ROLES.filter(
+        (role) => role !== UserRole.CHARITY_SHOP
+      ),
+    },
+    {
       icon: <SquareChartGantt className="size-5" />,
       name: "List an item",
       link: "/sell",
