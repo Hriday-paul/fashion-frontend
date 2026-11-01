@@ -17,7 +17,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
 interface IProductCart extends IProduct {
-    cartItems: {}[]
+    cartItems: {
+        id: string;
+    }[]
 }
 
 const ItemsLazyItems = ({ query, userName, initialData, initialMeta }: { query: { [key: string]: string | undefined }, userName: string, initialData: IProductCart[], initialMeta: IMeta }) => {
@@ -87,6 +89,8 @@ export default ItemsLazyItems;
 
 
 const AddRemoveBundleItems = ({ product }: { product: IProductCart }) => {
+
+    console.log(product)
 
     const [isInbundle, setIsInBundle] = useState(product?.cartItems?.length > 0);
     const [loading, setLoading] = useState(false);

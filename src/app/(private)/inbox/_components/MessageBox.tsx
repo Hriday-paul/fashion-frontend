@@ -1,13 +1,19 @@
 "use client"
 import PreMessage from './PreMessage';
 import NewMessages from './NewMessages';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { IMessage } from '@/types';
 
 function MessageBox({ chatId }: { chatId: string }) {
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
     const [updatedMsgs, setUpdatedMsgs] = useState<IMessage[]>([]);
+    const [isAllPreSeen, setIsAllPreSeen] = useState(false);
+
+    useEffect(() => {
+        setUpdatedMsgs([]);
+        setIsAllPreSeen(false);
+    }, [chatId]);
 
     const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
         if (bottomRef.current) {
@@ -23,9 +29,16 @@ function MessageBox({ chatId }: { chatId: string }) {
                     scrollToBottom={scrollToBottom}
                     containerRef={chatContainerRef}
                     updatedMsgs={updatedMsgs}
+                    isAllPreSeen={isAllPreSeen}
                 />
             )}
-            <NewMessages chatId={chatId} scrollToBottom={scrollToBottom} setUpdatedMsgs={setUpdatedMsgs} updatedMsgs={updatedMsgs} />
+            <NewMessages
+                chatId={chatId}
+                scrollToBottom={scrollToBottom}
+                setUpdatedMsgs={setUpdatedMsgs}
+                updatedMsgs={updatedMsgs}
+                setIsAllPreSeen={setIsAllPreSeen}
+            />
             <div ref={bottomRef}></div>
         </div>
     )

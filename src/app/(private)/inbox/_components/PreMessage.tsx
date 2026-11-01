@@ -36,12 +36,14 @@ function PreMessage({
     chatId,
     scrollToBottom,
     containerRef,
-    updatedMsgs
+    updatedMsgs,
+    isAllPreSeen = false
 }: {
     chatId: string;
     scrollToBottom: (behavior?: ScrollBehavior) => void;
     containerRef: React.RefObject<HTMLDivElement | null>;
     updatedMsgs: IMessage[];
+    isAllPreSeen?: boolean;
 }) {
     const { socket } = useSocket();
     const [loadProds, { isLoading }] = useLazyGetMyMessagesQuery();
@@ -97,7 +99,7 @@ function PreMessage({
                 scrollToBottom("auto");
             }
             isFirstLoad.current = false;
-            const latestChatId = data[data.length - 1]?.chatId;
+            const latestChatId = data[data.length - 1]?.chatId || chatId;
             if (socket && latestChatId) {
                 socket?.emit("seen", { chatId: latestChatId });
             }
@@ -112,7 +114,7 @@ function PreMessage({
             const heightDiff = el.scrollHeight - prevScrollHeight.current;
             el.scrollTop = prevScrollTop.current + heightDiff;
         }
-    }, [data, scrollToBottom, containerRef, socket]);
+    }, [data, scrollToBottom, containerRef, socket, chatId]);
 
     return (
         <>
@@ -152,7 +154,8 @@ function PreMessage({
 
                     const isUpdatedMsg = updatedMsgs?.find((msgUp) => msgUp?.id === msg?.id);
 
-                    const message = isUpdatedMsg ? isUpdatedMsg : msg;
+                    const baseMessage = isUpdatedMsg ? isUpdatedMsg : msg;
+                    const message = isAllPreSeen && !baseMessage?.isSeen ? { ...baseMessage, isSeen: true } : baseMessage;
 
                     const isMyMessage = message?.senderId?.toString() === user?.id?.toString();
 

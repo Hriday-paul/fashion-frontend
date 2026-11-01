@@ -1,11 +1,49 @@
+"use client";
+import { useState, useTransition } from "react";
 import CustomAvatar from "@/components/ui/custom-avatar";
 import { Rating } from "@/components/ui/rating";
 import { userRoleMapper } from "@/utils/userRoleMapper";
 import Link from "next/link";
 import { IUserWithExtra } from "./ProductDetails/ProductDetails";
 import { Button } from "@/components/ui/button";
+import { CreateChat } from "@/lib/Actions/Product.api";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
-const SellerDetails = ({ user, isMyProfile }: { user: IUserWithExtra; isMyProfile: boolean }) => {
+const SellerDetails = ({ user, isMyProfile, prodId }: { user: IUserWithExtra; isMyProfile: boolean, prodId: string }) => {
+  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  const handleContact = async () => {
+    setLoading(true);
+    try {
+      const res = await CreateChat({
+        payload: {
+          products: [prodId],
+          user2Id: user.id,
+        },
+      });
+
+      if (!res.success || !res?.data?.id) {
+        throw new Error(res.message || "Failed to start chat");
+      }
+
+      startTransition(() => {
+        router.push(`/inbox/${res.data!.id}`);
+      });
+    } catch (error: any) {
+      if (isRedirectError(error)) {
+        throw error;
+      }
+      toast.error(error?.message || "Failed to start chat");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isSubmitting = loading || isPending;
 
   return (
     <div className=" max-w-lg">
@@ -64,12 +102,11 @@ const SellerDetails = ({ user, isMyProfile }: { user: IUserWithExtra; isMyProfil
               className="cursor-pointer"
             ><Button variant={"outline"} className="border border-gray-900 cursor-pointer py-4">Visit Shop</Button></Link>
 
-            {isMyProfile ? <></> : <Link
-              href={`/inbox/${user?.userName}`}
-              className="cursor-pointer"
-            >
-              <Button variant={"outline"} className="border border-gray-900 cursor-pointer py-4">Ask A Question</Button>
-            </Link>}
+            {isMyProfile ? <></> :
+              <Button disabled={isSubmitting} onClick={handleContact} variant={"outline"} className="border border-gray-900 cursor-pointer py-4 min-w-[130px]">
+                {isSubmitting ? <div className="w-5 aspect-square rounded-full border-[2px] border-primary-black border-r-gray-400 animate-spin"></div> : "Ask A Question"}
+              </Button>
+            }
           </div>
 
         </div>

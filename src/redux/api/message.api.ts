@@ -13,7 +13,8 @@ const messageApi = baseApi.injectEndpoints({
                     product: IProduct
                 }[],
                 itemsPrice: number,
-                isUnavailable: boolean
+                isUnavailable: boolean,
+                isImSeller: boolean,
             },
         }, { chatId: string }>({
             query: ({chatId }) => ({

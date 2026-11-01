@@ -1,15 +1,26 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import OwnerMsgCard from '@/components/shared/Message/OwnerMsgCard';
 import ReceiverMsgCard from '@/components/shared/Message/ReceiverMsgCard';
 import { useSocket } from '@/Context/SocketProvider';
 import { RootState } from '@/redux/store';
 import { IMessage } from '@/types';
 import Image from 'next/image';
-import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
 
-function NewMessages({ chatId, scrollToBottom, setUpdatedMsgs, updatedMsgs }: { chatId: string; scrollToBottom: () => void; setUpdatedMsgs: React.Dispatch<React.SetStateAction<IMessage[]>>, updatedMsgs: IMessage[] }) {
+function NewMessages({
+    chatId,
+    scrollToBottom,
+    setUpdatedMsgs,
+    updatedMsgs,
+    setIsAllPreSeen
+}: {
+    chatId: string;
+    scrollToBottom: () => void;
+    setUpdatedMsgs: React.Dispatch<React.SetStateAction<IMessage[]>>;
+    updatedMsgs: IMessage[];
+    setIsAllPreSeen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
 
     const { socket } = useSocket();
     const user = useSelector((state: RootState) => state?.auth?.user);
@@ -17,33 +28,34 @@ function NewMessages({ chatId, scrollToBottom, setUpdatedMsgs, updatedMsgs }: { 
     const [newMessages, setNewMessages] = useState<IMessage[]>([]);
 
     useEffect(() => {
-        setNewMessages([])
+        setNewMessages([]);
 
         if (!socket) return;
 
-        socket.emit(`join-chat`, { chatId }, (res : any) => {
+        socket.emit(`join-chat`, { chatId }, (res: any) => {
             console.log(res);
+            socket?.emit(`seen`, { chatId });
         });
 
-        //  receive my sent message & receive
+        // receive my sent message & receive
         socket.on(`new-message`, (res: IMessage) => {
-
             setNewMessages((prev) => [...prev, res]);
-            socket?.emit(`seen`, { chatId: res?.chatId })
+            if (res?.senderId?.toString() !== user?.id?.toString()) {
+                socket?.emit(`seen`, { chatId: res?.chatId || chatId });
+            }
         });
 
         socket.on(`update-message`, (res: IMessage) => {
-
-            setUpdatedMsgs((prev) => [...prev, res]);
-            // socket?.emit(`seen`, { chatId: res?.chatId })
+            setUpdatedMsgs((prev) => [...prev.filter((m) => m.id !== res.id), res]);
         });
 
-        //seen msg
+        // seen msg
         socket.on(`seen-message`, () => {
-
-            //mark all messages as seen
+            // mark all messages as seen
+            setNewMessages((prev) => prev.map((msg) => ({ ...msg, isSeen: true })));
+            setUpdatedMsgs((prev) => prev.map((msg) => ({ ...msg, isSeen: true })));
+            setIsAllPreSeen(true);
         });
-
 
         socket?.on(`io-error`, (res) => {
             console.log("---------------error res---------------", res)
@@ -53,14 +65,13 @@ function NewMessages({ chatId, scrollToBottom, setUpdatedMsgs, updatedMsgs }: { 
 
         return () => {
             if (socket) {
-                // socket.off(`message`);
-                socket.off(`seen`);
+                socket.off(`seen-message`);
                 socket.off(`new-message`);
                 socket.off(`update-message`);
             }
         };
 
-    }, [socket, chatId, user])
+    }, [socket, chatId, user, setUpdatedMsgs, setIsAllPreSeen]);
 
     useEffect(() => {
         scrollToBottom();
@@ -84,25 +95,10 @@ function NewMessages({ chatId, scrollToBottom, setUpdatedMsgs, updatedMsgs }: { 
 
                     const isMyMessage = message?.senderId?.toString() === user?.id?.toString();
 
-                    // const currentDate = moment(message?.createdAt);
-                    // const prevDate =
-                    //     index > 0 ? moment(messages[index - 1]?.createdAt) : null;
-
-                    // const showDateSeparator =
-                    //     index === 0 || !currentDate.isSame(prevDate, "day");
-
                     return <div key={message?.id}>
 
-                        {/* {showDateSeparator && (
-                            <div className="flex justify-center items-center text-sm my-2">
-                                <p className="text-gray-900 bg-gray-200 px-2 py-1 rounded-md text-xs font-normal">
-                                    {formatChatDate(message?.createdAt)}
-                                </p>
-                            </div>
-                        )} */}
-
                         {!isMyMessage ?
-                            // sent message
+                            // received message
                             <div className="flex items-start gap-x-4" >
                                 <Image
                                     src={message?.sender?.picture?.url || "/empty-user.png"}
@@ -119,7 +115,7 @@ function NewMessages({ chatId, scrollToBottom, setUpdatedMsgs, updatedMsgs }: { 
 
                             :
 
-                            //received message
+                            // sent message
                             <div className="flex flex-row-reverse items-start gap-x-4">
                                 <Image
                                     src={message?.sender?.picture?.url || "/empty-user.png"}

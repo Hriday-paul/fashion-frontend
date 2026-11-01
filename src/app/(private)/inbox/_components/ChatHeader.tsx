@@ -79,7 +79,8 @@ interface ChatHeaderDetailsProps {
         product: IProduct
     }[],
     itemsPrice: number,
-    isUnavailable: boolean
+    isUnavailable: boolean,
+    isImSeller: boolean,
 
 }
 
@@ -104,7 +105,7 @@ const ChatHeaderDetails = ({ data, chatId }: { data: ChatHeaderDetailsProps, cha
                 {isSingleItem ? <SingleItemHeader data={data} /> : <MultipleItemsHeader data={data} />}
             </div>
 
-            {!data?.isUnavailable && <ActionButtons items={data?.items} sellerId={data?.user?.id} chatId={data?.id || chatId} />}
+            {!data?.isUnavailable && <ActionButtons items={data?.items} sellerId={data?.user?.id} chatId={data?.id || chatId} isImSeller={data?.isImSeller} />}
         </div>
 
         {/* {openItemDetails && <div className='w-full bg-white absolute top-0 left-0 z-10 shadow'>
@@ -168,7 +169,7 @@ const ChatHeaderDetails = ({ data, chatId }: { data: ChatHeaderDetailsProps, cha
             Some items in this chat are no longer available.
         </div>}
 
-        <OfferView offerItems={data?.items as any} open={openItemDetails} setOpen={setOpenItemDetails} title={"Chat Items"} />
+        <OfferView offerItems={(data?.items || []) as any} open={openItemDetails} setOpen={setOpenItemDetails} title={"Chat Items"} />
 
     </div>
 }
@@ -211,7 +212,7 @@ const MultipleItemsHeader = ({ data }: { data: ChatHeaderDetailsProps }) => {
     </div>
 }
 
-const ActionButtons = ({ items, sellerId, chatId }: { items: ChatHeaderDetailsProps['items'], sellerId: string, chatId: string }) => {
+const ActionButtons = ({ items, sellerId, chatId, isImSeller }: { items: ChatHeaderDetailsProps['items'], sellerId: string, chatId: string, isImSeller: boolean }) => {
 
     const [openOfferModal, setOpenOfferModal] = React.useState(false);
     const [loading, setLoading] = useState(false);
@@ -268,11 +269,11 @@ const ActionButtons = ({ items, sellerId, chatId }: { items: ChatHeaderDetailsPr
     const isBuying = loading || isPending;
 
     return <div className='flex flex-row gap-x-2'>
-        <Button variant="outline" className='cursor-pointer border-primary-black shadow-none rounded-md' onClick={handlemakeOffer}>Make an offer</Button>
+        <Button variant="outline" className='cursor-pointer border-primary-black shadow-none rounded-md' onClick={handlemakeOffer}>{isImSeller ? "Send" : "Make"} an offer</Button>
 
-        <Button className='cursor-pointer min-w-[92px] rounded-md' disabled={isBuying} onClick={handleBuyNow}>
+        {!isImSeller && <Button className='cursor-pointer min-w-[92px] rounded-md' disabled={isBuying} onClick={handleBuyNow}>
             {isBuying ? <div className="w-5 aspect-square rounded-full border-[2px] border-white border-r-gray-500 animate-spin"></div> : "Buy Now"}
-        </Button>
+        </Button>}
 
         <SendOfferModal open={openOfferModal} setOpen={setOpenOfferModal} products={products} sellerId={sellerId} />
 

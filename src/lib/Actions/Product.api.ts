@@ -127,3 +127,27 @@ export const BuyFromChat = async ({ payload }: { payload: { chatId: string, sell
         };
     }
 }
+
+export const CreateChat = async ({ payload }: { payload: { products: string[], user2Id: string } }): Promise<{
+    success: boolean;
+    message: string;
+    data: { id: string } | null;
+}> => {
+    try {
+        const res = await serverQueryWithReauth({ payload, endPoint: `/chats`, method: "POST" });
+        return {
+            success: res?.success !== undefined ? Boolean(res.success) : true,
+            message: res?.message || "Chat initiated successfully",
+            data: res?.data !== undefined ? res.data : (res ?? null),
+        };
+    } catch (error: any) {
+        if (isRedirectError(error)) {
+            throw error;
+        }
+        return {
+            success: false,
+            message: error?.message || "Failed to initiate chat",
+            data: null,
+        };
+    }
+}

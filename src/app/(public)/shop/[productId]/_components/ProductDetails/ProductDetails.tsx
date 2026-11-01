@@ -127,7 +127,7 @@ const ProductDetails = ({ product }: { product: IProductWithUser }) => {
       </div> : product?.isMyProduct ? <></> : <ActionButtons product={product}></ActionButtons>}
 
       {/* ========================= seller details ========================= */}
-      <SellerDetails user={product?.user} isMyProfile={product?.isMyProduct}></SellerDetails>
+      <SellerDetails user={product?.user} isMyProfile={product?.isMyProduct} prodId={product?.id}></SellerDetails>
     </div>
   );
 };
