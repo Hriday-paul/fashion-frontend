@@ -2,6 +2,29 @@ import { INotification } from "@/types";
 import Image from "next/image";
 import { defaultImg } from "@/utils/defaultImg";
 
+const PostImage = ({ notification }: { notification: INotification }) => {
+    const entityImgs = notification?.entityImgs || [];
+
+    if (entityImgs.length === 0) {
+        return null;
+    }
+
+    return <div className="flex -space-x-2">
+        {entityImgs.map((img, idx) => (
+            <Image
+                key={idx}
+                src={img || defaultImg?.product}
+                alt="order item image"
+                width={1200}
+                height={1200}
+                placeholder="blur"
+                blurDataURL={defaultImg?.placeholderImg}
+                className="w-10 h-10 rounded object-cover border border-white"
+            />
+        ))}
+    </div>
+}
+
 export const NotificationRender = ({ notification }: { notification: INotification }) => {
     switch (notification?.entityType) {
         case "PRODUCT":
@@ -16,7 +39,7 @@ export const NotificationRender = ({ notification }: { notification: INotificati
                     return {
                         avatar: notification?.entityImgs?.length > 0 ? <Image src={notification?.entityImgs[0] || defaultImg?.empty_user} alt="product image" width={1200} height={1200} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} className="w-10 h-10 rounded-full object-cover" /> : <Image src={defaultImg?.fashionIcon} alt="product image" width={1200} height={1200} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} className="w-10 h-10 rounded-full object-cover" />,
                         link: `/shop/${notification?.entityId}`,
-                        postImg: null
+                        postImg: <PostImage notification={notification} />
                     }
                 case "SOLD_OUT":
                     return {
@@ -25,13 +48,13 @@ export const NotificationRender = ({ notification }: { notification: INotificati
                             <span className="text-xs bg-destructive text-white px-1 py-0.5 absolute top-1 left-0">Sold</span>
                         </div> : <Image src={defaultImg?.fashionIcon} alt="product image" width={1200} height={1200} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} className="w-10 h-10 rounded-full object-cover" />,
                         link: `/shop/${notification?.entityId}`,
-                        postImg: null
+                        postImg: <PostImage notification={notification} />
                     }
                 default:
                     return {
                         avatar: <Image src={defaultImg?.fashionIcon} alt="product image" width={1200} height={1200} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} className="w-10 h-10 rounded-full object-cover" />,
                         link: null,
-                        postImg: null
+                        postImg: <PostImage notification={notification} />
                     }
             }
 
@@ -40,7 +63,7 @@ export const NotificationRender = ({ notification }: { notification: INotificati
             return {
                 avatar: <Image src={notification?.actor?.picture?.url || defaultImg?.empty_user} alt="user image" width={1200} height={1200} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} className="w-10 h-10 rounded-full object-cover" />,
                 link: `/inbox/${notification?.entityId}`,
-                postImg: null
+                postImg: <PostImage notification={notification} />
             }
 
         case "ORDER":
@@ -72,13 +95,13 @@ export const NotificationRender = ({ notification }: { notification: INotificati
                     return {
                         avatar: <Image src={notification?.actor?.picture?.url || defaultImg?.empty_user} alt="user image" width={1200} height={1200} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} className="w-10 h-10 rounded-full object-cover" />,
                         link: `/member/${notification?.entityId}`,
-                        postImg: null
+                        postImg: <PostImage notification={notification} />
                     }
                 default:
                     return {
                         avatar: <Image src={defaultImg?.fashionIcon} alt="product image" width={1200} height={1200} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} className="w-10 h-10 rounded-full object-cover" />,
                         link: null,
-                        postImg: null
+                        postImg: <PostImage notification={notification} />
                     }
             }
 
@@ -86,14 +109,14 @@ export const NotificationRender = ({ notification }: { notification: INotificati
             return {
                 avatar: <Image src={defaultImg?.fashionIcon} alt="product image" width={1200} height={1200} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} className="w-10 h-10 rounded-full object-cover" />,
                 link: null,
-                postImg: null
+                postImg: <PostImage notification={notification} />
             }
 
         case "RETURN":
             return {
                 avatar: <Image src={defaultImg?.fashionIcon} alt="product image" width={1200} height={1200} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} className="w-10 h-10 rounded-full object-cover" />,
                 link: null,
-                postImg: null
+                postImg: <PostImage notification={notification} />
             }
 
         case "BADGE":
@@ -101,14 +124,14 @@ export const NotificationRender = ({ notification }: { notification: INotificati
             return {
                 avatar: <Image src={defaultImg?.fashionIcon} alt="product image" width={1200} height={1200} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} className="w-10 h-10 rounded-full object-cover" />,
                 link: `/member/${notification?.entityId}`,
-                postImg: null
+                postImg: <PostImage notification={notification} />
             }
 
         default:
             return {
                 avatar: <Image src={defaultImg?.fashionIcon} alt="product image" width={1200} height={1200} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} className="w-10 h-10 rounded-full object-cover" />,
                 link: null,
-                postImg: null
+                postImg: <PostImage notification={notification} />
             }
     }
 }

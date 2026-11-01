@@ -28,8 +28,8 @@ export const productFormSchema = z.object({
   condition: z.string().min(1, {
     message: "Please select a condition.",
   }),
-  fabric: z.string().min(1, {
-    message: "Fabric information is required.",
+  fabric: z.array(z.string()).min(1, {
+    message: "Please select at least one material.",
   }),
   brandId: z.string({ required_error: "Please select a brand." }).min(1, {
     message: "Please select a brand.",
@@ -55,10 +55,10 @@ export const productFormSchema = z.object({
   // shippingDelivery: z.string({ required_error: "Shipping & returns information is required." }).min(1, {
   //   message: "Shipping & returns information is required.",
   // }),
-  // returnsPolicy: z.string({ required_error: "Returns policy is required." }).min(1, {
-  //   message: "Returns policy is required.",
-  // }),
-  // allowOffers: z.boolean().default(false),
+  returnsPolicy: z.string({ required_error: "Please select a return window." }).min(1, {
+    message: "Please select a return window.",
+  }),
+  allowOffers: z.boolean().default(true),
 
   weight_kg: z.string({ required_error: "Weight is required." }).refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
     message: "Weight must be a valid positive number.",
@@ -132,7 +132,7 @@ export const productFormDefaultValues: ProductFormValues = {
   categoryId: "",
   tags: [],
   condition: "",
-  fabric: "",
+  fabric: [],
   brandId: "",
   sizeId: "",
   color: "",
@@ -150,9 +150,9 @@ export const productFormDefaultValues: ProductFormValues = {
   weight_kg: "",
 
   // durationTime: "",
-  // returnsPolicy: "0",
+  returnsPolicy: "",
   // returnDescription: "",
-  // allowOffers: false,
+  allowOffers: true,
 };
 
 // color data
@@ -217,10 +217,6 @@ export const returnsPolicy = [
     label: "Returns accepted – 14 days",
     value: "14"
   },
-  {
-    label: "No returns",
-    value: "0"
-  }
 ];
 
 export const careInstructionsOptions = [

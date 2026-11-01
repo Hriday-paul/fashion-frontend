@@ -84,6 +84,10 @@ export interface IProduct {
   condition: ICondition;
   tags: string[];
   meterials: string[];
+  materials: {
+    id: string;
+    material: IMaterial;
+  }[];
   color: string;
   care_instructions: ICareInstruction[];
   allow_offer: boolean;
@@ -118,6 +122,11 @@ export interface IProduct {
   hight_cm: number // in cm, for shipping cost calculation
   width_cm: number // in cm, for shipping cost calculation
   length_cm: number
+}
+
+export interface IMaterial {
+    id: string;
+    name: string;
 }
 
 export interface ICartGroup {

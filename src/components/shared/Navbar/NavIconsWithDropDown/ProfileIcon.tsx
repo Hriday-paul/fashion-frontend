@@ -6,13 +6,16 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import {
   ChevronRight,
+  HandCoins,
   Handshake,
   Info,
+  LayoutDashboard,
   LifeBuoy,
   List,
   LogOut,
   Package,
   Settings,
+  Shirt,
   SquareChartGantt,
   Tags,
   UserRound,
@@ -43,13 +46,25 @@ import { useAppDispatch } from "@/redux/hooks";
 import { logout } from "@/redux/features/authSlice";
 import { baseApi } from "@/redux/api/baseApi";
 import { cn } from "@/lib/utils";
+import { UserRole } from "@/types";
 
 type NavLink = {
   icon: React.ReactNode;
   name: string;
   link: string;
   label?: React.ReactNode; // optional custom label (e.g. with a tooltip)
+  roles?: UserRole[];
 };
+
+// Reusable role groups
+const SELLER_ROLES = [
+  UserRole.INDIVIDUAL_USER,
+  UserRole.CHARITY_SHOP,
+  UserRole.ECO_FRIENDLY_STORE,
+  UserRole.CELEBRITY,
+  UserRole.AMBASSADOR,
+  UserRole.PROFESSIONAL_SELLER,
+];
 
 const itemClass =
   "cursor-pointer group rounded-none border-b border-gray-200 py-3";
@@ -103,6 +118,11 @@ export default function ProfileIcon() {
 
   const navLinks: NavLink[] = [
     {
+      icon: <LayoutDashboard className="size-5" />,
+      name: "Dashboard",
+      link: `/profile`,
+    },
+    {
       icon: <UserRound className="size-5" />,
       name: "View Profile",
       link: `/member/${user?.userName}`,
@@ -110,22 +130,37 @@ export default function ProfileIcon() {
     {
       icon: <UserRoundCog className="size-5" />,
       name: "Edit Profile",
-      link: "/profile",
+      link: "/profile/edit",
+    },
+    {
+      icon: <HandCoins className="size-5" />,
+      name: "Monetory Donations",
+      link: "/profile/donation",
+      roles: [UserRole.CHARITABLE_ORGANIZATION, UserRole.CHARITY_SHOP],
+    },
+    {
+      icon: <Shirt className="size-5" />,
+      name: "Cloth Donations",
+      link: "/profile/donation/cloth",
+      roles: [UserRole.CHARITY_SHOP],
     },
     {
       icon: <SquareChartGantt className="size-5" />,
       name: "List an item",
       link: "/sell",
+      roles: SELLER_ROLES,
     },
     {
       icon: <List className="size-5" />,
       name: "Products-Listing",
       link: "/profile/sell/products",
+      roles: SELLER_ROLES,
     },
     {
       icon: <Package className="size-5" />,
       name: "My Orders",
       link: "/profile/purchase/orders",
+      roles: SELLER_ROLES,
     },
     {
       icon: <Settings className="size-5" />,
@@ -137,6 +172,7 @@ export default function ProfileIcon() {
       name: "Assisted Seller",
       label: <AssistedSellerLabel />,
       link: "/assisted-seller",
+      roles: SELLER_ROLES,
     },
     {
       icon: <Tags className="size-5" />,
@@ -150,6 +186,13 @@ export default function ProfileIcon() {
     },
   ];
 
+  const activeNavLinks = navLinks.filter((item) => {
+    if (!item.roles) return true;
+    return item.roles.includes(user?.auth?.role);
+  });
+
+  const isCharity = [UserRole.CHARITY_SHOP, UserRole.CHARITABLE_ORGANIZATION].includes(user?.auth?.role);
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger className={cn("cursor-pointer relative focus-within:outline-none focus-within:ring-0 focus-within:ring-primary-black p-1.5 md:flex hidden", open && "bg-gray-100 rounded-md")}>
@@ -160,7 +203,7 @@ export default function ProfileIcon() {
         align="end"
         className="md:min-w-xs overflow-y-auto max-h-96 p-0 rounded-none"
       >
-        {navLinks.map((item) => (
+        {activeNavLinks.map((item) => (
           <Link href={item.link} key={item.name} onClick={closeMenu}>
             <DropdownMenuItem className={itemClass}>
               <div className="flex h-6 w-6 items-center justify-center text-muted-foreground">
@@ -177,7 +220,7 @@ export default function ProfileIcon() {
         ))}
 
         {/* Donate */}
-        <CharityDonationFormDialog>
+        {!isCharity && <CharityDonationFormDialog>
           <div className="px-1.5 hover:bg-zinc-100">
             <div className="flex items-center gap-x-3 pl-1 cursor-pointer py-3">
               <LifeBuoy className="flex size-5 items-center justify-center text-muted-foreground" />
@@ -185,7 +228,7 @@ export default function ProfileIcon() {
             </div>
             <DropdownMenuSeparator />
           </div>
-        </CharityDonationFormDialog>
+        </CharityDonationFormDialog>}
 
         {/* Logout */}
         <DropdownMenuItem onClick={handleLogout} className={itemClass}>

@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import React, { useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   buildProductSchema,
   CharityFormSchema,
@@ -31,6 +32,7 @@ import {
   productFormDefaultValues,
   productFormSchema,
   ProductFormValues,
+  returnsPolicy,
 } from "./schema";
 import { ImageUploadGuide } from "./ImageUploadGuide";
 import { PriceOverview } from "./PriceOverview";
@@ -43,6 +45,7 @@ import { useGetCategoryQuery } from "@/redux/api/categoryApi";
 import CategorySelector, { Category } from "./Categories/CategorySelector";
 import SizeSelector from "./Size/Sizeselector";
 import BrandSelector from "./Brand/Brandselector";
+import MaterialSelector from "./Material/MaterialSelector";
 import { getFirstErrorMessage } from "@/utils/modifyFormError";
 import { toast } from "sonner";
 import { useGetCharitiesQuery } from "@/redux/api/userApi";
@@ -50,6 +53,7 @@ import { formattedData } from "./utils";
 import Image from "next/image";
 import { useGetSizesQuery } from "@/redux/api/size.api";
 import { useGetBrandsQuery } from "@/redux/api/brand.api";
+import { useGetMaterialsQuery } from "@/redux/api/material.api";
 
 import {
   InputGroup,
@@ -99,6 +103,10 @@ export default function AddProductForm() {
   });
   // ======================= category brand ===========================
   const { data: brandData } = useGetBrandsQuery({ categoryId: selectedCategory?.id }, {
+    skip: !selectedCategory
+  });
+  // ======================= category materials ===========================
+  const { data: materialData } = useGetMaterialsQuery({ categoryId: selectedCategory?.id }, {
     skip: !selectedCategory
   });
   // =============================== get charities =============================
@@ -190,6 +198,9 @@ export default function AddProductForm() {
   function handleCategorySelect(cat: Category) {
     setSelectedCategory(cat);
     form.setValue("categoryId", cat.id, { shouldValidate: true });
+    form.setValue("sizeId", "", { shouldValidate: false });
+    form.setValue("brandId", "", { shouldValidate: false });
+    form.setValue("fabric", [], { shouldValidate: false });
   }
 
   const handleApplySuggestedParcel = (suggestion: IParcelSuggestion) => {
@@ -203,6 +214,7 @@ export default function AddProductForm() {
   const categories = categoriesData?.data || [];
   const sizes = sizeData?.data || [];
   const brands = brandData?.data || [];
+  const materials = materialData?.data || [];
 
 
   // ===================================== submitting error ===============================
@@ -418,23 +430,15 @@ export default function AddProductForm() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="fabric"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Fabric</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter fabric"
-                        {...field}
-                        className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormItem>
+                <FormLabel>Materials</FormLabel>
+                <MaterialSelector
+                  control={form.control}
+                  materials={materials}
+                  selectedCategory={selectedCategory}
+                  placeholder="Select materials"
+                />
+              </FormItem>
             </div>
 
 
@@ -839,6 +843,73 @@ export default function AddProductForm() {
               </div>
             </div>
 
+          </div>
+
+          {/* ============ Return Window & Allow Offer ================ */}
+          <div className="space-y-4 mt-12">
+            <div>
+              <p className="text-lg lg:text-2xl font-bold text-gray-900">Offers & Returns</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Configure your return window and whether buyers can send price offers on this listing.
+              </p>
+            </div>
+
+            <div className="space-y-5 pt-1">
+              <FormField
+                control={form.control}
+                name="returnsPolicy"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Return Window</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || undefined}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3 w-full cursor-pointer focus-within:border-primary-black">
+                          <SelectValue placeholder="Select return window" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="p-0 rounded-none">
+                        {returnsPolicy.map((option) => (
+                          <SelectItem
+                            className="rounded-none cursor-pointer py-2.5 px-3 text-base"
+                            key={option.value}
+                            value={option.value}
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="allowOffers"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded border border-[#e1e1e1] bg-white px-4 py-3.5">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base font-medium text-gray-900 cursor-pointer">
+                        Allow buyer to make an offer
+                      </FormLabel>
+                      <p className="text-xs text-gray-500">
+                        Let interested buyers propose a price for this item.
+                      </p>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
 
 

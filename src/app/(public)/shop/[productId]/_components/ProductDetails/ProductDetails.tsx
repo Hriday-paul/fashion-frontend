@@ -77,8 +77,8 @@ const ProductDetails = ({ product }: { product: IProductWithUser }) => {
           <p>{product?.condition}</p>
         </div>
         <div className="flex md:gap-x-8 gap-x-4 items-center">
-          <h2 className="w-30">Fabric: </h2>
-          <p>{product?.meterials?.join(", ")}</p>
+          <h2 className="w-30">Materials: </h2>
+          <p>{product?.materials?.map((material) => material?.material?.name).join(", ")}</p>
         </div>
         <div className="flex md:gap-x-8 gap-x-4 items-center">
           <h2 className="w-30">Brands: </h2>

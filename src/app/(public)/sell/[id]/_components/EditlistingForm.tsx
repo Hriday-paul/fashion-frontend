@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { X, Camera } from "lucide-react";
@@ -22,11 +22,13 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
     colors,
     conditionOptions,
     productFormSchema,
     ProductFormValues,
+    returnsPolicy,
 } from "@/components/shared/UserProfile/AddProduct/schema";
 import { PriceOverview } from "@/components/shared/UserProfile/AddProduct/PriceOverview";
 import { ParcelSizeSuggestion } from "@/components/shared/UserProfile/AddProduct/ParcelSizeSuggestion";
@@ -41,6 +43,7 @@ import { useGetCharitiesQuery } from "@/redux/api/userApi";
 import Image from "next/image";
 import { useGetSizesQuery } from "@/redux/api/size.api";
 import { useGetBrandsQuery } from "@/redux/api/brand.api";
+import { useGetMaterialsQuery } from "@/redux/api/material.api";
 
 import {
     InputGroup,
@@ -53,6 +56,7 @@ import { ImageUploadGuide } from "@/components/shared/UserProfile/AddProduct/Ima
 import CategorySelector from "@/components/shared/UserProfile/AddProduct/Categories/CategorySelector";
 import SizeSelector from "@/components/shared/UserProfile/AddProduct/Size/Sizeselector";
 import BrandSelector from "@/components/shared/UserProfile/AddProduct/Brand/Brandselector";
+import MaterialSelector from "@/components/shared/UserProfile/AddProduct/Material/MaterialSelector";
 import { TagInput } from "@/components/shared/UserProfile/AddProduct/FormComponent/TagInput";
 import { formattedData } from "@/components/shared/UserProfile/AddProduct/utils";
 import InputCharityDonationInput from "@/components/shared/UserProfile/AddProduct/InputCharityDonationInput";
@@ -79,7 +83,7 @@ function getDefaultValues(product: IProduct): ProductFormValues {
         sizeId: product.size?.id ?? product.sizeId ?? "",
         brandId: product.brand?.id ?? product.brandId ?? "",
         tags: product.tags ?? [],
-        fabric: product?.meterials[0] ?? "",
+        fabric: product?.meterials ?? [],
         color: product.color ?? "",
         condition: product.condition ?? "",
         donation_percent: product?.donation_percent
@@ -93,6 +97,8 @@ function getDefaultValues(product: IProduct): ProductFormValues {
         hight_cm: product.hight_cm != null ? String(product.hight_cm) : "",
         width_cm: product.width_cm != null ? String(product.width_cm) : "",
         length_cm: product.length_cm != null ? String(product.length_cm) : "",
+        returnsPolicy: product.return_window != null ? String(product.return_window) : "",
+        allowOffers: product.allow_offer ?? true,
     };
 }
 
@@ -122,6 +128,11 @@ function EditlistingForm({ product }: { product: IProduct }) {
     );
     // ======================= category brand ===========================
     const { data: brandData } = useGetBrandsQuery(
+        { categoryId: selectedCategory?.id },
+        { skip: !selectedCategory }
+    );
+    // ======================= category materials ===========================
+    const { data: materialData } = useGetMaterialsQuery(
         { categoryId: selectedCategory?.id },
         { skip: !selectedCategory }
     );
@@ -187,9 +198,10 @@ function EditlistingForm({ product }: { product: IProduct }) {
     function handleCategorySelect(cat: Category) {
         setSelectedCategory(cat);
         form.setValue("categoryId", cat.id, { shouldValidate: true });
-        // Category changed -> previously selected size/brand may no longer be valid
+        // Category changed -> previously selected size/brand/materials may no longer be valid
         form.setValue("sizeId", "", { shouldValidate: false });
         form.setValue("brandId", "", { shouldValidate: false });
+        form.setValue("fabric", [], { shouldValidate: false });
     }
 
     const handleApplySuggestedParcel = (suggestion: IParcelSuggestion) => {
@@ -204,6 +216,7 @@ function EditlistingForm({ product }: { product: IProduct }) {
     const categories = categoriesData?.data || [];
     const sizes = sizeData?.data || [];
     const brands = brandData?.data || [];
+    const materials = materialData?.data || [];
 
     const onError = (errors: any) => {
         console.log(errors);
@@ -444,23 +457,15 @@ function EditlistingForm({ product }: { product: IProduct }) {
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="fabric"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Fabric</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Enter fabric"
-                                                {...field}
-                                                className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            <FormItem>
+                                <FormLabel>Materials</FormLabel>
+                                <MaterialSelector
+                                    control={form.control}
+                                    materials={materials}
+                                    selectedCategory={selectedCategory}
+                                    placeholder="Select materials"
+                                />
+                            </FormItem>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-4">
@@ -812,6 +817,73 @@ function EditlistingForm({ product }: { product: IProduct }) {
                                     )}
                                 />
                             </div>
+                        </div>
+                    </div>
+
+                    {/* ============ Return Window & Allow Offer ================ */}
+                    <div className="space-y-4 mt-12">
+                        <div>
+                            <p className="text-lg lg:text-2xl font-bold text-gray-900">Offers & Returns</p>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Configure your return window and whether buyers can send price offers on this listing.
+                            </p>
+                        </div>
+
+                        <div className="space-y-5 pt-1">
+                            <FormField
+                                control={form.control}
+                                name="returnsPolicy"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Return Window</FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            value={field.value || undefined}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3 w-full cursor-pointer focus-within:border-primary-black">
+                                                    <SelectValue placeholder="Select return window" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent className="p-0 rounded-none">
+                                                {returnsPolicy.map((option) => (
+                                                    <SelectItem
+                                                        className="rounded-none cursor-pointer py-2.5 px-3 text-base"
+                                                        key={option.value}
+                                                        value={option.value}
+                                                    >
+                                                        {option.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="allowOffers"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded border border-[#e1e1e1] bg-white px-4 py-3.5">
+                                        <div className="space-y-0.5">
+                                            <FormLabel className="text-base font-medium text-gray-900 cursor-pointer">
+                                                Allow buyer to make an offer
+                                            </FormLabel>
+                                            <p className="text-xs text-gray-500">
+                                                Let interested buyers propose a price for this item.
+                                            </p>
+                                        </div>
+                                        <FormControl>
+                                            <Switch
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
                         </div>
                     </div>
 

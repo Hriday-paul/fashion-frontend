@@ -10,13 +10,14 @@ import { useGetChatDetailsQuery } from '@/redux/api/message.api';
 import { IProduct, IUser } from '@/types';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, Plus, X } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Plus, X } from 'lucide-react';
 import SendOfferModal from '@/components/shared/Modal/SendOfferModal';
 import { BuyFromChat } from '@/lib/Actions/Product.api';
 import { toast } from 'sonner';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import OfferView from '@/components/shared/Message/OfferView';
 import { useCurrency } from '@/hooks/useCurrency';
+import { defaultImg } from '@/utils/defaultImg';
 
 function formatLastActive(date: Date | string) {
     const activeDate = moment(date);
@@ -46,18 +47,26 @@ function ChatHeader({ chatId }: { chatId: string }) {
     }
 
     return (
-        isSuccess ? <div>
+        isSuccess ? <div className="w-full">
 
-            <div className="border-b border-gray-200 flex items-center justify-center px-4 py-2.5">
-                <div className="flex items-center gap-x-3 w-full justify-center">
+            <div className="border-b border-gray-200 flex items-center justify-between gap-2 px-3 sm:px-4 py-2.5">
+                <Link
+                    href="/inbox"
+                    className="lg:hidden p-1 -ml-1 text-gray-700 hover:text-black transition-colors shrink-0"
+                    aria-label="Back to messages"
+                >
+                    <ArrowLeft className="size-5" />
+                </Link>
 
-                    <Link href={`/member/${userData?.data?.user?.userName}`}>
-                        <div className="lg:flex-grow">
-                            <h3 className="text-base font-semibold">{userData?.data?.user?.userName || 'Unknown'}</h3>
-                        </div>
+                <div className="flex items-center gap-x-2 min-w-0 flex-1 justify-center">
+                    <Link href={`/member/${userData?.data?.user?.userName}`} className="min-w-0 max-w-full">
+                        <h3 className="text-sm sm:text-base font-semibold truncate">
+                            {userData?.data?.user?.userName || 'Unknown'}
+                        </h3>
                     </Link>
                 </div>
-                <div>
+
+                <div className="shrink-0">
                     <ReportDialog />
                 </div>
             </div>
@@ -98,74 +107,24 @@ const ChatHeaderDetails = ({ data, chatId }: { data: ChatHeaderDetailsProps, cha
         }
     }
 
-    return <div className='relative'>
-        <div className='flex flex-row justify-between items-center p-2 border-b border-gray-200 bg-zinc-50'>
+    return <div className='relative w-full'>
+        <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2.5 p-2.5 sm:p-3 border-b border-gray-200 bg-zinc-50'>
 
-            <div onClick={handleClick} className='cursor-pointer'>
+            <div onClick={handleClick} className='cursor-pointer min-w-0 flex-1'>
                 {isSingleItem ? <SingleItemHeader data={data} /> : <MultipleItemsHeader data={data} />}
             </div>
 
-            {!data?.isUnavailable && <ActionButtons items={data?.items} sellerId={data?.user?.id} chatId={data?.id || chatId} isImSeller={data?.isImSeller} />}
+            {!data?.isUnavailable && (
+                <ActionButtons
+                    items={data?.items}
+                    sellerId={data?.user?.id}
+                    chatId={data?.id || chatId}
+                    isImSeller={data?.isImSeller}
+                />
+            )}
         </div>
 
-        {/* {openItemDetails && <div className='w-full bg-white absolute top-0 left-0 z-10 shadow'>
-            <div className='flex flex-row justify-between items-center p-2 border-b border-gray-100'>
-                <p className='font-semibold'>Details</p>
-                <Button className='cursor-pointer' onClick={() => setOpenItemDetails(false)} variant="ghost"><X size={24} /></Button>
-            </div>
-
-            <div className='space-y-3'>
-                {data?.items?.map((item) => (
-                    <Link key={item?.id} href={`/shop/${item?.product?.id}`}>
-                        <div className='flex flex-row gap-x-2 items-center  border-b border-gray-100 px-2 py-2.5 justify-between hover:bg-gray-50 duration-150'>
-                            <div className='flex flex-row gap-x-2 items-start'>
-                                <Image src={item?.product?.images?.[0]?.url || ''} alt={item?.product?.title || 'Product Image'} className='w-12 h-12 object-cover rounded' width={500} height={500} />
-                                <div>
-                                    <p className='text-base font-semibold'>{item?.product?.title}</p>
-                                    <p className='text-sm text-gray-600'>${item?.product?.finalPrice}</p>
-                                </div>
-                            </div>
-                            <ChevronRight className='text-gray-500 size-5' />
-                        </div>
-                    </Link>
-                ))}
-            </div>
-
-            <Link href={`/member/${data?.user?.userName}/bundle`} className='w-full'>
-                <div className='flex flex-row gap-x-2 items-center justify-between p-2.5 hover:bg-gray-50 duration-150'>
-                    <div className='flex flex-row gap-x-2 items-center'>
-                        <span className='border border-black p-2'>
-                            <Plus size={25} />
-                        </span>
-                        <div>
-                            <p className='text-base font-semibold'>Add more items</p>
-                            <p className='text-gray-600 text-sm'>Get discounts on your purchase</p>
-                        </div>
-                    </div>
-                    <ChevronRight className='text-gray-500 size-5' />
-                </div>
-            </Link>
-
-            <div className="flex items-center gap-x-3 p-2.5 border-b border-gray-100">
-
-                <Link href={`/member/${data?.user?.userName}`}>
-                    <CustomAvatar img={data?.user?.picture?.url} name={data?.user?.userName || 'Unknown'} className="md:size-12 size-10" fallbackClass="text-base md:text-base" />
-                </Link>
-
-                <Link href={`/member/${data?.user?.userName}`}>
-                    <div className="lg:flex-grow">
-                        <p className="text-base font-semibold">{data?.user?.userName || 'Unknown'}</p>
-                    </div>
-                </Link>
-            </div>
-
-            <div className='p-2.5'>
-                <ReportDialog />
-            </div>
-
-        </div>} */}
-
-        {data?.isUnavailable && <div className='bg-red-700 text-white p-1.5 text-center text-sm font-semibold'>
+        {data?.isUnavailable && <div className='bg-red-700 text-white px-3 py-1.5 text-center text-xs sm:text-sm font-semibold'>
             Some items in this chat are no longer available.
         </div>}
 
@@ -177,15 +136,22 @@ const ChatHeaderDetails = ({ data, chatId }: { data: ChatHeaderDetailsProps, cha
 const SingleItemHeader = ({ data }: { data: ChatHeaderDetailsProps }) => {
     const { format } = useCurrency();
     const product = data?.items[0]?.product;
-    return <div>
-        <div className='flex flex-row gap-x-2 items-start'>
-            <Image src={product?.images?.[0]?.url || ''} alt={product?.title || 'Product Image'} className='w-12 h-12 object-cover rounded' width={500} height={500} />
-            <div>
-                <h3 className='text-base font-semibold'>{product?.title}</h3>
-                <p className='text-sm text-gray-600'>{format(product?.finalPrice)} <span>+ service fee</span></p>
+    return <div className='min-w-0'>
+        <div className='flex flex-row gap-x-2.5 items-center min-w-0'>
+            <Image
+                src={product?.images?.[0]?.url || defaultImg?.product}
+                alt={product?.title || 'Product Image'}
+                className='w-11 h-11 sm:w-12 sm:h-12 object-cover rounded shrink-0'
+                width={500}
+                height={500}
+            />
+            <div className='min-w-0 flex-1'>
+                <h3 className='text-sm sm:text-base font-semibold line-clamp-1 break-all'>{product?.title}</h3>
+                <p className='text-xs sm:text-sm text-gray-600 truncate'>
+                    {format(product?.finalPrice)} <span>+ service fee</span>
+                </p>
             </div>
         </div>
-
     </div>
 }
 
@@ -195,20 +161,28 @@ const MultipleItemsHeader = ({ data }: { data: ChatHeaderDetailsProps }) => {
 
     const firstProduct = data?.items[0]?.product;
 
-    return <div>
+    return <div className='min-w-0'>
+        <div className='flex flex-row gap-x-2.5 items-center min-w-0'>
+            <div className='relative shrink-0'>
+                <Image
+                    src={firstProduct?.images?.[0]?.url || defaultImg?.product}
+                    alt={firstProduct?.title || 'Product Image'}
+                    className='w-11 h-11 sm:w-12 sm:h-12 object-cover rounded'
+                    width={500}
+                    height={500}
+                />
 
-        <div className='flex flex-row gap-x-2 items-start'>
-            <div className='relative'>
-                <Image src={firstProduct?.images?.[0]?.url || ''} alt={firstProduct?.title || 'Product Image'} className='w-12 h-12 object-cover rounded' width={500} height={500} />
-
-                <span className='absolute top-0 right-0 bg-black/50 text-white w-full h-full flex justify-center items-center font-semibold rounded'>{`+${itemsCount - 1}`}</span>
+                <span className='absolute inset-0 bg-black/50 text-white flex justify-center items-center text-xs sm:text-sm font-semibold rounded'>
+                    {`+${itemsCount - 1}`}
+                </span>
             </div>
-            <div>
-                <p className='text-base font-semibold'>{itemsCount} items</p>
-                <p className='text-sm font-medium text-gray-600'>{format(data?.itemsPrice)} + service fee</p>
+            <div className='min-w-0 flex-1'>
+                <p className='text-sm sm:text-base font-semibold truncate'>{itemsCount} items</p>
+                <p className='text-xs sm:text-sm font-medium text-gray-600 truncate'>
+                    {format(data?.itemsPrice)} + service fee
+                </p>
             </div>
         </div>
-
     </div>
 }
 
@@ -268,12 +242,28 @@ const ActionButtons = ({ items, sellerId, chatId, isImSeller }: { items: ChatHea
 
     const isBuying = loading || isPending;
 
-    return <div className='flex flex-row gap-x-2'>
-        <Button variant="outline" className='cursor-pointer border-primary-black shadow-none rounded-md' onClick={handlemakeOffer}>{isImSeller ? "Send" : "Make"} an offer</Button>
+    return <div className='flex flex-row items-center gap-2 w-full sm:w-auto shrink-0'>
+        <Button
+            variant="outline"
+            className='cursor-pointer border-primary-black shadow-none rounded-md flex-1 sm:flex-initial text-xs sm:text-sm h-9 sm:h-10 px-3 sm:px-4'
+            onClick={handlemakeOffer}
+        >
+            {isImSeller ? "Send" : "Make"} an offer
+        </Button>
 
-        {!isImSeller && <Button className='cursor-pointer min-w-[92px] rounded-md' disabled={isBuying} onClick={handleBuyNow}>
-            {isBuying ? <div className="w-5 aspect-square rounded-full border-[2px] border-white border-r-gray-500 animate-spin"></div> : "Buy Now"}
-        </Button>}
+        {!isImSeller && (
+            <Button
+                className='cursor-pointer min-w-[92px] rounded-md flex-1 sm:flex-initial text-xs sm:text-sm h-9 sm:h-10 px-3 sm:px-4'
+                disabled={isBuying}
+                onClick={handleBuyNow}
+            >
+                {isBuying ? (
+                    <div className="w-5 aspect-square rounded-full border-[2px] border-white border-r-gray-500 animate-spin"></div>
+                ) : (
+                    "Buy Now"
+                )}
+            </Button>
+        )}
 
         <SendOfferModal open={openOfferModal} setOpen={setOpenOfferModal} products={products} sellerId={sellerId} />
 

@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Bell, ChevronRight, Handshake, Heart, List, LogOut, Mail, MapPin, Moon, Package, PackageOpen, Settings, SquareChartGantt, Tags, UserRoundCog, Wallet } from "lucide-react";
+import { Bell, ChevronRight, HandCoins, Handshake, Heart, LayoutDashboard, List, LogOut, Mail, MapPin, Moon, Package, PackageOpen, Settings, Shirt, SquareChartGantt, Tags, UserRoundCog, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,37 +13,77 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/redux/hooks";
 import { logout } from "@/redux/features/authSlice";
 import { baseApi } from "@/redux/api/baseApi";
+import { UserRole } from "@/types";
 
-const navLinksFotProfileIcon = [
+// Reusable role groups
+const SELLER_ROLES = [
+  UserRole.INDIVIDUAL_USER,
+  UserRole.CHARITY_SHOP,
+  UserRole.ECO_FRIENDLY_STORE,
+  UserRole.CELEBRITY,
+  UserRole.AMBASSADOR,
+  UserRole.PROFESSIONAL_SELLER,
+];
+
+type NavLink = {
+  icon: React.ReactNode;
+  name: string;
+  link: string;
+  roles?: UserRole[];
+}
+
+const navLinksFotProfileIcon: NavLink[] = [
+  {
+    icon: <LayoutDashboard className="size-5" />,
+    name: "Dashboard",
+    link: "/profile",
+  },
   {
     icon: <UserRoundCog className="size-5" />,
-    name: "Edit Profile ",
-    link: "/profile",
+    name: "Edit Profile",
+    link: "/profile/edit",
   },
   {
     icon: <CartIcon className="size-5" />,
     name: "Shop",
     link: "/shop",
+    roles: SELLER_ROLES,
   },
   {
     icon: <SquareChartGantt className="size-5" />,
     name: "List an item",
     link: "/sell",
+    roles: SELLER_ROLES,
   },
   {
     icon: <List className="size-5" />,
     name: "Products-Listing",
     link: "/profile/sell/products",
+    roles: SELLER_ROLES,
   },
   {
     icon: <Package className="size-5" />,
     name: "My Orders",
     link: "/profile/purchase/orders",
+    roles: SELLER_ROLES,
+  },
+  {
+    icon: <HandCoins className="size-5" />,
+    name: "Monetory Donation",
+    link: "/profile/donation",
+    roles: [UserRole.CHARITABLE_ORGANIZATION, UserRole.CHARITY_SHOP],
+  },
+  {
+    icon: <Shirt className="size-5" />,
+    name: "Cloth Donation",
+    link: "/profile/donation/cloth",
+    roles: [UserRole.CHARITY_SHOP],
   },
   {
     icon: <Heart className="size-5" />,
     name: "Favorites",
     link: "/wishlist",
+    roles: SELLER_ROLES,
   },
   {
     icon: <Settings className="size-5" />,
@@ -54,6 +94,7 @@ const navLinksFotProfileIcon = [
     icon: <Handshake className="size-5" />,
     name: "Assisted Seller",
     link: "/assisted-seller",
+    roles: SELLER_ROLES,
   },
   {
     icon: <Tags className="size-5" />,
@@ -74,16 +115,19 @@ const navLinksFotProfileIcon = [
     icon: <Mail className="size-5" />,
     name: "Message",
     link: "/inbox",
+    roles: SELLER_ROLES,
   },
   {
     icon: <Moon className="size-5" />,
     name: "Vacation mode",
     link: "/profile/vacation-mode",
+    roles: SELLER_ROLES,
   },
   {
     icon: <PackageOpen className="size-5" />,
     name: "Bundle Offers",
     link: "/profile/sell/bundle-discount",
+    roles: SELLER_ROLES,
   },
   // {
   //   icon: <LogOut className="size-5" />,
@@ -112,6 +156,16 @@ export function SheetContentContainer({
     router.refresh();
   };
 
+  const activeNavLinks = navLinksFotProfileIcon.filter((item) => {
+    if (!item.roles) return true;
+    const role = user?.auth?.role;
+    if (!role) return false;
+    return item.roles.includes(role);
+  });
+
+  const isCharityShop = user?.auth?.role === UserRole.CHARITY_SHOP;
+  const isCharityOrg = user?.auth?.role === UserRole.CHARITABLE_ORGANIZATION;
+
   return (
     <div className="flex h-full flex-col bg-background overflow-y-auto scroll-hide">
       {/* Header Section */}
@@ -139,14 +193,14 @@ export function SheetContentContainer({
       </div>
 
       {/* Featured Section */}
-      <div className="border-b p-4">
+      {!isCharityOrg && <div className="border-b p-4">
         <Card className="overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 dark:from-orange-950/20 dark:to-amber-950/20">
           <CardContent className="p-0">
             <div className="flex items-center gap-3 p-4">
               <div className="flex-1">
                 <h3 className="font-semibold text-foreground">Sell an item</h3>
                 <p className="text-xs text-muted-foreground">
-                  (Earn money and donate to charity)
+                  {isCharityShop ? "(Earn money from sales)" : "(Earn money and donate to charity)"}
                 </p>
               </div>
               <div className="relative">
@@ -180,7 +234,7 @@ export function SheetContentContainer({
                 <ChevronRight className="h-4 w-4 text-white group-hover:translate-x-2 duration-500" />
               </Link>
             </div>
-            <CharityDonationFormDialog>
+            {!isCharityShop && <CharityDonationFormDialog>
               <Button
                 className="w-full rounded-none bg-white text-black hover:bg-gray-100 group cursor-pointer"
                 size="sm"
@@ -188,15 +242,15 @@ export function SheetContentContainer({
                 Donate Now{" "}
                 <ChevronRight className="h-4 w-4  group-hover:translate-x-2 duration-500" />
               </Button>
-            </CharityDonationFormDialog>
+            </CharityDonationFormDialog>}
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* Navigation List */}
       <div className="flex-1 ">
         <nav className="py-2">
-          {navLinksFotProfileIcon.map((item, index) => (
+          {activeNavLinks.map((item, index) => (
             <Link href={item.link || "#"} key={index} onClick={() => setOpen(false)} className="cursor-pointer">
 
               <button
