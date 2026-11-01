@@ -12,9 +12,14 @@ export default function middleware(req: any) {
       "callbackUrl",
       nextUrl.pathname + nextUrl.search,
     );
-    return NextResponse.redirect(signInUrl);
-  }
+    const response = NextResponse.redirect(signInUrl);
 
+    response.headers.set('x-middleware-cache', 'no-cache')
+
+    return response;
+  }
+  
+  return NextResponse.next()
 }
 
 export const config = {
