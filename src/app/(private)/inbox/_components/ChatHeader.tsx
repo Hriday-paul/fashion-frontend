@@ -261,9 +261,10 @@ const ActionButtons = ({ items, sellerId, chatId }: { items: ChatHeaderDetailsPr
     const isBuying = loading || isPending;
 
     return <div className='flex flex-row gap-x-2'>
-        <Button variant="outline" className='cursor-pointer' onClick={handlemakeOffer}>Make an offer</Button>
-        <Button className='cursor-pointer min-w-[92px]' disabled={isBuying} onClick={handleBuyNow}>
-            {isBuying ? <div className="w-5 aspect-square rounded-full border-[2px] border-primary-black border-r-gray-500 animate-spin"></div> : "Buy Now"}
+        <Button variant="outline" className='cursor-pointer border-primary-black shadow-none rounded-md' onClick={handlemakeOffer}>Make an offer</Button>
+
+        <Button className='cursor-pointer min-w-[92px] rounded-md' disabled={isBuying} onClick={handleBuyNow}>
+            {isBuying ? <div className="w-5 aspect-square rounded-full border-[2px] border-white border-r-gray-500 animate-spin"></div> : "Buy Now"}
         </Button>
 
         <SendOfferModal open={openOfferModal} setOpen={setOpenOfferModal} products={products} sellerId={sellerId} />
