@@ -9,7 +9,7 @@ import CustomAvatar from '@/components/shared/CustomAvatar';
 import { useGetChatDetailsQuery } from '@/redux/api/message.api';
 import { IProduct, IUser } from '@/types';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { ArrowLeft, ChevronRight, Plus, X } from 'lucide-react';
 import SendOfferModal from '@/components/shared/Modal/SendOfferModal';
 import { BuyFromChat } from '@/lib/Actions/Product.api';
@@ -71,7 +71,7 @@ function ChatHeader({ chatId }: { chatId: string }) {
                 </div>
             </div>
 
-            {isSuccess && <ChatHeaderDetails data={userData?.data} chatId={chatId} />}
+            {(isSuccess && userData?.data) && <ChatHeaderDetails data={userData?.data} chatId={chatId} />}
 
         </div> : <></>
     )
@@ -94,6 +94,7 @@ interface ChatHeaderDetailsProps {
 }
 
 const ChatHeaderDetails = ({ data, chatId }: { data: ChatHeaderDetailsProps, chatId: string }) => {
+
     const isSingleItem = data?.items?.length === 1;
     const router = useRouter();
 

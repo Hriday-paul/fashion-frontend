@@ -60,7 +60,7 @@ function SupportStats({ userName }: { userName: string }) {
                         <div key={c?.charityId} className='border border-gray-200 p-4 rounded-md'>
                             <div className="flex items-center gap-4 ">
                                 <Image
-                                    src={c?.charityImage || defaultImg?.empty_user}
+                                    src={c?.charityImage || defaultImg?.product}
                                     alt={`${c?.charityName} logo`}
                                     height={600}
                                     width={800}

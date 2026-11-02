@@ -6,6 +6,8 @@ export default function middleware(req: any) {
   const isLoggedIn = req.cookies.get("fashion-access-token")?.value;
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
+  console.log("Middleware check:", { isLoggedIn, isAuthRoute });
+
   if (!isLoggedIn && !isAuthRoute) {
     const signInUrl = new URL("/sign-in", req.url);
     signInUrl.searchParams.set(

@@ -30,7 +30,7 @@ function SendMessage({ chatId }: { chatId: string }) {
             const combined = [...prev, ...selected];
 
             if (combined.length > MAX_FILES) {
-                const trimmed = combined.slice(combined.length - MAX_FILES); // keep last MAX_FILES, drop from beginning
+                const trimmed = combined?.slice(combined.length - MAX_FILES); // keep last MAX_FILES, drop from beginning
                 toast.warning(`Max ${MAX_FILES} files allowed. Oldest file(s) removed.`);
                 return trimmed;
             }

@@ -55,7 +55,7 @@ async function CharityImpact({ params }: { params: Promise<{ productId: string }
                     >
                         <Link href={`/member/${c?.charity.userName}`}>
                             <Image
-                                src={c?.charity.charityThumbnail?.url || "/not-found.png"}
+                                src={c?.charity.charityThumbnail?.url || defaultImg?.product}
                                 alt="Charity thumbnail"
                                 className="object-cover w-28 h-16 rounded-md"
                                 width={800}
