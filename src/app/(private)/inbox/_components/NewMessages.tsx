@@ -103,11 +103,11 @@ function NewMessages({
                                 <Image
                                     src={message?.sender?.picture?.url || "/empty-user.png"}
                                     alt="user image"
-                                    className="h-10 w-10 object-cover rounded-full"
+                                    className="h-10 w-10 shrink-0 object-cover rounded-full"
                                     height={500}
                                     width={500}
                                 />
-                                <div className="max-w-[50%] space-y-3 overflow-hidden">
+                                <div className="min-w-0 space-y-3 overflow-auto">
                                     <ReceiverMsgCard msg={message} />
                                 </div>
                             </div>
@@ -119,11 +119,11 @@ function NewMessages({
                                 <Image
                                     src={message?.sender?.picture?.url || "/empty-user.png"}
                                     alt="user image"
-                                    className="h-10 w-10 object-cover rounded-full"
+                                    className="h-10 w-10 shrink-0 object-cover rounded-full"
                                     height={500}
                                     width={500}
                                 />
-                                <div className="flex max-w-[50%] flex-col items-end space-y-3">
+                                <div className="flex min-w-0 flex-col items-end space-y-3 overflow-auto">
                                     <OwnerMsgCard msg={message} />
                                 </div>
                             </div>}

@@ -180,11 +180,11 @@ function PreMessage({
                                 <Image
                                     src={message?.sender?.picture?.url || "/empty-user.png"}
                                     alt="user image"
-                                    className="h-10 w-10 object-cover rounded-full"
+                                    className="h-10 w-10 shrink-0 object-cover rounded-full"
                                     height={500}
                                     width={500}
                                 />
-                                <div className="space-y-3 overflow-auto">
+                                <div className="min-w-0 space-y-3 overflow-auto">
                                     <ReceiverMsgCard msg={message} />
                                 </div>
                             </div>
@@ -193,11 +193,11 @@ function PreMessage({
                                 <Image
                                     src={message?.sender?.picture?.url || "/empty-user.png"}
                                     alt="user image"
-                                    className="h-10 w-10 object-cover rounded-full"
+                                    className="h-10 w-10 shrink-0 object-cover rounded-full"
                                     height={500}
                                     width={500}
                                 />
-                                <div className="flex flex-col items-end space-y-3 overflow-auto">
+                                <div className="flex min-w-0 flex-col items-end space-y-3 overflow-auto">
                                     <OwnerMsgCard msg={message} />
                                 </div>
                             </div>}
