@@ -108,7 +108,6 @@ function NewMessages({
                                     width={500}
                                 />
                                 <div className="max-w-[50%] space-y-3 overflow-hidden">
-
                                     <ReceiverMsgCard msg={message} />
                                 </div>
                             </div>

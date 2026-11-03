@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -15,19 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import {
     Form,
     FormControl,
     FormField,
@@ -36,17 +22,11 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { cn } from "@/lib/utils";
-import { useGetCharitiesQuery } from "@/redux/api/userApi";
 import { DonateDirectMoney } from "@/lib/Actions/Donation.action";
 import { toast } from "sonner";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Image from "next/image";
-import { defaultImg } from "@/utils/defaultImg";
-import { userRoleMapper } from "@/utils/userRoleMapper";
-import Link from "next/link";
 import { IUser } from "@/types";
 
 const formSchema = z.object({
@@ -65,12 +45,11 @@ export function DonationFromProfile({
     children?: React.ReactNode;
     charity: IUser
 }) {
-    const { data: charitiesData, isLoading: charitiesLoading } =
-        useGetCharitiesQuery();
+
+    console.log(charity, "=====================================")
 
     const [selectedPreset, setSelectedPreset] = useState<string>("");
     const [open, setOpen] = useState(false);
-    const [charityOpen, setCharityOpen] = useState(false);
     const router = useRouter();
 
     const form = useForm<FormData>({
