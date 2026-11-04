@@ -1,4 +1,4 @@
-import { Addresses, IBandleTier, IBillingDetails, IFolow, IMeta, IUser, IWalletPayout } from "@/types";
+import { Addresses, IBandleTier, IBillingDetails, IFolow, IMeta, IUser, IWalletTransactions } from "@/types";
 import { tagTypes } from "../tagTypes";
 import { baseApi } from "./baseApi";
 
@@ -27,10 +27,11 @@ const userApi = baseApi.injectEndpoints({
             }),
         }),
 
-        payouts: builder.query<{ data: { data: IWalletPayout[], meta: IMeta } }, {}>({
-            query: () => ({
-                url: "/account/payouts",
+        transactions: builder.query<{ data: { data: IWalletTransactions[], meta: IMeta } }, {}>({
+            query: (query) => ({
+                url: "/account/transactions",
                 method: "GET",
+                params: query,
             }),
         }),
 
@@ -108,4 +109,4 @@ const userApi = baseApi.injectEndpoints({
     }),
 })
 
-export const { useGetCharitiesQuery, useDefaultBillingDetailsQuery, useUpdateBillingDetailsMutation, useSellerBundleTiersQuery, useUserAddressesQuery, useGetUserByUsernameQuery, useLazyGetFolowingsQuery, useLazyGetFolowersQuery, useBalanceQuery, useAccountDataQuery, useConnectAccountMutation, usePayoutsQuery, useRequestWithdrawMutation } = userApi;
+export const { useGetCharitiesQuery, useDefaultBillingDetailsQuery, useUpdateBillingDetailsMutation, useSellerBundleTiersQuery, useUserAddressesQuery, useGetUserByUsernameQuery, useLazyGetFolowingsQuery, useLazyGetFolowersQuery, useBalanceQuery, useAccountDataQuery, useConnectAccountMutation, useTransactionsQuery, useRequestWithdrawMutation } = userApi;

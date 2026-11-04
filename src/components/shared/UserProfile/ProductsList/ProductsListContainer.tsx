@@ -6,7 +6,7 @@ import useLazyLoad from "@/hooks/useLazyLoad";
 import Image from "next/image";
 import { useLazyProductsGetByMemberQuery } from "@/redux/api/productApi";
 import { Heart } from "lucide-react";
-import { DonationFromProfile } from "@/app/(public)/member/[username]/_components/DonationFromProfile";
+import ClothesDonationDialog from "../../Modal/clothesDonation/ClothesDonationDialog";
 
 type Props = {
   query: { [key: string]: string | undefined },
@@ -91,12 +91,12 @@ const EmptyCharityShop = ({ user }: { user: IUser }) => {
     <p className="text-center text-gray-700 text-sm lg:text-base">This charity shop hasn't listed any items yet.</p>
     <p className="text-center text-gray-700 text-sm lg:text-base">Check back soon or follow to be notified when new items are added.</p>
 
-    <DonationFromProfile charity={user}>
+    <ClothesDonationDialog charityId={user?.id}>
       <button className="text-center w-full bg-[#f59e0b] hover:bg-[#f59e0b]/90 text-[#0f172a] font-bold py-2.5 rounded-lg text-sm cursor-pointer inline-flex flex-row items-center gap-2 mt-4 justify-center transition-colors duration-100">
         <Heart />
         Donate clothes
       </button>
-    </DonationFromProfile>
+    </ClothesDonationDialog>
 
     {/* <button className="text-center w-full bg-white hover:bg-gray-50 text-[#0f172a] font-bold py-2.5 rounded-lg text-sm cursor-pointer mt-2 justify-center transition-colors duration-100 border border-black">
             Folow this charity shop

@@ -1,7 +1,7 @@
 import { Wallet } from 'lucide-react'
 import React from 'react'
 import { AccountBalance } from './_components/Balance'
-import EarningPayoutContainer from './EarningPayoutContainer'
+import TransactionsContainer from './_components/TransactionsContainer'
 
 function EarningPage() {
     return (
@@ -23,7 +23,7 @@ function EarningPage() {
 
                 <AccountBalance />
 
-                <EarningPayoutContainer />
+                <TransactionsContainer />
 
 
             </div>
