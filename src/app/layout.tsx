@@ -39,7 +39,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const rates = await GetRates();
+  // const rates = await GetRates();
 
   return (
     <html lang="en">
@@ -48,7 +48,7 @@ export default async function RootLayout({
 
           {/* <TopInfo></TopInfo> */}
 
-          <SetRates rates={rates || []} />
+          {/* <SetRates rates={rates || []} /> */}
 
           <div className="sticky top-0 z-50 ">
             <Navbar></Navbar>
