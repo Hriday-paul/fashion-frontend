@@ -45,6 +45,27 @@ export const makeOfferOrder = async ({ payload }: { payload: { cartGroupId: stri
     }
 }
 
+export const makeListingOrder = async ({ payload }: { payload: { productId: string, shipmentServiceId: string, treeGiftCount: number, allowedAuthentication: boolean } }) => {
+    try {
+        const res = await serverQueryWithReauth({ payload, endPoint: `/orders/listing`, method: "POST" });
+
+        return {
+            success: res?.success !== undefined ? Boolean(res.success) : true,
+            message: res?.message || "Listing order created successfully",
+            data: res?.data !== undefined ? res.data : (res ?? null),
+        };
+    } catch (error: any) {
+        if (isRedirectError(error)) {
+            throw error;
+        }
+        return {
+            success: false,
+            message: error?.message || "Failed to create listing order",
+            data: null,
+        };
+    }
+}
+
 export const GetLebel = async ({ payload }: { payload: { "orderId": string } }) => {
     try {
         const res = await serverQueryWithReauth({ payload, endPoint: `/orders/shipping-label/${payload?.orderId}`, method: "POST" });

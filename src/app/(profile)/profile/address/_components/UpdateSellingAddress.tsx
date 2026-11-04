@@ -1,11 +1,15 @@
 "use client"
 import BillingAddressModal from '@/app/(public)/checkout/cart/[cartGroupId]/_components/Billing/BillingAddressModal';
 import { updateSellingDetails } from '@/lib/Actions/Cart.action';
+import { useSellCountriesQuery } from '@/redux/api/userApi';
 import { IBillingDetails } from '@/types';
 import React, { useState } from 'react'
 
 function UpdateSellingAddress({ defaultdata, actionBtn, className }: { defaultdata: IBillingDetails | null, actionBtn: React.ReactNode, className?: string }) {
     const [showEditAddress, setShowEditAddress] = useState<boolean>(false);
+    const { data: sellCountriesRes } = useSellCountriesQuery();
+
+    const allowedCountries = sellCountriesRes?.data?.map((country) => country.code);
 
     const updateAddressFn = async (data: any) => {
         const res = await updateSellingDetails(data);
@@ -27,7 +31,7 @@ function UpdateSellingAddress({ defaultdata, actionBtn, className }: { defaultda
                 defaultValue={defaultdata}
                 title='Selling Address'
                 updateAddressFn={updateAddressFn}
-                allowedCountries={["GB"]}
+                allowedCountries={allowedCountries}
             />
         </div>
     )

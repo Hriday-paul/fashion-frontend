@@ -750,7 +750,7 @@ export interface IMessage {
 }
 
 
-enum MsgType {
+export enum MsgType {
   SYSTEM = "SYSTEM",
   OFFER = "OFFER",
   DIRECT = "DIRECT"

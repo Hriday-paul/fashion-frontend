@@ -21,6 +21,8 @@ function ChatList() {
         if (!socket) return;
 
         socket?.on(`chat-list`, (res) => {
+
+            console.log(res)
             setChatList(res);
             setIsLoading(false);
         });

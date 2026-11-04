@@ -77,7 +77,7 @@ function SelectAddress({
             {
                 input: value,
                 // componentRestrictions: { country: "us" } // Restrict to a specific country if needed
-                ...(allowedCountries ? {
+                ...(allowedCountries && allowedCountries.length > 0 ? {
                     componentRestrictions: { country: allowedCountries }
                 } : {})
             },

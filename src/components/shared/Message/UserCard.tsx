@@ -1,7 +1,7 @@
 import CustomAvatar from "@/components/shared/CustomAvatar";
 import { cn } from "@/lib/utils";
 import { RootState } from "@/redux/store";
-import { IChatUser } from "@/types";
+import { IChatUser, MsgType } from "@/types";
 import { defaultImg } from "@/utils/defaultImg";
 import moment from "moment";
 import Image from "next/image";
@@ -32,7 +32,20 @@ const UserCard = ({ chat }: { chat: IChatUser }) => {
   const lastFullMsg = chat?.messages[0];
   const remainingCount = (chat?.items || []).length - 3;
 
-  const lastmsg = lastFullMsg?.text ? <p className="line-clamp-1 text-sm text-black/60">{lastFullMsg?.text}</p> : lastFullMsg?.files?.length > 0 ? <p className="line-clamp-1 text-sm text-black/60">Sent an attachment</p> : <p className="line-clamp-1 text-sm text-black/60">No messages yet</p>;
+  const isSystemMsg = lastFullMsg?.type === MsgType.SYSTEM || Boolean(lastFullMsg?.SystemMessage);
+
+  const lastmsg =
+    isSystemMsg && lastFullMsg?.SystemMessage?.title ? (
+      <p className="line-clamp-1 text-sm text-black/60">
+        System Message
+      </p>
+    ) : lastFullMsg?.text ? (
+      <p className="line-clamp-1 text-sm text-black/60">{lastFullMsg?.text}</p>
+    ) : lastFullMsg?.files?.length > 0 ? (
+      <p className="line-clamp-1 text-sm text-black/60">Sent an attachment</p>
+    ) : (
+      <p className="line-clamp-1 text-sm text-black/60">No messages yet</p>
+    );
 
   return (
     <Link
