@@ -957,7 +957,9 @@ export interface IShipment {
   status: ShipmentStatus,
   events: IShipmentEvent[],
   createdAt: Date,
-  updatedAt: Date
+  updatedAt: Date,
+  isPaid : boolean,
+  payment : IPayment | null
 }
 
 export enum ShipmentStatus {

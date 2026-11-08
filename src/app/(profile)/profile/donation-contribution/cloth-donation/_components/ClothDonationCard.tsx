@@ -20,6 +20,7 @@ import ClothDonationDetailsDialog, {
   formatClothStatus,
   formatWashedType,
 } from "./ClothDonationDetailsDialog";
+import ClothDonationShipmentActions from "./ClothDonationShipmentActions";
 
 interface ClothDonationCardProps {
   donation: IClothDonation;
@@ -153,7 +154,10 @@ function ClothDonationCard({ donation }: ClothDonationCardProps) {
               <span />
             )}
 
-            <ClothDonationDetailsDialog donation={donation} />
+            <div className="flex flex-wrap items-center gap-2">
+              <ClothDonationShipmentActions donation={donation} />
+              <ClothDonationDetailsDialog donation={donation} />
+            </div>
           </div>
         </div>
       </div>

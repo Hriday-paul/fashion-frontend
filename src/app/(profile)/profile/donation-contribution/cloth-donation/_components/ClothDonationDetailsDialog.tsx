@@ -33,6 +33,7 @@ import Link from "next/link";
 import moment from "moment";
 import { defaultImg } from "@/utils/defaultImg";
 import { cn } from "@/lib/utils";
+import ClothDonationShipmentActions from "./ClothDonationShipmentActions";
 
 export function formatClothStatus(status: TClothDonationStatus) {
   switch (status) {
@@ -353,8 +354,8 @@ function ClothDonationDetailsDialog({
             </div>
           )}
 
-          {/* Shipment Info (if available) */}
-          {donation.shipment && (
+          {/* Shipment Info / Actions */}
+          {(donation.shipment || donation.status === "ACCEPTED") && (
             <div className="space-y-2 border-t border-gray-200 pt-4">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                 <Truck className="size-3.5" />
@@ -363,24 +364,29 @@ function ClothDonationDetailsDialog({
               <div className="border border-gray-200 p-3.5 flex flex-wrap items-center justify-between gap-3 text-sm">
                 <div className="space-y-0.5">
                   <p className="font-medium text-gray-900">
-                    Status: {donation.shipment.status}
+                    {donation.shipment
+                      ? `Status: ${donation.shipment.status}`
+                      : "Approved — Ready for shipping"}
                   </p>
-                  {donation.shipment.trackingNumber && (
+                  {donation.shipment?.trackingNumber && (
                     <p className="text-xs text-muted-foreground">
                       Tracking #: {donation.shipment.trackingNumber}
                     </p>
                   )}
                 </div>
-                {donation.shipment.trackingUrl && (
-                  <Link
-                    href={donation.shipment.trackingUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs font-semibold underline text-primary"
-                  >
-                    Track Shipment
-                  </Link>
-                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  {donation.shipment?.trackingUrl && (
+                    <Link
+                      href={donation.shipment.trackingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-semibold underline text-primary"
+                    >
+                      Track Shipment
+                    </Link>
+                  )}
+                  <ClothDonationShipmentActions donation={donation} />
+                </div>
               </div>
             </div>
           )}

@@ -244,6 +244,7 @@ export function SheetContentContainer({
               <Link
                 href={"/sell"}
                 onClick={() => setOpen(false)}
+                prefetch={false}
                 className="flex items-center justify-center gap-2 group"
               >
                 <span className="text-sm font-medium text-white">Sell Now</span>

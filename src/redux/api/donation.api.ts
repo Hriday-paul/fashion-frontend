@@ -1,4 +1,5 @@
 import {
+  ICourierServiceRates,
   IDirectDonation,
   IDonationThanksMsg,
   IMeta,
@@ -151,8 +152,7 @@ const donationApi = baseApi.injectEndpoints({
     getMyClothDonations: builder.query<
       {
         message: string;
-        data: { data: IClothDonation[]; meta: IMeta } | IClothDonation[];
-        meta?: IMeta;
+        data: { data: IClothDonation[]; meta: IMeta }
       },
       IClothDonationQueryParams | void
     >({
@@ -260,6 +260,49 @@ const donationApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.cloth_donation],
     }),
+
+    getClothDonationShippingRates: builder.query<
+      {
+        message: string;
+        data: { rates: ICourierServiceRates[] };
+      },
+      { donationReqId: string }
+    >({
+      query: ({ donationReqId }) => ({
+        url: `/cloth-donations/shipment/rates/${donationReqId}`,
+        method: "GET",
+      }),
+    }),
+
+    payClothDonationShippingCost: builder.mutation<
+      {
+        message: string;
+        data: string;
+      },
+      { donationReqId: string; shipmentServiceId: string }
+    >({
+      query: (body) => ({
+        url: "/cloth-donations/shipment/checkout",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [tagTypes.cloth_donation],
+    }),
+
+    getClothDonationShippingLabel: builder.mutation<
+      {
+        message: string;
+        data: string | { labelUrl?: string; url?: string };
+      },
+      { donationReqId: string }
+    >({
+      query: (body) => ({
+        url: "/cloth-donations/label",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [tagTypes.cloth_donation],
+    }),
   }),
 });
 
@@ -275,4 +318,7 @@ export const {
   useGetDirectDonationsRaisedListQuery,
   useGetExtraDonationsRaisedListQuery,
   useSendThanksMessageMutation,
+  useGetClothDonationShippingRatesQuery,
+  usePayClothDonationShippingCostMutation,
+  useGetClothDonationShippingLabelMutation,
 } = donationApi;

@@ -68,7 +68,7 @@ const NavLogoCategory = () => {
               </Button>
             </CharityDonationFormDialog>}
 
-            {!isCharityOrg && <Link href={"/sell"}>
+            {!isCharityOrg && <Link href={"/sell"} prefetch={false}>
               <Button variant={"default"} className="rounded-none cursor-pointer">
                 Sell An Item
               </Button>
@@ -84,7 +84,7 @@ const NavLogoCategory = () => {
             </Button>
           </CharityDonationFormDialog>}
 
-          <Link href={"/sell"}>
+          <Link href={"/sell"} prefetch={false}>
             <Button variant={"default"} className="rounded-none cursor-pointer">
               Sell An Item
             </Button>
