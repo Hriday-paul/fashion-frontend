@@ -41,12 +41,14 @@ import { useGetCharitiesQuery } from "@/redux/api/userApi";
 import { DonateDirectMoney } from "@/lib/Actions/Donation.action";
 import { toast } from "sonner";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { defaultImg } from "@/utils/defaultImg";
 import { userRoleMapper } from "@/utils/userRoleMapper";
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const formSchema = z.object({
   charityId: z.string().min(1, "Please select a charity"),
@@ -63,13 +65,16 @@ export function CharityDonationFormDialog({
 }: {
   children?: React.ReactNode;
 }) {
-  const { data: charitiesData, isLoading: charitiesLoading } =
-    useGetCharitiesQuery();
+  const { data: charitiesData, isLoading: charitiesLoading } = useGetCharitiesQuery();
+
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const [selectedPreset, setSelectedPreset] = useState<string>("");
   const [open, setOpen] = useState(false);
   const [charityOpen, setCharityOpen] = useState(false);
   const router = useRouter();
+
+  const pathname = usePathname();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -118,8 +123,18 @@ export function CharityDonationFormDialog({
   const currentAmount = form.watch("amount");
   const customInputValue = selectedPreset ? "" : currentAmount;
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    // Only guard the "open" action; closing should always work
+    if (nextOpen && !user) {
+      const callbackUrl = pathname.startsWith("/sign-in") ? "/" : pathname;
+      router.push(`/sign-in?callbackUrl=${callbackUrl}`);
+      return;
+    }
+    setOpen(nextOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild className="w-auto">
         {children ? (
           <div>{children}</div>
