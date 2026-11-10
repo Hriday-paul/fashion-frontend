@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Search, X, ChevronDown } from "lucide-react";
+import { Search, X, ChevronDown, Check } from "lucide-react";
 import { Control, Controller } from "react-hook-form";
 import { ProductFormValues } from "../schema";
-import { Checkbox } from "@/components/ui/checkbox";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -23,6 +22,9 @@ interface MaterialSelectorProps {
     placeholder?: string;
 }
 
+// Stable reference so we never create a new array on every render
+const EMPTY: string[] = [];
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function MaterialSelector({
@@ -36,12 +38,12 @@ export default function MaterialSelector({
     return (
         <Controller
             control={control}
-            name={"fabric"}
+            name="fabric"
             render={({ field, fieldState }) => (
                 <div className="flex flex-col gap-1">
                     <MaterialSelectorInner
                         materials={materials}
-                        value={Array.isArray(field.value) ? field.value : []}
+                        value={Array.isArray(field.value) ? (field.value as string[]) : EMPTY}
                         onChange={field.onChange}
                         isDisabled={isDisabled}
                         placeholder={placeholder}
@@ -75,6 +77,7 @@ function MaterialSelectorInner({
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [showTooltip, setShowTooltip] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const searchRef = useRef<HTMLInputElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -82,6 +85,15 @@ function MaterialSelectorInner({
     const filtered = search.trim()
         ? materials.filter((m) => m.name.toLowerCase().includes(search.toLowerCase()))
         : materials;
+
+    // Track viewport so only ONE panel (mobile modal OR desktop dropdown) is mounted
+    useEffect(() => {
+        const mq = window.matchMedia("(max-width: 767px)");
+        setIsMobile(mq.matches);
+        const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+        mq.addEventListener("change", handler);
+        return () => mq.removeEventListener("change", handler);
+    }, []);
 
     function openPanel() {
         if (isDisabled) return;
@@ -95,8 +107,7 @@ function MaterialSelectorInner({
     }
 
     function toggleMaterial(material: MaterialOption) {
-        const isSelected = value.includes(material.name);
-        if (isSelected) {
+        if (value.includes(material.name)) {
             onChange(value.filter((item) => item !== material.name));
         } else {
             onChange([...value, material.name]);
@@ -105,26 +116,29 @@ function MaterialSelectorInner({
 
     // Focus search on open
     useEffect(() => {
-        if (open) setTimeout(() => searchRef.current?.focus(), 80);
+        if (!open) return;
+        const t = setTimeout(() => searchRef.current?.focus(), 80);
+        return () => clearTimeout(t);
     }, [open]);
 
     // Close desktop dropdown on outside click
     useEffect(() => {
-        if (!open) return;
+        if (!open || isMobile) return;
         function handle(e: MouseEvent) {
-            if (window.innerWidth < 768) return;
+            const target = e.target as Node;
             if (
                 panelRef.current &&
-                !panelRef.current.contains(e.target as Node) &&
+                !panelRef.current.contains(target) &&
                 wrapperRef.current &&
-                !wrapperRef.current.contains(e.target as Node)
+                !wrapperRef.current.contains(target)
             ) {
-                closePanel();
+                setOpen(false);
+                setSearch("");
             }
         }
         document.addEventListener("mousedown", handle);
         return () => document.removeEventListener("mousedown", handle);
-    }, [open]);
+    }, [open, isMobile]);
 
     // ── Shared list content ──────────────────────────────────────────────────
 
@@ -140,17 +154,26 @@ function MaterialSelectorInner({
                     return (
                         <div
                             key={material.id}
+                            role="checkbox"
+                            aria-checked={isSelected}
                             onClick={() => toggleMaterial(material)}
-                            className={`flex items-center justify-between px-4 py-3.5 cursor-pointer hover:bg-muted/60 transition-colors border-b border-border/40 last:border-0 ${isSelected ? "bg-muted" : ""
-                                }`}
+                            className={`flex items-center justify-between px-4 py-3.5 cursor-pointer hover:bg-muted/60 transition-colors border-b border-border/40 last:border-0 ${
+                                isSelected ? "bg-muted" : ""
+                            }`}
                         >
                             <span className="text-base text-foreground">{material.name}</span>
-                            <Checkbox
-                                checked={isSelected}
-                                onCheckedChange={() => toggleMaterial(material)}
-                                onClick={(e) => e.stopPropagation()}
-                                className="rounded-xs border-gray-500 data-[state=checked]:text-white shrink-0 ml-2"
-                            />
+
+                            {/* Purely visual checkbox: the row handles the click */}
+                            <span
+                                aria-hidden="true"
+                                className={`flex items-center justify-center w-4 h-4 shrink-0 ml-2 rounded-xs border pointer-events-none ${
+                                    isSelected
+                                        ? "bg-primary-black border-primary-black text-white"
+                                        : "bg-white border-gray-500"
+                                }`}
+                            >
+                                {isSelected && <Check className="w-3 h-3" strokeWidth={3} />}
+                            </span>
                         </div>
                     );
                 })
@@ -179,10 +202,7 @@ function MaterialSelectorInner({
         </div>
     );
 
-    const triggerLabel =
-        value.length === 0
-            ? placeholder
-            : value.join(", ");
+    const triggerLabel = value.length === 0 ? placeholder : value.join(", ");
 
     return (
         <div ref={wrapperRef} className="relative w-full">
@@ -197,10 +217,15 @@ function MaterialSelectorInner({
                     type="button"
                     onClick={() => (open ? closePanel() : openPanel())}
                     disabled={isDisabled}
-                    className={`flex items-center justify-between w-full bg-white border border-gray-200 rounded focus-within:border-primary-black px-3 md:py-3 py-2 text-sm text-left focus:outline-none transition-opacity cursor-pointer ${isDisabled ? "opacity-80 bg-zinc-50 cursor-not-allowed" : ""
-                        }`}
+                    className={`flex items-center justify-between w-full bg-white border border-gray-200 rounded focus-within:border-primary-black px-3 md:py-3 py-2 text-sm text-left focus:outline-none transition-opacity cursor-pointer ${
+                        isDisabled ? "opacity-80 bg-zinc-50 cursor-not-allowed" : ""
+                    }`}
                 >
-                    <span className={`truncate pr-2 ${value.length > 0 ? "text-foreground" : "text-muted-foreground"}`}>
+                    <span
+                        className={`truncate pr-2 ${
+                            value.length > 0 ? "text-foreground" : "text-muted-foreground"
+                        }`}
+                    >
                         {triggerLabel}
                     </span>
                     <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -218,56 +243,51 @@ function MaterialSelectorInner({
                 )}
             </div>
 
-            {open && (
-                <>
-                    {/* ── MOBILE: centered modal ── */}
+            {open && isMobile && (
+                /* ── MOBILE: centered modal ── */
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/50" onClick={closePanel} />
                     <div
-                        className="md:hidden fixed inset-0 z-50 flex items-center justify-center p-4"
-                        onClick={(e) => e.stopPropagation()}
+                        className="relative w-full max-w-sm bg-background shadow-2xl flex flex-col overflow-hidden"
+                        style={{ maxHeight: "80dvh" }}
                     >
-                        <div className="absolute inset-0 bg-black/50" onClick={closePanel} />
-                        <div
-                            className="relative w-full max-w-sm bg-background shadow-2xl flex flex-col overflow-hidden"
-                            style={{ maxHeight: "80dvh" }}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {/* Modal header */}
-                            <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
-                                <div className="w-7" />
-                                <span className="font-semibold text-base text-foreground">Materials</span>
-                                <button
-                                    type="button"
-                                    onClick={closePanel}
-                                    className="p-1 rounded hover:bg-muted transition-colors"
-                                >
-                                    <X className="w-5 h-5 text-muted-foreground" />
-                                </button>
-                            </div>
-                            {searchBar}
-                            {listContent}
-                            <div className="px-4 py-3 border-t border-border shrink-0">
-                                <button
-                                    type="button"
-                                    onClick={closePanel}
-                                    className="w-full rounded bg-primary-black text-white text-sm py-2 cursor-pointer"
-                                >
-                                    Done
-                                </button>
-                            </div>
+                        {/* Modal header */}
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
+                            <div className="w-7" />
+                            <span className="font-semibold text-base text-foreground">Materials</span>
+                            <button
+                                type="button"
+                                onClick={closePanel}
+                                className="p-1 rounded hover:bg-muted transition-colors"
+                            >
+                                <X className="w-5 h-5 text-muted-foreground" />
+                            </button>
                         </div>
-                    </div>
-
-                    {/* ── DESKTOP: dropdown ── */}
-                    <div
-                        ref={panelRef}
-                        className="hidden md:flex md:flex-col absolute z-50 mt-1 w-full min-w-[200px] bg-background border border-border shadow-lg overflow-hidden"
-                    >
                         {searchBar}
                         {listContent}
+                        <div className="px-4 py-3 border-t border-border shrink-0">
+                            <button
+                                type="button"
+                                onClick={closePanel}
+                                className="w-full rounded bg-primary-black text-white text-sm py-2 cursor-pointer"
+                            >
+                                Done
+                            </button>
+                        </div>
                     </div>
-                </>
+                </div>
+            )}
+
+            {open && !isMobile && (
+                /* ── DESKTOP: dropdown ── */
+                <div
+                    ref={panelRef}
+                    className="flex flex-col absolute z-50 mt-1 w-full min-w-[200px] bg-background border border-border shadow-lg overflow-hidden"
+                >
+                    {searchBar}
+                    {listContent}
+                </div>
             )}
         </div>
     );
 }
-
