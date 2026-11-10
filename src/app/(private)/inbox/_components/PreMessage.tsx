@@ -2,11 +2,12 @@
 "use client"
 import OwnerMsgCard from '@/components/shared/Message/OwnerMsgCard';
 import ReceiverMsgCard from '@/components/shared/Message/ReceiverMsgCard';
+import SystemMsgCard from '@/components/shared/Message/SystemMsgCard';
 import { useSocket } from '@/Context/SocketProvider';
 import useLazyLoad from '@/hooks/useLazyLoad';
 import { useLazyGetMyMessagesQuery } from '@/redux/api/message.api';
 import { RootState } from '@/redux/store';
-import { IMessage } from '@/types';
+import { IMessage, MsgType } from '@/types';
 import moment from 'moment';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react'
@@ -150,59 +151,68 @@ function PreMessage({
             }
 
             {
-                data?.map((msg, index) => {
+                data
+                    ?.filter((msg) => {
+                        const isSys = msg?.type === MsgType.SYSTEM || Boolean(msg?.SystemMessage);
+                        if (!isSys) return true;
+                        return msg?.SystemMessage?.msgForUserId?.toString() === user?.id?.toString();
+                    })
+                    ?.map((msg, index, visibleData) => {
 
-                    const isUpdatedMsg = updatedMsgs?.find((msgUp) => msgUp?.id === msg?.id);
+                        const isUpdatedMsg = updatedMsgs?.find((msgUp) => msgUp?.id === msg?.id);
 
-                    const baseMessage = isUpdatedMsg ? isUpdatedMsg : msg;
-                    const message = isAllPreSeen && !baseMessage?.isSeen ? { ...baseMessage, isSeen: true } : baseMessage;
+                        const baseMessage = isUpdatedMsg ? isUpdatedMsg : msg;
+                        const message = isAllPreSeen && !baseMessage?.isSeen ? { ...baseMessage, isSeen: true } : baseMessage;
 
-                    const isMyMessage = message?.senderId?.toString() === user?.id?.toString();
+                        const isSystemMessage = message?.type === MsgType.SYSTEM || Boolean(message?.SystemMessage);
+                        const isMyMessage = message?.senderId?.toString() === user?.id?.toString();
 
-                    const currentDate = moment(message?.createdAt);
-                    const prevDate = index > 0 ? moment(data[index - 1]?.createdAt) : null;
+                        const currentDate = moment(message?.createdAt);
+                        const prevDate = index > 0 ? moment(visibleData[index - 1]?.createdAt) : null;
 
-                    const showDateSeparator = index === 0 || !currentDate.isSame(prevDate, "day");
+                        const showDateSeparator = index === 0 || !currentDate.isSame(prevDate, "day");
 
-                    return <div key={message?.id}>
+                        return <div key={message?.id}>
 
-                        {showDateSeparator && (
-                            <div className="flex justify-center items-center text-sm my-8">
-                                <p className="text-gray-900 bg-gray-200 px-2 py-0.5 rounded-md text-xs font-normal">
-                                    {formatChatDate(message?.createdAt)}
-                                </p>
-                            </div>
-                        )}
-
-
-                        {!isMyMessage ?
-                            <div className="flex items-start gap-x-4">
-                                <Image
-                                    src={message?.sender?.picture?.url || "/empty-user.png"}
-                                    alt="user image"
-                                    className="h-10 w-10 object-cover rounded-full"
-                                    height={500}
-                                    width={500}
-                                />
-                                <div className="space-y-3 overflow-auto">
-                                    <ReceiverMsgCard msg={message} />
+                            {showDateSeparator && (
+                                <div className="flex justify-center items-center text-sm my-8">
+                                    <p className="text-gray-900 bg-gray-200 px-2 py-0.5 rounded-md text-xs font-normal">
+                                        {formatChatDate(message?.createdAt)}
+                                    </p>
                                 </div>
-                            </div>
-                            :
-                            <div className="flex flex-row-reverse items-start gap-x-4">
-                                <Image
-                                    src={message?.sender?.picture?.url || "/empty-user.png"}
-                                    alt="user image"
-                                    className="h-10 w-10 object-cover rounded-full"
-                                    height={500}
-                                    width={500}
-                                />
-                                <div className="flex flex-col items-end space-y-3 overflow-auto">
-                                    <OwnerMsgCard msg={message} />
+                            )}
+
+
+                            {isSystemMessage ? (
+                                <SystemMsgCard msg={message} />
+                            ) : !isMyMessage ?
+                                <div className="flex items-start gap-x-4">
+                                    <Image
+                                        src={message?.sender?.picture?.url || "/empty-user.png"}
+                                        alt="user image"
+                                        className="h-10 w-10 shrink-0 object-cover rounded-full"
+                                        height={500}
+                                        width={500}
+                                    />
+                                    <div className="min-w-0 space-y-3 overflow-auto">
+                                        <ReceiverMsgCard msg={message} />
+                                    </div>
                                 </div>
-                            </div>}
-                    </div>
-                })
+                                :
+                                <div className="flex flex-row-reverse items-start gap-x-4">
+                                    <Image
+                                        src={message?.sender?.picture?.url || "/empty-user.png"}
+                                        alt="user image"
+                                        className="h-10 w-10 shrink-0 object-cover rounded-full"
+                                        height={500}
+                                        width={500}
+                                    />
+                                    <div className="flex min-w-0 flex-col items-end space-y-3 overflow-auto">
+                                        <OwnerMsgCard msg={message} />
+                                    </div>
+                                </div>}
+                        </div>
+                    })
             }
         </>
     )

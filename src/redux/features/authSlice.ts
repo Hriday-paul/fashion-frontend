@@ -23,15 +23,15 @@ const authSlice = createSlice({
       state.user = user;
       state.token = accessToken;
 
-      // Store token in Cookies for middleware authentication
-      Cookies.set("fashion-access-token", accessToken, {
-        path: "/",
-        expires: 7,
-      });
-      Cookies.set("fashion-refresh-token", refreshToken, {
-        path: "/",
-        expires: 30,
-      });
+      // // Store token in Cookies for middleware authentication
+      // Cookies.set("fashion-access-token", accessToken, {
+      //   path: "/",
+      //   expires: 7,
+      // });
+      // Cookies.set("fashion-refresh-token", refreshToken, {
+      //   path: "/",
+      //   expires: 30,
+      // });
 
 
 

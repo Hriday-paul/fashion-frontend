@@ -50,11 +50,9 @@ function ClothDonationPage() {
     { refetchOnMountOrArgChange: true }
   );
 
-  const donations: IClothDonation[] = Array.isArray(data?.data)
-    ? data.data
-    : data?.data?.data || [];
+  const donations: IClothDonation[] = data?.data?.data || [];
 
-  const meta = !Array.isArray(data?.data) ? data?.data?.meta : data?.meta;
+  const meta = data?.data?.meta;
 
   return (
     <div className="pb-10 max-w-4xl">

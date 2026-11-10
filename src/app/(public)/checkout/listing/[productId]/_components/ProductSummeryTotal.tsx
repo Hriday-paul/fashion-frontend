@@ -17,7 +17,7 @@ function ProductSummeryTotal({ summery, cartGroupId }: { summery: OrderSummeryTy
 
     const shippingCost = shippingCart?.shipment?.shipment_charge_total || 0;
 
-    const totalCost = summery?.subTotal + shippingCost + treeGiftCost + authenticationCost;
+    const totalCost = summery?.subTotal + shippingCost + treeGiftCost + authenticationCost + summery?.serviceFeeCost;
 
     return (
         <CardContent>

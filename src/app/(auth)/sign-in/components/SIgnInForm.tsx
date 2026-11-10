@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { GoogleAuthProvider, OAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/firebase.init";
 import { AccountStatusModal, AccountApprovalStatus } from "./AccountStatusModal";
+import { setAuthCookie } from "@/lib/Actions/Auth.action";
 
 const formSchema = z.object({
   email: z
@@ -152,6 +153,12 @@ const SIgnInForm = () => {
             refreshToken: res?.data?.refreshToken
           })
         );
+
+        await setAuthCookie({
+          acstoken: res?.data?.accessToken,
+          reftoken: res?.data?.refreshToken
+        });
+
         toast.success("Login successful");
         router.refresh();
         router.replace(callbackUrl || "/profile");
@@ -173,6 +180,12 @@ const SIgnInForm = () => {
             refreshToken: res?.data?.refreshToken
           })
         );
+
+        await setAuthCookie({
+          acstoken: res?.data?.accessToken,
+          reftoken: res?.data?.refreshToken
+        });
+
         toast.success("Login successful");
         router.refresh();
         router.replace(callbackUrl || "/profile");

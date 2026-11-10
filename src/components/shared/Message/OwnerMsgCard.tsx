@@ -19,7 +19,7 @@ const OwnerMsgCard = ({ msg }: { msg: IMessage }) => {
           </Link>
         ))}
       </div>)}
-      <p>{msg?.text}</p>
+      <p className="break-words">{msg?.text}</p>
       <div className="flex items-center justify-end gap-1 text-[10px] text-gray-700">
         <span>{moment(msg?.createdAt).format("h:mm a")}</span>
         {msg?.isSeen ? (

@@ -1,6 +1,4 @@
-import { CharityDonationFormDialog } from '@/components/shared/Modal/Charity/CharityDonationFormDialog';
-import { Button } from '@/components/ui/button';
-import { GetCharityAbout } from '@/lib/services/UserDetails';
+import GetUserDetails from '@/lib/services/UserDetails';
 import { IUser } from '@/types';
 import { defaultImg } from '@/utils/defaultImg';
 import { BookImage, File, Heart, LucideIcon, Shirt } from 'lucide-react';
@@ -10,18 +8,18 @@ import { notFound } from 'next/navigation';
 import React, { Suspense } from 'react'
 
 import {
-    MapPin,
     Globe,
     Facebook,
     Instagram,
     Twitter,
 } from "lucide-react";
 import ClothesDonationDialog from '@/components/shared/Modal/clothesDonation/ClothesDonationDialog';
+import { DonationFromProfile } from '../../_components/DonationFromProfile';
 
 async function CharityDetails({ params }: { params: Promise<{ username: string }> }) {
     const { username } = await params;
 
-    const user = GetCharityAbout({ userName: username })
+    const user = GetUserDetails({ userName: username });
 
     return (
         <div>
@@ -36,14 +34,17 @@ async function CharityDetails({ params }: { params: Promise<{ username: string }
 
 export default CharityDetails;
 
+const OverViewDetails = async ({ userPromise }: { userPromise: Promise<{ data: { user: IUser } }> }) => {
+
+    const userD = await userPromise;
 
 
-const OverViewDetails = async ({ userPromise }: { userPromise: Promise<{ data: IUser }> }) => {
-
-    const user = await userPromise;
-
-    if (!user?.data) {
+    if (!userD?.data?.user) {
         return notFound()
+    }
+
+    const user = {
+        data: userD?.data?.user
     }
 
     return <div className='grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 lg:gap-16'>
@@ -55,12 +56,12 @@ const OverViewDetails = async ({ userPromise }: { userPromise: Promise<{ data: I
                 <div className="text-lg font-bold mb-1 leading-tight" style={{ textWrap: "pretty" }}>100% goes to this charity</div>
                 <p className="text-[12.5px] text-white mb-4 leading-relaxed">FASHION doesn't take a cut. Donate directly from this page.</p>
 
-                <CharityDonationFormDialog>
+                <DonationFromProfile charity={user?.data}>
                     <button className="text-center w-full bg-[#f59e0b] hover:bg-[#d97706] text-[#0f172a] font-bold py-2.5 rounded-lg text-sm cursor-pointer flex justify-center items-center gap-1.5">
                         <Heart size={20} />
                         Make your donation
                     </button>
-                </CharityDonationFormDialog>
+                </DonationFromProfile>
             </div>
 
             <section className="rounded-lg border border-gray-200 bg-gray-50 p-4">

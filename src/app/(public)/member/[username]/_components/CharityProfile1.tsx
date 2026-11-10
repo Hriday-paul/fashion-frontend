@@ -2,8 +2,6 @@
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { IBadge, IUser } from '@/types'
 import { notFound } from 'next/navigation'
-import { Rating } from "@/components/ui/rating";
-import moment from 'moment'
 import { userRoleMapper } from '@/utils/userRoleMapper'
 import Link from 'next/link';
 import FolowUnFolow from '@/app/(public)/member/[username]/_components/FolowUnFolow';
@@ -18,7 +16,6 @@ import tw from "@/assets/icons/twitter.png"
 import Image from 'next/image';
 import { useCurrency } from '@/hooks/useCurrency';
 import Flag from '@/components/shared/Flag';
-import { CharityDonationFormDialog } from '@/components/shared/Modal/Charity/CharityDonationFormDialog';
 import { defaultImg } from '@/utils/defaultImg';
 import { DonationFromProfile } from './DonationFromProfile';
 
@@ -270,23 +267,25 @@ function CharityProfile1({ user }: { user: User }) {
                         </DonationFromProfile>
                     </div>}
 
-                    {user?.data?.user?.charityGalleries.length > 0 ? <section className='mt-3'>
-                        <h2 className="text-lg font-semibold text-foreground">Gallery</h2>
-                        <div className="mt-2 grid grid-cols-2 gap-3 md:grid-cols-3">
-                            {user?.data?.user?.charityGalleries?.map((image) => (
-                                <Image
-                                    src={image.url || defaultImg?.placeholderImg}
-                                    key={image?.id}
-                                    alt={image?.caption || `Gallery Image`}
-                                    placeholder='blur'
-                                    blurDataURL={defaultImg?.placeholderImg}
-                                    width={1024}
-                                    height={768}
-                                    className="aspect-4/3 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                />
-                            ))}
-                        </div>
-                    </section> : <EmptyGallery />}
+                    <div className='mt-3'>
+                        {user?.data?.user?.charityGalleries.length > 0 ? <section className='mt-3'>
+                            <h2 className="text-lg font-semibold text-foreground">Gallery</h2>
+                            <div className="mt-2 grid grid-cols-2 gap-3 md:grid-cols-3">
+                                {user?.data?.user?.charityGalleries?.map((image) => (
+                                    <Image
+                                        src={image.url || defaultImg?.placeholderImg}
+                                        key={image?.id}
+                                        alt={image?.caption || `Gallery Image`}
+                                        placeholder='blur'
+                                        blurDataURL={defaultImg?.placeholderImg}
+                                        width={1024}
+                                        height={768}
+                                        className="aspect-4/3 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    />
+                                ))}
+                            </div>
+                        </section> : <EmptyGallery />}
+                    </div>
 
                 </div>
 

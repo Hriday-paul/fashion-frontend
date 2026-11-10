@@ -1,12 +1,12 @@
 "use client"
 import { Button } from '@/components/ui/button'
-import { makeOfferOrder, makeOrder } from '@/lib/Actions/Order.action';
+import { makeListingOrder, makeOfferOrder, makeOrder } from '@/lib/Actions/Order.action';
 import { RootState } from '@/redux/store';
 import { useRouter } from 'next/navigation';
 import React from 'react'
 import { useSelector } from 'react-redux';
 
-function ProcessOrder({ cartGroupId, mode, haveAnyUnavailableItems }: { cartGroupId: string; mode: 'cart' | 'offer'; haveAnyUnavailableItems: boolean }) {
+function ProcessOrder({ cartGroupId, mode, haveAnyUnavailableItems }: { cartGroupId: string; mode: 'cart' | 'offer' | 'listing'; haveAnyUnavailableItems: boolean }) {
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 
@@ -22,7 +22,22 @@ function ProcessOrder({ cartGroupId, mode, haveAnyUnavailableItems }: { cartGrou
         setIsLoading(true);
         try {
 
-            if (mode === 'offer') {
+            if (mode === 'listing') {
+                const res = await makeListingOrder({
+                    payload: {
+                        productId: cartGroupId,
+                        shipmentServiceId: shippingcart?.shipment?.serviceId,
+                        allowedAuthentication: shippingcart?.allowedAuthentication,
+                        treeGiftCount: shippingcart?.treeCount
+                    }
+                });
+
+                if (!res.success) {
+                    throw new Error(res.message);
+                }
+
+                router.replace(res?.data);
+            } else if (mode === 'offer') {
                 const res = await makeOfferOrder({
                     payload: {
                         cartGroupId,

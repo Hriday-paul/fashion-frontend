@@ -54,15 +54,17 @@ function CollapsibleLeafList({
   items: Category[];
   onNavigate: () => void;
 }) {
+  const half = Math.ceil(items.length / 2);
+  const columns = [items.slice(0, half), items.slice(half)]; // 2 groups
 
   return (
-    <div className={`grid grid-cols-2 max-w-xl`}>
-      {items.map((item) => (
-        <LeafItem
-          key={item.id}
-          item={item}
-          onNavigate={onNavigate}
-        />
+    <div className="flex flex-row items-start max-w-xl">
+      {columns.map((col, i) => (            // one wrapper per COLUMN
+        <div key={i} className="flex flex-col w-1/2">
+          {col.map((item) => (              // items stack inside it
+            <LeafItem key={item.id} item={item} onNavigate={onNavigate} />
+          ))}
+        </div>
       ))}
     </div>
   );

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import OwnerMsgCard from '@/components/shared/Message/OwnerMsgCard';
 import ReceiverMsgCard from '@/components/shared/Message/ReceiverMsgCard';
+import SystemMsgCard from '@/components/shared/Message/SystemMsgCard';
 import { useSocket } from '@/Context/SocketProvider';
 import { RootState } from '@/redux/store';
-import { IMessage } from '@/types';
+import { IMessage, MsgType } from '@/types';
 import Image from 'next/image';
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
@@ -77,38 +78,46 @@ function NewMessages({
         scrollToBottom();
     }, [newMessages]);
 
+    const visibleNewMessages = newMessages?.filter((msg) => {
+        const isSys = msg?.type === MsgType.SYSTEM || Boolean(msg?.SystemMessage);
+        if (!isSys) return true;
+        return msg?.SystemMessage?.msgForUserId?.toString() === user?.id?.toString();
+    });
+
     return (
         <>
 
-            {newMessages?.length > 0 && <div className="flex justify-center items-center text-sm my-8">
+            {visibleNewMessages?.length > 0 && <div className="flex justify-center items-center text-sm my-8">
                 <p className="text-gray-900 bg-gray-200 px-2 py-0.5 rounded-md text-xs font-normal">
                     Latest messages
                 </p>
             </div>}
 
             {
-                newMessages?.map((msg, index) => {
+                visibleNewMessages?.map((msg, index) => {
 
                     const isUpdatedMsg = updatedMsgs?.find((msgUp) => msgUp?.id === msg?.id);
 
                     const message = isUpdatedMsg ? isUpdatedMsg : msg;
 
+                    const isSystemMessage = message?.type === MsgType.SYSTEM || Boolean(message?.SystemMessage);
                     const isMyMessage = message?.senderId?.toString() === user?.id?.toString();
 
                     return <div key={message?.id}>
 
-                        {!isMyMessage ?
+                        {isSystemMessage ? (
+                            <SystemMsgCard msg={message} />
+                        ) : !isMyMessage ?
                             // received message
                             <div className="flex items-start gap-x-4" >
                                 <Image
                                     src={message?.sender?.picture?.url || "/empty-user.png"}
                                     alt="user image"
-                                    className="h-10 w-10 object-cover rounded-full"
+                                    className="h-10 w-10 shrink-0 object-cover rounded-full"
                                     height={500}
                                     width={500}
                                 />
-                                <div className="max-w-[50%] space-y-3 overflow-hidden">
-
+                                <div className="min-w-0 space-y-3 overflow-auto">
                                     <ReceiverMsgCard msg={message} />
                                 </div>
                             </div>
@@ -120,11 +129,11 @@ function NewMessages({
                                 <Image
                                     src={message?.sender?.picture?.url || "/empty-user.png"}
                                     alt="user image"
-                                    className="h-10 w-10 object-cover rounded-full"
+                                    className="h-10 w-10 shrink-0 object-cover rounded-full"
                                     height={500}
                                     width={500}
                                 />
-                                <div className="flex max-w-[50%] flex-col items-end space-y-3">
+                                <div className="flex min-w-0 flex-col items-end space-y-3 overflow-auto">
                                     <OwnerMsgCard msg={message} />
                                 </div>
                             </div>}

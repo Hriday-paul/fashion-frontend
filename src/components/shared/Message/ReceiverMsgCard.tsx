@@ -19,7 +19,7 @@ const ReceiverMsgCard = ({ msg }: { msg: IMessage }) => {
           </Link>
         ))}
       </div>)}
-      <p className="text-black">{msg?.text}</p>
+      <p className="text-black break-words">{msg?.text}</p>
       <p className="text-[10px] text-left text-gray-700">{moment(msg?.createdAt).format("h:mm a")}</p>
     </div>
   );

@@ -2,12 +2,17 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Enable pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-RUN npm install --legacy-peer-deps
+# Copy dependency files first
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npm run build
+RUN pnpm build
 
-CMD [ "npm", "start"]
+CMD ["pnpm", "start"]

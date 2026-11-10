@@ -125,8 +125,8 @@ export interface IProduct {
 }
 
 export interface IMaterial {
-    id: string;
-    name: string;
+  id: string;
+  name: string;
 }
 
 export interface ICartGroup {
@@ -737,7 +737,6 @@ export interface IMessage {
     url: string;
     type: "IMAGE" | "DOCUMENT"
   }[];
-  type: "text" | "file"
   isSeen: boolean;
   chatId: string;
   senderId: string;
@@ -745,7 +744,31 @@ export interface IMessage {
   receiverId: string;
   receiver: IUser;
   createdAt: Date,
-  offer: IOffer | null
+  offer: IOffer | null,
+  SystemMessage: ISystemMsg | null,
+  type: MsgType
+}
+
+
+export enum MsgType {
+  SYSTEM = "SYSTEM",
+  OFFER = "OFFER",
+  DIRECT = "DIRECT"
+}
+
+export interface ISystemMsg {
+  id: string;
+  title: string;
+  text: string;
+
+  msgForUserId: string;
+  msgForUser: IUser;
+
+  msgId: string;
+  msg: IMessage;
+
+  createdAt: Date;
+
 }
 
 export interface IOffer {
@@ -881,25 +904,34 @@ export enum StripePaymentStatus {
   REFUNDED = "REFUNDED"
 }
 
-export interface IWalletPayout {
+export interface IWalletTransactions {
   id: string,
   walletId: string,
   amount: number,
-  stripePayoutId: string | null,
-  status: PayoutStatus,
-  paidAt: Date | null,
+  txType: WalletTransactionType,
+  direction: TransactionDirection,
   connectAccountId: string,
   stripeBalanceTransactionId: string | null,
-  payoutData: any | null,
+  description: string | null,
   userId: string,
   createdAt: Date,
   updatedAt: Date
 }
 
-export enum PayoutStatus {
-  PENDING = "PENDING",
-  PAID = "PAID",
-  FAILED = "FAILED"
+export enum WalletTransactionType {
+  EARNING = "EARNING",
+  DONATION_RECEIVED = "DONATION_RECEIVED",
+  PURCHASE = "PURCHASE",
+  DONATION_SENT = "DONATION_SENT",
+  REFUND = "REFUND",
+  WITHDRAWAL = "WITHDRAWAL",
+  SHIPPING = "SHIPPING",
+  ADJUSTMENT = "ADJUSTMENT"
+}
+
+export enum TransactionDirection {
+  IN = "IN",
+  OUT = "OUT"
 }
 
 export interface IShipment {
@@ -925,7 +957,9 @@ export interface IShipment {
   status: ShipmentStatus,
   events: IShipmentEvent[],
   createdAt: Date,
-  updatedAt: Date
+  updatedAt: Date,
+  isPaid : boolean,
+  payment : IPayment | null
 }
 
 export enum ShipmentStatus {

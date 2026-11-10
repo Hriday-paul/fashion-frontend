@@ -3,18 +3,22 @@ import Container from "../Container";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { CharityDonationFormDialog } from "../Modal/Charity/CharityDonationFormDialog";
+
 const quickLink = [
   {
     label: "Sing In",
     href: "/sign-in",
+    prefetch: true,
   },
   {
     label: "Sing Up",
     href: "/sign-up",
+    prefetch: true,
   },
   {
     label: "Sell Now",
     href: "/sell",
+    prefetch: false,
   },
 ];
 
@@ -33,6 +37,7 @@ const TopInfo = () => {
             <Link
               key={index}
               href={link.href}
+              prefetch={link.prefetch}
               className={cn(
                 "uppercase",
                 link.label === "Donate now" && "text-green-600"

@@ -9,9 +9,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
+// import { Checkbox } from "@/components/ui/checkbox";
 import { IUser } from "@/types";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { defaultImg } from "@/utils/defaultImg";
 import { userRoleMapper } from "@/utils/userRoleMapper";
@@ -146,11 +145,18 @@ function CharityMultiSelect({
                 href={`/member/${charity?.userName}`} className="text-sm underline text-green-700">
                 View Charity
               </Link>
-              <Checkbox
+              {/* <Checkbox
                 checked={isChecked}
                 onCheckedChange={() => toggle(charity)}
                 onClick={(e) => e.stopPropagation()}
                 className="rounded-xs border-gray-500 data-[state=checked]:text-white shrink-0 ml-2"
+              /> */}
+              <input
+                type="checkbox"
+                checked={isChecked}
+                readOnly
+                tabIndex={-1}
+                className="w-4 h-4 shrink-0 ml-2 accent-primary-black cursor-pointer pointer-events-none"
               />
             </div>
           );

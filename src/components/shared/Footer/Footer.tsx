@@ -11,17 +11,20 @@ const BuyLinks = [
   {
     id: 1,
     name: "Shop",
-    link: "/shop"
+    link: "/shop",
+    prefetch: true
   },
   {
     id: 2,
     name: "Order Tracking",
-    link: "/order-tracking"
+    link: "/order-tracking",
+    prefetch: true
   },
   {
     id: 3,
     name: "Returns",
-    link: "/returns"
+    link: "/returns",
+    prefetch: true
   },
 ];
 
@@ -29,17 +32,20 @@ const SellLinks = [
   {
     id: 1,
     name: "Sell",
-    link: "/sell"
+    link: "/sell",
+    prefetch: false
   },
   {
     id: 2,
     name: "Donate",
-    link: "/donate"
+    link: "/donate",
+    prefetch: true
   },
   {
     id: 3,
     name: "Assisted seller",
-    link: "/assisted-seller"
+    link: "/assisted-seller",
+    prefetch: false
   },
 
 ];
@@ -78,7 +84,7 @@ const socialIcons = [
   { icon: Instagram, label: "Instagram" }
 ];
 
-function FooterColumn({ links, title }: { title: string, links: { name: string; link: string, id: number }[] }) {
+function FooterColumn({ links, title }: { title: string, links: { name: string; link: string, id: number, prefetch?: boolean }[] }) {
   return (
     <div>
       <h3 className="text-white text-lg font-bold mb-4">{title}</h3>
@@ -87,6 +93,7 @@ function FooterColumn({ links, title }: { title: string, links: { name: string; 
           <li key={link?.id}>
             <Link
               href={link?.link}
+              prefetch={link?.prefetch}
               className="text-gray-400 hover:text-white transition-colors text-sm sm:text-base"
             >
               {link?.name}

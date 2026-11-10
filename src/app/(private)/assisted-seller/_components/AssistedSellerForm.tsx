@@ -280,8 +280,8 @@ export function AssistedSellerForm() {
   return (
     <div className="md:space-y-6 space-y-3 max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Sell Any Item</h1>
-        <p className="text-muted-foreground">Complete the form below to submit items for our assisted seller service</p>
+        <h1 className="text-3xl font-bold mb-2">Assited Sell</h1>
+        <p className="text-muted-foreground">Complete the form below to submit items for our assisted seller service. <Link href="/help/assisted-seller" className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-700">Learn more about assisted selling</Link>.</p>
       </div>
 
       <Form {...form}>
@@ -736,9 +736,9 @@ export function AssistedSellerForm() {
 
                 <br />
 
-                We aim to sell items within 30 days. After this, you can request their return (return shipping may apply).
+                We aim to sell items within 30 days. After this, you can request their return (return shipping may apply).{" "}
                 <Link
-                  href="/help/donations"
+                  href="/help/assisted-seller#selling-window-and-returns"
                   className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-700"
                 >
                   Terms & Conditions apply

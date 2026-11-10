@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo } from "react";
 import { useWatch } from "react-hook-form";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 import {
@@ -24,14 +23,22 @@ import {
 import { countries } from "@/utils/constant";
 import Flag from "@/components/shared/Flag";
 
-function SelectCountry({ control, setValue }: any) {
+function SelectCountry({ control, setValue, allowedCountries }: any) {
   // Anchor the dropdown to the whole wrapper so it lines up with the input's left edge
   const anchor = useComboboxAnchor();
 
+  const availableCountries = useMemo(
+    () =>
+      allowedCountries && allowedCountries.length > 0
+        ? countries.filter((c) => allowedCountries.includes(c.code))
+        : countries,
+    [allowedCountries]
+  );
+
   const countryName = useWatch({ control, name: "country" });
   const selectedCountry = useMemo(
-    () => countries.find((c) => c.name === countryName),
-    [countryName]
+    () => availableCountries.find((c) => c.name === countryName),
+    [availableCountries, countryName]
   );
 
   // Keep countryCode in sync (moved out of render)
@@ -48,7 +55,7 @@ function SelectCountry({ control, setValue }: any) {
           <FormLabel>Country</FormLabel>
           <FormControl>
             <Combobox
-              items={countries}
+              items={availableCountries}
               value={selectedCountry?.name || ""}
               onValueChange={(name) => field.onChange(name || "")}
             >

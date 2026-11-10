@@ -1,4 +1,4 @@
-import { Addresses, IBandleTier, IBillingDetails, IFolow, IMeta, IUser, IWalletPayout } from "@/types";
+import { Addresses, IBandleTier, IBillingDetails, IFolow, IMeta, IUser, IWalletTransactions } from "@/types";
 import { tagTypes } from "../tagTypes";
 import { baseApi } from "./baseApi";
 
@@ -27,10 +27,11 @@ const userApi = baseApi.injectEndpoints({
             }),
         }),
 
-        payouts: builder.query<{ data: { data: IWalletPayout[], meta: IMeta } }, {}>({
-            query: () => ({
-                url: "/account/payouts",
+        transactions: builder.query<{ data: { data: IWalletTransactions[], meta: IMeta } }, {}>({
+            query: (query) => ({
+                url: "/account/transactions",
                 method: "GET",
+                params: query,
             }),
         }),
 
@@ -74,6 +75,13 @@ const userApi = baseApi.injectEndpoints({
             providesTags: [tagTypes.user_billing],
         }),
 
+        sellCountries: builder.query<{ data: { id: string; name: string; code: string; createdAt: string; updatedAt: string }[] }, void>({
+            query: () => ({
+                url: "/sell-countries",
+                method: "GET",
+            }),
+        }),
+
         sellerBundleTiers: builder.query<{ data: { tiers: IBandleTier[] } }, { username: string }>({
             query: ({ username }) => ({
                 url: `/users/bundle-discount-tiers/${username}`,
@@ -108,4 +116,4 @@ const userApi = baseApi.injectEndpoints({
     }),
 })
 
-export const { useGetCharitiesQuery, useDefaultBillingDetailsQuery, useUpdateBillingDetailsMutation, useSellerBundleTiersQuery, useUserAddressesQuery, useGetUserByUsernameQuery, useLazyGetFolowingsQuery, useLazyGetFolowersQuery, useBalanceQuery, useAccountDataQuery, useConnectAccountMutation, usePayoutsQuery, useRequestWithdrawMutation } = userApi;
+export const { useGetCharitiesQuery, useDefaultBillingDetailsQuery, useUpdateBillingDetailsMutation, useSellerBundleTiersQuery, useUserAddressesQuery, useSellCountriesQuery, useGetUserByUsernameQuery, useLazyGetFolowingsQuery, useLazyGetFolowersQuery, useBalanceQuery, useAccountDataQuery, useConnectAccountMutation, useTransactionsQuery, useRequestWithdrawMutation } = userApi;

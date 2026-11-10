@@ -9,7 +9,7 @@ import Link from 'next/link';
 import FolowUnFolow from '@/app/(public)/member/[username]/_components/FolowUnFolow';
 import { Button } from '@/components/ui/button';
 import FolowerFolowing from '@/app/(public)/member/[username]/_components/FolowerFolowing';
-import { Check, Heart } from 'lucide-react';
+import { BadgeCheck, Check, Heart } from 'lucide-react';
 import { countries } from '@/utils/constant';
 import Flag from '../Flag';
 import CountrySellNotAvaialbleAlert from './CountrySellNotAvaialbleAlert';
@@ -90,9 +90,20 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
                   {userRoleMapper(user?.data?.user?.auth?.role)?.label}
                 </span>
 
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground my-0.5 block">
+                {!isCharityShop ? <h2 className="text-2xl md:text-3xl font-bold text-foreground my-0.5 block">
                   {userData?.userName}
                 </h2>
+                  :
+                  <>
+                    <div className='flex flex-row gap-x-1 items-center'>
+                      <h2 className="tracking-tight text-2xl md:text-3xl font-semibold">
+                        {user?.data?.user?.fname} {user?.data?.user?.lname}
+                      </h2>
+                      <BadgeCheck fill='green' className='text-white' size={28} />
+                    </div>
+
+                    <p className='text-base'>@{userData?.userName}</p>
+                  </>}
 
                 {country?.code && <div className='flex items-center gap-2 my-0.5 whitespace-nowrap'>
                   <Flag code={country?.code} name={userData?.country} />

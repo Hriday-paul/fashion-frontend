@@ -9,8 +9,8 @@ import CustomAvatar from '@/components/shared/CustomAvatar';
 import { useGetChatDetailsQuery } from '@/redux/api/message.api';
 import { IProduct, IUser } from '@/types';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronRight, Plus, X } from 'lucide-react';
+import { redirect, useRouter } from 'next/navigation';
+import { AlertCircle, ArrowLeft, ChevronRight, Plus, X } from 'lucide-react';
 import SendOfferModal from '@/components/shared/Modal/SendOfferModal';
 import { BuyFromChat } from '@/lib/Actions/Product.api';
 import { toast } from 'sonner';
@@ -71,7 +71,7 @@ function ChatHeader({ chatId }: { chatId: string }) {
                 </div>
             </div>
 
-            {isSuccess && <ChatHeaderDetails data={userData?.data} chatId={chatId} />}
+            {(isSuccess && userData?.data) && <ChatHeaderDetails data={userData?.data} chatId={chatId} />}
 
         </div> : <></>
     )
@@ -94,6 +94,7 @@ interface ChatHeaderDetailsProps {
 }
 
 const ChatHeaderDetails = ({ data, chatId }: { data: ChatHeaderDetailsProps, chatId: string }) => {
+
     const isSingleItem = data?.items?.length === 1;
     const router = useRouter();
 
@@ -124,9 +125,14 @@ const ChatHeaderDetails = ({ data, chatId }: { data: ChatHeaderDetailsProps, cha
             )}
         </div>
 
-        {data?.isUnavailable && <div className='bg-red-700 text-white px-3 py-1.5 text-center text-xs sm:text-sm font-semibold'>
-            Some items in this chat are no longer available.
-        </div>}
+        {data?.isUnavailable && (
+            <div className="flex items-center justify-center gap-2 border-b border-amber-200 bg-amber-50 px-3.5 py-2 text-amber-800">
+                <AlertCircle className="size-4 shrink-0 text-amber-600" />
+                <p className="text-xs sm:text-sm font-medium">
+                    Some items in this chat are no longer available.
+                </p>
+            </div>
+        )}
 
         <OfferView offerItems={(data?.items || []) as any} open={openItemDetails} setOpen={setOpenItemDetails} title={"Chat Items"} />
 

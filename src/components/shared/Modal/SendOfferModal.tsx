@@ -80,7 +80,7 @@ export default function SendOfferModal({
   ];
 
   const images = products?.map((product) => product?.images?.[0]).filter(Boolean);
-  const visibleImages = images.slice(0, 3);
+  const visibleImages = images?.slice(0, 3);
   const remainingCount = images.length - visibleImages.length;
 
   return (

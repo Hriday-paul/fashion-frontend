@@ -52,7 +52,6 @@ const SummaryOverview = async ({ summeryPromise, offerId }: { summeryPromise: Pr
         itemsCount: 1,
         subTotal: details?.finalPrice,
         totalExtraDonation: 0,
-
     }
 
     return (
@@ -70,7 +69,7 @@ const SummaryOverview = async ({ summeryPromise, offerId }: { summeryPromise: Pr
 
             <DonationCard cartGroupId={offerId} />
 
-            <ProcessOrder cartGroupId={offerId} mode="offer" haveAnyUnavailableItems={totalSummery?.haveAnyUnavailableItems} />
+            <ProcessOrder cartGroupId={offerId} mode="listing" haveAnyUnavailableItems={totalSummery?.haveAnyUnavailableItems} />
 
         </>
     )
