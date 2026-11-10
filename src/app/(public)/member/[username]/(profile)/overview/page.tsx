@@ -1,6 +1,4 @@
-import { CharityDonationFormDialog } from '@/components/shared/Modal/Charity/CharityDonationFormDialog';
-import { Button } from '@/components/ui/button';
-import GetUserDetails, { GetCharityAbout } from '@/lib/services/UserDetails';
+import GetUserDetails from '@/lib/services/UserDetails';
 import { IUser } from '@/types';
 import { defaultImg } from '@/utils/defaultImg';
 import { BookImage, File, Heart, LucideIcon, Shirt } from 'lucide-react';
@@ -10,7 +8,6 @@ import { notFound } from 'next/navigation';
 import React, { Suspense } from 'react'
 
 import {
-    MapPin,
     Globe,
     Facebook,
     Instagram,

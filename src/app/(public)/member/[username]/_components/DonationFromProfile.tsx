@@ -25,9 +25,11 @@ import { DialogTrigger } from "@radix-ui/react-dialog";
 import { DonateDirectMoney } from "@/lib/Actions/Donation.action";
 import { toast } from "sonner";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IUser } from "@/types";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const formSchema = z.object({
     amount: z.string().min(1, "Please select or enter an amount"),
@@ -46,11 +48,11 @@ export function DonationFromProfile({
     charity: IUser
 }) {
 
-    console.log(charity, "=====================================")
-
     const [selectedPreset, setSelectedPreset] = useState<string>("");
     const [open, setOpen] = useState(false);
     const router = useRouter();
+    const pathname = usePathname();
+    const user = useSelector((state: RootState) => state.auth.user);
 
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -98,8 +100,17 @@ export function DonationFromProfile({
     const currentAmount = form.watch("amount");
     const customInputValue = selectedPreset ? "" : currentAmount;
 
+    const handleOpenChange = (nextOpen: boolean) => {
+        // Only guard the "open" action; closing should always work
+        if (nextOpen && !user) {
+            router.push(`/sign-in?callbackUrl=${encodeURIComponent(pathname)}`); // adjust to your actual sign-in route
+            return;
+        }
+        setOpen(nextOpen);
+    };
+
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild className="w-auto">
                 {children ? (
                     <div>{children}</div>

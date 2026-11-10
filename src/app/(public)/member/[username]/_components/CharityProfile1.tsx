@@ -2,8 +2,6 @@
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { IBadge, IUser } from '@/types'
 import { notFound } from 'next/navigation'
-import { Rating } from "@/components/ui/rating";
-import moment from 'moment'
 import { userRoleMapper } from '@/utils/userRoleMapper'
 import Link from 'next/link';
 import FolowUnFolow from '@/app/(public)/member/[username]/_components/FolowUnFolow';
@@ -18,7 +16,6 @@ import tw from "@/assets/icons/twitter.png"
 import Image from 'next/image';
 import { useCurrency } from '@/hooks/useCurrency';
 import Flag from '@/components/shared/Flag';
-import { CharityDonationFormDialog } from '@/components/shared/Modal/Charity/CharityDonationFormDialog';
 import { defaultImg } from '@/utils/defaultImg';
 import { DonationFromProfile } from './DonationFromProfile';
 
