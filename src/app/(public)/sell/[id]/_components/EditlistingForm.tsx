@@ -83,7 +83,9 @@ function getDefaultValues(product: IProduct): ProductFormValues {
         sizeId: product.size?.id ?? product.sizeId ?? "",
         brandId: product.brand?.id ?? product.brandId ?? "",
         tags: product.tags ?? [],
-        fabric: product?.meterials ?? [],
+        fabric: product?.materials?.length
+            ? product.materials.map((m) => m?.material?.id || m?.id)
+            : product?.meterials ?? [],
         color: product.color ?? "",
         condition: product.condition ?? "",
         donation_percent: product?.donation_percent

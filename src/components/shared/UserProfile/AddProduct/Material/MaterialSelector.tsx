@@ -62,7 +62,7 @@ export default function MaterialSelector({
 interface MaterialSelectorInnerProps {
     materials: MaterialOption[];
     value: string[];
-    onChange: (names: string[]) => void;
+    onChange: (ids: string[]) => void;
     isDisabled: boolean;
     placeholder: string;
 }
@@ -107,10 +107,10 @@ function MaterialSelectorInner({
     }
 
     function toggleMaterial(material: MaterialOption) {
-        if (value.includes(material.name)) {
-            onChange(value.filter((item) => item !== material.name));
+        if (value.includes(material.id)) {
+            onChange(value.filter((item) => item !== material.id));
         } else {
-            onChange([...value, material.name]);
+            onChange([...value, material.id]);
         }
     }
 
@@ -150,7 +150,7 @@ function MaterialSelectorInner({
                 </p>
             ) : (
                 filtered.map((material) => {
-                    const isSelected = value.includes(material.name);
+                    const isSelected = value.includes(material.id);
                     return (
                         <div
                             key={material.id}
@@ -202,7 +202,12 @@ function MaterialSelectorInner({
         </div>
     );
 
-    const triggerLabel = value.length === 0 ? placeholder : value.join(", ");
+    const selectedNames = value
+        .map((id) => materials.find((m) => m.id === id)?.name)
+        .filter(Boolean);
+
+    const triggerLabel =
+        selectedNames.length === 0 ? placeholder : selectedNames.join(", ");
 
     return (
         <div ref={wrapperRef} className="relative w-full">
@@ -223,7 +228,7 @@ function MaterialSelectorInner({
                 >
                     <span
                         className={`truncate pr-2 ${
-                            value.length > 0 ? "text-foreground" : "text-muted-foreground"
+                            selectedNames.length > 0 ? "text-foreground" : "text-muted-foreground"
                         }`}
                     >
                         {triggerLabel}
