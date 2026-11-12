@@ -303,6 +303,48 @@ const donationApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.cloth_donation],
     }),
+
+    getMemberSellDonationsRaised: builder.query<
+      {
+        message: string;
+        data: { data: ISelldonation[]; meta: IMeta };
+      },
+      { userName: string; page?: number; limit?: number }
+    >({
+      query: ({ userName, ...params }) => ({
+        url: `/donations/sell-raised/${userName}`,
+        method: "GET",
+        params: params || undefined,
+      }),
+    }),
+
+    getMemberDirectDonationsRaised: builder.query<
+      {
+        message: string;
+        data: { data: IDirectDonation[]; meta: IMeta };
+      },
+      { userName: string; page?: number; limit?: number }
+    >({
+      query: ({ userName, ...params }) => ({
+        url: `/donations/direct-raised/${userName}`,
+        method: "GET",
+        params: params || undefined,
+      }),
+    }),
+
+    getMemberExtraDonationsRaised: builder.query<
+      {
+        message: string;
+        data: { data: ISelldonation[]; meta: IMeta };
+      },
+      { userName: string; page?: number; limit?: number }
+    >({
+      query: ({ userName, ...params }) => ({
+        url: `/donations/extra-raised/${userName}`,
+        method: "GET",
+        params: params || undefined,
+      }),
+    }),
   }),
 });
 
@@ -321,4 +363,10 @@ export const {
   useGetClothDonationShippingRatesQuery,
   usePayClothDonationShippingCostMutation,
   useGetClothDonationShippingLabelMutation,
+  useGetMemberSellDonationsRaisedQuery,
+  useLazyGetMemberSellDonationsRaisedQuery,
+  useGetMemberDirectDonationsRaisedQuery,
+  useLazyGetMemberDirectDonationsRaisedQuery,
+  useGetMemberExtraDonationsRaisedQuery,
+  useLazyGetMemberExtraDonationsRaisedQuery,
 } = donationApi;

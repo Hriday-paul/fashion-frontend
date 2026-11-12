@@ -20,6 +20,7 @@ import tw from "@/assets/icons/twitter.png"
 import Image from 'next/image';
 import { useCurrency } from '@/hooks/useCurrency';
 import { DonationFromProfile } from '@/app/(public)/member/[username]/_components/DonationFromProfile';
+import DonationsRaisedDialog from '../Modal/Donation/DonationsRaisedDialog';
 
 type User = {
   data:
@@ -175,10 +176,28 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
                 <p className='text-gray-700'>Sales</p>
               </div>}
 
-              {(isCharityShop || isCharity) && <div className=''>
-                <p className='font-semibold'>{format(user?.data?.totalRaisedDonation || 0, { decimals: 1 })}</p>
-                <p className='text-gray-700'>Raised</p>
-              </div>}
+              {(isCharityShop || isCharity) && (
+                <DonationsRaisedDialog
+                  userName={userData?.userName}
+                  charityName={
+                    `${userData?.fname || ""} ${userData?.lname || ""}`.trim() ||
+                    userData?.userName
+                  }
+                  totalRaisedDonation={user?.data?.totalRaisedDonation}
+                >
+                  <button
+                    type="button"
+                    className="text-left cursor-pointer group transition-opacity hover:opacity-85"
+                  >
+                    <p className="font-semibold group-hover:text-green-800 transition-colors">
+                      {format(user?.data?.totalRaisedDonation || 0, { decimals: 1 })}
+                    </p>
+                    <p className="text-gray-700">
+                      Raised
+                    </p>
+                  </button>
+                </DonationsRaisedDialog>
+              )}
 
               {!(isCharityShop || isCharity) && <Link href={`/member/${userData?.userName}/donations`} className=''>
                 <p className='font-semibold'>{user?.data?.totalDonation}</p>

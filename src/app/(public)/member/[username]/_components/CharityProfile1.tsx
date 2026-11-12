@@ -18,6 +18,7 @@ import { useCurrency } from '@/hooks/useCurrency';
 import Flag from '@/components/shared/Flag';
 import { defaultImg } from '@/utils/defaultImg';
 import { DonationFromProfile } from './DonationFromProfile';
+import DonationsRaisedDialog from '@/components/shared/Modal/Donation/DonationsRaisedDialog';
 
 type User = {
     data:
@@ -152,10 +153,26 @@ function CharityProfile1({ user }: { user: User }) {
                             </div>} userName={userData?.userName} />
                         </div>
 
-                        <div className=''>
-                            <p className='font-semibold'>{format(user?.data?.totalRaisedDonation || 0, { decimals: 1 })}</p>
-                            <p className='text-gray-700'>Raised</p>
-                        </div>
+                        <DonationsRaisedDialog
+                            userName={userData?.userName}
+                            charityName={
+                                `${userData?.fname || ""} ${userData?.lname || ""}`.trim() ||
+                                userData?.userName
+                            }
+                            totalRaisedDonation={user?.data?.totalRaisedDonation}
+                        >
+                            <button
+                                type="button"
+                                className="text-left cursor-pointer group transition-opacity hover:opacity-85"
+                            >
+                                <p className="font-semibold">
+                                    {format(user?.data?.totalRaisedDonation || 0, { decimals: 1 })}
+                                </p>
+                                <p className="text-gray-700">
+                                    Raised
+                                </p>
+                            </button>
+                        </DonationsRaisedDialog>
 
                     </div>
                 </div>
