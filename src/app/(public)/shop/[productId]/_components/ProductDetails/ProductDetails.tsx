@@ -1,11 +1,15 @@
+"use client"
 import Link from "next/link";
 import ActionButtons from "../ActionButtons";
 import SellerDetails from "../SellerDetails";
 import { CheckIcon } from "@/icons";
 import ProductDetailsHeader from "./ProductDetailsHeader";
 import DisplayLargeDescriptionText from "@/components/shared/DisplayLargeDescriptionText";
-import { IProduct, ISize, IUser } from "@/types";
+import { IProduct, ISize, IUser, UserRole } from "@/types";
 import Sizechart from "../dialog/Sizechart";
+import { Eye } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 export type IUserWithExtra = IUser & {
   _count: {
@@ -30,9 +34,15 @@ export type IProductWithUser = Omit<IProduct, "user"> & {
 };
 
 const ProductDetails = ({ product }: { product: IProductWithUser }) => {
+
+  const user = useSelector((state: RootState) => state?.auth?.user)
+
   const isStockOut = product?.stock === 0;
 
   const isDeleted = product?.isDeleted;
+
+
+  const allowAction = user?.auth?.role ? (user?.auth?.role == UserRole.CHARITY_SHOP || user?.auth?.role == UserRole.CHARITABLE_ORGANIZATION || user?.auth?.role == UserRole.ECO_FRIENDLY_STORE) : false;
 
   return (
     <div className="space-y-2 lg:space-y-3">
@@ -124,10 +134,16 @@ const ProductDetails = ({ product }: { product: IProductWithUser }) => {
         <p className="text-center text-white">Item Sold Out</p>
       </div> : isDeleted ? <div className="py-3 max-w-lg bg-yellow-700 2xl:w-2/3">
         <p className="text-center text-white">Item not available</p>
-      </div> : product?.isMyProduct ? <></> : <ActionButtons product={product}></ActionButtons>}
+      </div> : (product?.isMyProduct || allowAction) ? <div className="">
+        <div className="flex flex-row gap-x-1 items-center justify-center bg-zinc-200 rounded-md py-1.5 max-w-lg">
+          <Eye size={20} />
+          <p className="text-base font-medium">View Only</p>
+        </div>
+        <p className="text-sm text-gray-800 mt-1">Charaties/Charaty Shops, Eco-Friendly Stores & you can just view this listing but cannot make purchases.</p>
+      </div> : <ActionButtons product={product}></ActionButtons>}
 
       {/* ========================= seller details ========================= */}
-      <SellerDetails user={product?.user} isMyProfile={product?.isMyProduct} prodId={product?.id}></SellerDetails>
+      <SellerDetails user={product?.user} isMyProfile={product?.isMyProduct || allowAction} prodId={product?.id}></SellerDetails>
     </div>
   );
 };

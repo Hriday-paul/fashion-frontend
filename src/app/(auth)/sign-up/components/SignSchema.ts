@@ -34,6 +34,10 @@ const formSchema = z.object({
       }
     ),
 
+  country: z
+    .string({ required_error: "Country is required" })
+    .min(1, { message: "Country is required" }),
+
 })
 
 

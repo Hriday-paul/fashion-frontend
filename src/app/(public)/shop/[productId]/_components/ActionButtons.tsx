@@ -12,7 +12,6 @@ import { useDispatch } from "react-redux";
 import { baseApi } from "@/redux/api/baseApi";
 import { tagTypes } from "@/redux/tagTypes";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import Link from "next/link";
 import { CreateChat } from "@/lib/Actions/Product.api";
 import { toast } from "sonner";
 

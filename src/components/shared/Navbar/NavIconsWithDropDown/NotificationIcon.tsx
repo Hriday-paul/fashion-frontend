@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 import { NotificationRender } from "./NotificationRender";
+import { NotificationType } from "@/types";
 
 
 import {
@@ -62,61 +63,81 @@ export default function NotificationIcon() {
           {
             isLoading ? (<div className="flex-center h-28">
               <span className="loaderDark !w-10"> </span>
-            </div>) : isSuccess ? <>
+            </div>) : isSuccess ? <div className="space-y-1.5">
 
               {notifications?.data?.data?.map((notification) => {
-
                 const renderNotification = NotificationRender({ notification });
+                const isWelcome =
+                  notification?.type === NotificationType.WELLCOME ||
+                  (notification?.type as unknown) === "WELLCOME";
 
-                return <div key={notification?.id}>
-                  <DropdownMenuItem className="flex-none focus:bg-transparent">
-                    <Link href={renderNotification?.link || "#"} onClick={closeMenu} className="w-full">
-                      <Card className="p-4 shadow-none rounded">
-                        <div className="flex items-start gap-3">
-                          <Avatar className="size-8 bg-gray-900  flex justify-center items-center flex-shrink-0">
-                            {renderNotification.avatar}
-                          </Avatar>
+                const cardContent = (
+                  <Card className="p-4 shadow-none rounded">
+                    <div className="flex items-start gap-3">
+                      <Avatar className="size-8 bg-gray-900 flex justify-center items-center flex-shrink-0">
+                        {renderNotification.avatar}
+                      </Avatar>
 
-                          <div className="flex flex-row gap-x-1 items-start justify-between">
+                      <div className="flex flex-row gap-x-1 items-start justify-between flex-1 min-w-0">
+                        <div className="flex flex-col gap-1 flex-1 min-w-0">
+                          <p className="text-sm text-gray-700">
+                            {notification.message.split(/(\*\*.*?\*\*)/g).map((part, index) =>
+                              part.startsWith("**") && part.endsWith("**") ? (
+                                <strong key={index} className="text-primary-black">
+                                  {part.slice(2, -2)}
+                                </strong>
+                              ) : (
+                                <span key={index}>{part}</span>
+                              )
+                            )}
+                          </p>
 
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                              <div className="flex-1 min-w-0">
+                          <span className="text-xs text-gray-500 whitespace-nowrap">
+                            {moment(notification?.createdAt).fromNow()}
+                          </span>
 
-                                <p className="text-sm text-gray-700">
-                                  {notification.message.split(/(\*\*.*?\*\*)/g).map((part, index) =>
-                                    part.startsWith("**") && part.endsWith("**") ? (
-                                      <strong key={index} className="text-primary-black">
-                                        {part.slice(2, -2)}
-                                      </strong>
-                                    ) : (
-                                      <span key={index}>{part}</span>
-                                    )
-                                  )}
-                                </p>
-
-                                <span className="text-xs text-gray-500 whitespace-nowrap">
-                                  {moment(notification?.createdAt).fromNow()}
-                                </span>
-                              </div>
+                          {isWelcome && (
+                            <div className="mt-2.5">
+                              <Button
+                                asChild
+                                size="sm"
+                                className="rounded-none text-xs h-7 px-3 font-medium cursor-pointer"
+                              >
+                                <Link href="/profile/edit" onClick={closeMenu}>
+                                  Complete your profile
+                                </Link>
+                              </Button>
                             </div>
-
-                            <div className="flex-shrink-0">
-                              {
-                                notification?.entityImgs?.length == 1 && renderNotification?.postImg
-                              }
-                            </div>
-
-                          </div>
+                          )}
                         </div>
 
-                        {
-                          notification?.entityImgs?.length > 1 && renderNotification?.postImg
-                        }
+                        <div className="flex-shrink-0">
+                          {notification?.entityImgs?.length == 1 && renderNotification?.postImg}
+                        </div>
+                      </div>
+                    </div>
 
-                      </Card>
-                    </Link>
-                  </DropdownMenuItem>
-                </div>
+                    {notification?.entityImgs?.length > 1 && renderNotification?.postImg}
+                  </Card>
+                );
+
+                return (
+                  <div key={notification?.id}>
+                    <DropdownMenuItem className="flex-none focus:bg-transparent p-0">
+                      {isWelcome ? (
+                        <div className="w-full">{cardContent}</div>
+                      ) : (
+                        <Link
+                          href={renderNotification?.link || "#"}
+                          onClick={closeMenu}
+                          className="w-full"
+                        >
+                          {cardContent}
+                        </Link>
+                      )}
+                    </DropdownMenuItem>
+                  </div>
+                );
               })}
 
               {notifications?.data?.data?.length <= 0 && <div className="py-10 space-y-2">
@@ -126,7 +147,7 @@ export default function NotificationIcon() {
                 </center>
               </div>}
 
-            </> : <div className="py-10 space-y-2">
+            </div> : <div className="py-10 space-y-2">
               <Image src={"/notification.gif"} unoptimized alt="empty-cart" className="h-12 w-auto mx-auto" height={500} width={500} />
               <p className="text-center text-gray-500 text-sm">No notifications available</p>
               <center>

@@ -4,8 +4,9 @@ import { FolowMemeber, UnFolowMemeber } from '@/lib/Actions/Folow.action';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import React from 'react'
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
-function FolowUnFolow({ isFolow, memberId }: { isFolow: boolean, memberId: string }) {
+function FolowUnFolow({ isFolow, memberId, className }: { isFolow: boolean, memberId: string, className?: string }) {
 
     const handleFolow = async () => {
         try {
@@ -40,9 +41,9 @@ function FolowUnFolow({ isFolow, memberId }: { isFolow: boolean, memberId: strin
     return (
         <>
             {
-                isFolow ? <Button variant={'outline'} onClick={handleUnFolow} className="font-semibold px-6 cursor-pointer rounded-none w-full md:w-1/2 lg:w-auto">
+                isFolow ? <Button variant={'outline'} onClick={handleUnFolow} className={cn("font-semibold px-6 cursor-pointer rounded-none w-full sm:w-auto", className)}>
                     Following
-                </Button> : <Button onClick={handleFolow} className=" text-white font-semibold px-6 cursor-pointer rounded-none w-full md:w-1/2 lg:w-auto">
+                </Button> : <Button onClick={handleFolow} className={cn("text-white font-semibold px-6 cursor-pointer rounded-none w-full sm:w-auto", className)}>
                     Follow
                 </Button>
             }

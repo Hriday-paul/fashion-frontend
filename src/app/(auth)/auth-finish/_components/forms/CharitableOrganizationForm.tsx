@@ -23,8 +23,8 @@ import { buildAuthFinishFormData } from "../submitAuthFinish";
 
 const charitableOrganizationSchema = z.object({
   legalName: z
-    .string({ required_error: "Legal name is required" })
-    .min(1, "Legal name is required"),
+    .string({ required_error: "Legal organisation name is required" })
+    .min(1, "Legal organisation name is required"),
   registrationNumber: z.string().optional(),
   registrationCountry: z
     .string({ required_error: "Registration country is required" })
@@ -92,11 +92,11 @@ export default function CharitableOrganizationForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-base font-semibold text-gray-900">
-                Legal Organization Name <span className="text-red-500">*</span>
+                Legal Organisation Name <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Enter legal organization name"
+                  placeholder="Enter legal organisation name"
                   {...field}
                   className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
                 />
@@ -113,11 +113,11 @@ export default function CharitableOrganizationForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-base font-semibold text-gray-900">
-                  Registration Number
+                  Organisation Registration Number
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter registration number"
+                    placeholder="Enter organisation registration number"
                     {...field}
                     className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
                   />

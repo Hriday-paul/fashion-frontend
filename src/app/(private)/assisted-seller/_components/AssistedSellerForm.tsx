@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -97,10 +97,27 @@ const CharityFormSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 export function AssistedSellerForm() {
+  const formTopRef = useRef<HTMLDivElement>(null);
   const { data: charitiesData } = useGetCharitiesQuery();
   const user = useSelector((state: RootState) => state.auth.user);
   const { symbol } = useCurrency();
   const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
+
+  const scrollToFormTop = useCallback(() => {
+    if (typeof window !== "undefined") {
+      if (formTopRef.current) {
+        formTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, []);
+
+  const handleSuccessDialogChange = useCallback((open: boolean) => {
+    setOpenSuccessDialog(open);
+    if (!open) {
+      scrollToFormTop();
+    }
+  }, [scrollToFormTop]);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -112,7 +129,8 @@ export function AssistedSellerForm() {
     name?: string;
   } | null>(null);
 
-  const required_Charity = user?.auth?.role !== UserRole.ECO_FRIENDLY_STORE;
+  const isCharityShop = user?.auth?.role === UserRole.CHARITY_SHOP;
+  const required_Charity = user?.auth?.role !== UserRole.ECO_FRIENDLY_STORE && !isCharityShop;
 
   const schema = (required_Charity ? formSchema.merge(CharityFormSchema) : formSchema).superRefine(
     (data, ctx) => {
@@ -170,6 +188,8 @@ export function AssistedSellerForm() {
       //reset the form and uploaded images
       form.reset();
       setImages([]);
+
+      scrollToFormTop();
 
       setOpenSuccessDialog(true);
 
@@ -278,7 +298,7 @@ export function AssistedSellerForm() {
   const priceType = form.watch("priceType")
 
   return (
-    <div className="md:space-y-6 space-y-3 max-w-2xl mx-auto">
+    <div ref={formTopRef} className="md:space-y-6 space-y-3 max-w-2xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Assited Sell</h1>
         <p className="text-muted-foreground">Complete the form below to submit items for our assisted seller service. <Link href="/help/assisted-seller" className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-700">Learn more about assisted selling</Link>.</p>
@@ -439,7 +459,7 @@ export function AssistedSellerForm() {
                           <Label htmlFor="option-2" className="font-medium cursor-pointer flex flex-col items-start">
                             <p className="text-base font-medium">Tell us what you'd like to earn</p>
                             <span className="text-sm text-muted-foreground mt-0.5">
-                              Roughly how much you'd like to receive after our fees and your donation
+                              Roughly how much you'd like to receive after our fees{required_Charity ? " and your donation" : ""}
                             </span>
 
                             {priceType === "TARGET_AMOUNT" && (
@@ -724,7 +744,7 @@ export function AssistedSellerForm() {
             <div>
               <p className="font-semibold text-base">Assisted Seller Service</p>
               <p className="text-sm text-gray-800">
-                Our assisted seller fee is 30% of the each sale price, before your chosen charity donation.
+                Our assisted seller fee is 30% of the each sale price{required_Charity ? ", before your chosen charity donation" : ""}.
 
                 <br />
 
@@ -762,7 +782,7 @@ export function AssistedSellerForm() {
         </form>
       </Form>
 
-      <SuccessModal open={openSuccessDialog} setOpen={setOpenSuccessDialog} content={<div className="p-5">
+      <SuccessModal open={openSuccessDialog} setOpen={handleSuccessDialogChange} content={<div className="p-5">
 
         <div className="flex justify-center mb-5">
           <CheckCircle2 className="w-14 h-14 text-green-500" strokeWidth={1.75} />

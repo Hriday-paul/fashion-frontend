@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,7 +36,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
 import { useGetCharitiesQuery } from "@/redux/api/userApi";
 import { DonateDirectMoney } from "@/lib/Actions/Donation.action";

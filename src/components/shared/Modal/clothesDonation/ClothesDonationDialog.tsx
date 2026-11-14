@@ -29,7 +29,7 @@ export default function ClothesDonationDialog({ className, children, charityId }
                 Donate Clothes <AnimatedArrow />
             </Button> */}
             <Dialog open={open} onOpenChange={handleOpenChange} >
-                <DialogTrigger asChild>
+                <DialogTrigger asChild className={className}>
                     {children}
                 </DialogTrigger>
                 <DialogContent className="max-h-[90vh] sm:max-w-2xl overflow-y-auto scroll-hide rounded">

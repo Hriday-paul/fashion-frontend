@@ -74,6 +74,7 @@ function SelectCountry({ control, setValue, allowedCountries }: any) {
                     "focus:ring-0 focus:border has-[[data-slot=input-group-control]:focus-visible]:ring-0 has-[[data-slot=input-group-control]:focus-visible]:border-primary-black",
                     selectedCountry && "pl-8" // room for the flag only when one is selected
                   )}
+                  autoComplete="off"
                 />
               </div>
 

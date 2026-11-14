@@ -133,11 +133,11 @@ export default function CharityShopForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-base font-semibold text-gray-900">
-                  Legal Business Name
+                  Legal Organisation Name
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter legal business name"
+                    placeholder="Enter legal organisation name"
                     {...field}
                     className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
                   />
@@ -153,11 +153,11 @@ export default function CharityShopForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-base font-semibold text-gray-900">
-                  Business Registration Number
+                  Organisation Registration Number
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter business registration number"
+                    placeholder="Enter organisation registration number"
                     {...field}
                     className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
                   />

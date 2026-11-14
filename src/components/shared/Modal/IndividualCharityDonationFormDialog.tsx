@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -22,7 +23,6 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { X, ArrowRight } from "lucide-react";
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import CommonButton from "@/components/ui/common-button";
 import AnimatedArrow from "@/components/animatedArrows/AnimatedArrow";
 import { useCurrency } from "@/hooks/useCurrency";

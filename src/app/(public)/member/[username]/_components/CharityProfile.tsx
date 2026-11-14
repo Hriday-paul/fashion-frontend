@@ -6,6 +6,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import React, { Suspense } from 'react'
+import CharityGallery from './CharityGallery';
+import ExpandableText from '@/components/shared/ExpandableText';
 
 function CharityProfile({ userName }: { userName: string }) {
 
@@ -43,9 +45,11 @@ const CharityDetails = async ({ userPromise }: { userPromise: Promise<{ data: IU
                         About us
                     </h2>
                     <div className="space-y-6 text-base leading-relaxed text-text-main/80">
-                        <p>
-                            {user?.data?.description}
-                        </p>
+                        <ExpandableText
+                            text={user?.data?.description}
+                            lines={4}
+                            className="text-foreground leading-relaxed max-w-xl"
+                        />
                     </div>
                 </section>
 
@@ -55,20 +59,7 @@ const CharityDetails = async ({ userPromise }: { userPromise: Promise<{ data: IU
                     <p className="mt-1 text-sm text-gray-700">
                         Moments from our recent programmes on the ground.
                     </p>
-                    <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">
-                        {user?.data?.charityGalleries?.map((image) => (
-                            <Image
-                                src={image.url || defaultImg?.placeholderImg}
-                                key={image?.id}
-                                alt={image?.caption || `Gallery Image`}
-                                placeholder='blur'
-                                blurDataURL={defaultImg?.placeholderImg}
-                                width={1024}
-                                height={768}
-                                className="aspect-4/3 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
-                        ))}
-                    </div>
+                    <CharityGallery images={user?.data?.charityGalleries} />
                 </section>}
             </div>
 

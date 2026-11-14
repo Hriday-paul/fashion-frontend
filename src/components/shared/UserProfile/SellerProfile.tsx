@@ -5,11 +5,12 @@ import { notFound } from 'next/navigation'
 import { Rating } from "@/components/ui/rating";
 import moment from 'moment'
 import { userRoleMapper } from '@/utils/userRoleMapper'
+import ExpandableText from '../ExpandableText';
 import Link from 'next/link';
 import FolowUnFolow from '@/app/(public)/member/[username]/_components/FolowUnFolow';
 import { Button } from '@/components/ui/button';
 import FolowerFolowing from '@/app/(public)/member/[username]/_components/FolowerFolowing';
-import { BadgeCheck, Check, Heart } from 'lucide-react';
+import { BadgeCheck, Check, Heart, Shirt } from 'lucide-react';
 import { countries } from '@/utils/constant';
 import Flag from '../Flag';
 import CountrySellNotAvaialbleAlert from './CountrySellNotAvaialbleAlert';
@@ -21,6 +22,8 @@ import Image from 'next/image';
 import { useCurrency } from '@/hooks/useCurrency';
 import { DonationFromProfile } from '@/app/(public)/member/[username]/_components/DonationFromProfile';
 import DonationsRaisedDialog from '../Modal/Donation/DonationsRaisedDialog';
+import userBannerPlaceholder from "@/assets/banner/user-placeholder.png";
+import ClothesDonationDialog from '../Modal/clothesDonation/ClothesDonationDialog';
 
 type User = {
   data:
@@ -63,14 +66,31 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
     { name: 'Website', url: userData?.website, icon: wb },
   ].filter((link) => link.url);
 
+  const bannerSrc = (userData?.bannerUrl && userData.bannerUrl.trim()) ? userData.bannerUrl : userBannerPlaceholder;
+  const isPlaceholder = bannerSrc === userBannerPlaceholder;
+
   return (
     <div className='pt-5'>
+
+      {/* Profile Banner */}
+      <div className="relative w-full h-44 sm:h-56 md:h-64 lg:h-72 rounded-2xl overflow-hidden bg-muted mb-6">
+        <Image
+          src={bannerSrc}
+          alt={`${userData?.userName || "User"} banner`}
+          fill
+          priority
+          quality={100}
+          unoptimized={isPlaceholder}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 1200px, 1400px"
+          className="object-cover"
+        />
+      </div>
 
       {!isCharity ? <>
         {/* Profile Header Section */}
         <div className='flex flex-col lg:flex-row lg:justify-between items-start lg:items-center gap-5'>
 
-          <div className='flex flex-col md:flex-row md:items-center gap-y-5 gap-x-0 md:gap-x-16 lg:gap-x-20'>
+          <div className='flex flex-col md:flex-row md:items-center gap-y-5 gap-x-0 md:gap-x-6 lg:gap-x-6 xl:gap-x-12'>
 
             <div className="flex flex-row items-start gap-3 md:gap-5 shrink-0">
 
@@ -154,7 +174,7 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
 
             </div>
 
-            <div className='flex flex-row flex-wrap lg:flex-nowrap items-center gap-8 lg:gap-10'>
+            <div className='flex flex-row flex-wrap items-center gap-4 sm:gap-6 xl:gap-8'>
 
               <div className=''>
                 <FolowerFolowing type='following' folowerCount={userData?._count?.followers || 0} folowingCount={userData?._count?.following || 0} actionBtn={<div className=''>
@@ -164,14 +184,14 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
               </div>
 
 
-              <div className='border-x border-gray-200 px-8 lg:px-10'>
+              <div className='border-x border-gray-200 px-4 sm:px-6 xl:px-8'>
                 <FolowerFolowing type='followers' folowerCount={userData?._count?.followers || 0} folowingCount={userData?._count?.following || 0} actionBtn={<div className=''>
                   <p className='font-semibold'>{userData?._count?.followers || 0}</p>
                   <p className='text-gray-700'>Followers</p>
                 </div>} userName={userData?.userName} />
               </div>
 
-              {!isCharity && <div className='border-r border-gray-200 pr-8 lg:pr-10'>
+              {!isCharity && <div className='border-r border-gray-200 pr-4 sm:pr-6 xl:pr-8'>
                 <p className='font-semibold'>{user?.data?.totalSells}</p>
                 <p className='text-gray-700'>Sales</p>
               </div>}
@@ -182,14 +202,12 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
                   charityName={
                     `${userData?.fname || ""} ${userData?.lname || ""}`.trim() ||
                     userData?.userName
-                  }
-                  totalRaisedDonation={user?.data?.totalRaisedDonation}
-                >
+                  }>
                   <button
                     type="button"
                     className="text-left cursor-pointer group transition-opacity hover:opacity-85"
                   >
-                    <p className="font-semibold group-hover:text-green-800 transition-colors">
+                    <p className="font-semibold">
                       {format(user?.data?.totalRaisedDonation || 0, { decimals: 1 })}
                     </p>
                     <p className="text-gray-700">
@@ -207,18 +225,37 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
             </div>
           </div>
 
-          {!user?.data?.isCurrentUser && <div className="w-full flex flex-col justify-start lg:justify-end items-start lg:items-end gap-y-3">
-            <FolowUnFolow isFolow={user?.data?.isfolowing} memberId={userData?.id} />
-            {isCharityShop && (
-              <div className='lg:w-auto w-full'>
-                <DonationFromProfile charity={user?.data?.user}>
-                  <Button className=" text-white font-semibold px-6 cursor-pointer rounded-none w-full md:w-1/2 lg:w-36 bg-green-800 hover:bg-green-700 duration-200 transition-colors flex flex-row gap-x-1.5 items-center justify-center">
-                    <Heart size={20} />
+          {!user?.data?.isCurrentUser && (
+            isCharityShop ? (
+              <div className="w-full sm:w-auto grid grid-cols-1 sm:flex sm:flex-row sm:items-center lg:grid lg:grid-cols-2 lg:w-72 xl:w-80 gap-2 sm:gap-2.5 shrink-0">
+                <FolowUnFolow
+                  isFolow={user?.data?.isfolowing}
+                  memberId={userData?.id}
+                  className="w-full sm:w-auto lg:w-full col-span-1 h-9 px-3"
+                />
+
+                <DonationFromProfile charity={user?.data?.user} className="w-full sm:w-auto lg:w-full col-span-1">
+                  <Button className="text-white font-semibold px-3 cursor-pointer rounded-none w-full sm:w-auto lg:w-full bg-green-800 hover:bg-green-700 duration-200 transition-colors flex flex-row gap-x-1.5 items-center justify-center text-sm h-9">
+                    <Heart size={16} />
                     Donate Now
                   </Button>
                 </DonationFromProfile>
-              </div>)}
-          </div>}
+
+                <ClothesDonationDialog charityId={userData?.id} className="w-full sm:w-auto lg:w-full col-span-1 sm:col-auto lg:col-span-2">
+                  <Button
+                    className="font-semibold px-3 cursor-pointer rounded-none w-full sm:w-auto lg:w-full col-span-1 sm:col-auto lg:col-span-2 bg-[#f59e0b] hover:bg-[#d97706] text-[#0f172a] duration-200 transition-colors flex flex-row gap-x-1.5 items-center justify-center text-sm h-9 shadow-xs"
+                  >
+                    <Shirt size={16} />
+                    Donate Clothes
+                  </Button>
+                </ClothesDonationDialog>
+              </div>
+            ) : (
+              <div className="w-full sm:w-auto shrink-0">
+                <FolowUnFolow isFolow={user?.data?.isfolowing} memberId={userData?.id} className="w-full sm:w-auto" />
+              </div>
+            )
+          )}
         </div>
 
         {/* Badges Section */}
@@ -250,9 +287,11 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
         {/* Bio Section */}
         {
           userData?.bio && <div className="mt-5 md:mt-8 lg:mt-10">
-            <pre className="text-foreground leading-relaxed md:text-lg max-w-xl whitespace-pre-wrap break-words font-figtree">
-              {userData?.bio}
-            </pre>
+            <ExpandableText
+              text={userData?.bio}
+              lines={4}
+              className="text-foreground leading-relaxed md:text-lg max-w-xl"
+            />
           </div>
         }
 
@@ -283,9 +322,15 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
                 {userRoleMapper(user?.data?.user?.auth?.role)?.label}
               </span>
             </div>
-            <p className="mt-2 text-sm md:text-base">
-              {user?.data?.user?.bio}
-            </p>
+            {user?.data?.user?.bio && (
+              <div className="mt-2">
+                <ExpandableText
+                  text={user?.data?.user?.bio}
+                  lines={4}
+                  className="text-sm md:text-base text-foreground leading-relaxed"
+                />
+              </div>
+            )}
           </div>
 
           <div className='md:w-auto w-full'>

@@ -9,6 +9,8 @@ async function BundleDiscount() {
 
     const discounts = await GetBundleDiscounts() as { data: { enabled: boolean, tiers: { itemCount: number, discountPercent: number }[] } };
 
+    console.log(discounts)
+
     return (
         <div>
             <EnableBundleCreation discounts={discounts.data} />

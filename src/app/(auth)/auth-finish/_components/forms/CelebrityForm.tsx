@@ -20,6 +20,28 @@ import { useFinishAuthMutation } from "@/redux/api/authApi";
 import { getFirstErrorMessage } from "@/utils/modifyFormError";
 import DocumentUploadField from "../DocumentUploadField";
 import { buildAuthFinishFormData } from "../submitAuthFinish";
+import { cn } from "@/lib/utils";
+
+export const isValidUrl = (url?: string | null): boolean => {
+  if (!url || typeof url !== "string") return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+
+  const urlPattern =
+    /^(https?:\/\/)?(www\.)?([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(:\d+)?(\/[^\s]*)?$/i;
+
+  if (!urlPattern.test(trimmed)) {
+    return false;
+  }
+
+  try {
+    const hasProtocol = /^https?:\/\//i.test(trimmed);
+    const urlObj = new URL(hasProtocol ? trimmed : `https://${trimmed}`);
+    return !!urlObj.hostname && urlObj.hostname.includes(".");
+  } catch {
+    return false;
+  }
+};
 
 const celebritySchema = z.object({
   legalName: z
@@ -29,8 +51,26 @@ const celebritySchema = z.object({
     .string({ required_error: "Public name is required" })
     .min(1, "Public name is required"),
   profession: z.string().optional(),
-  officialWebsite: z.string().optional(),
-  officialProfileUrls: z.array(z.string()).default([]),
+  officialWebsite: z
+    .string()
+    .trim()
+    .optional()
+    .or(z.literal(""))
+    .refine((val) => !val || isValidUrl(val), {
+      message:
+        "Please enter a valid website URL (e.g. https://xyz.com, www.abc.com, or abc.com)",
+    }),
+  officialProfileUrls: z
+    .array(
+      z
+        .string()
+        .trim()
+        .refine((val) => isValidUrl(val), {
+          message:
+            "Please enter a valid URL (e.g. https://xyz.com, www.abc.com, or abc.com)",
+        })
+    )
+    .default([]),
 });
 
 type CelebrityFormValues = z.infer<typeof celebritySchema>;
@@ -42,10 +82,12 @@ export default function CelebrityForm({
 }) {
   const [documents, setDocuments] = useState<File[]>([]);
   const [profileUrlInput, setProfileUrlInput] = useState("");
+  const [profileUrlError, setProfileUrlError] = useState("");
   const [finishAuth, { isLoading }] = useFinishAuthMutation();
 
   const form = useForm<CelebrityFormValues>({
     resolver: zodResolver(celebritySchema),
+    mode: "onChange",
     defaultValues: {
       legalName: "",
       publicName: "",
@@ -60,11 +102,23 @@ export default function CelebrityForm({
   const handleAddProfileUrl = () => {
     const trimmed = profileUrlInput.trim();
     if (!trimmed) return;
-    if (!profileUrls.includes(trimmed)) {
-      form.setValue("officialProfileUrls", [...profileUrls, trimmed], {
-        shouldValidate: true,
-      });
+
+    if (!isValidUrl(trimmed)) {
+      setProfileUrlError(
+        "Please enter a valid URL (e.g. https://xyz.com, www.abc.com, or abc.com)"
+      );
+      return;
     }
+
+    if (profileUrls.includes(trimmed)) {
+      setProfileUrlError("This URL has already been added");
+      return;
+    }
+
+    setProfileUrlError("");
+    form.setValue("officialProfileUrls", [...profileUrls, trimmed], {
+      shouldValidate: true,
+    });
     setProfileUrlInput("");
   };
 
@@ -87,6 +141,16 @@ export default function CelebrityForm({
     }
 
     const pendingUrl = profileUrlInput.trim();
+    if (pendingUrl) {
+      if (!isValidUrl(pendingUrl)) {
+        setProfileUrlError(
+          "Please enter a valid URL (e.g. https://xyz.com, www.abc.com, or abc.com)"
+        );
+        toast.error("Please enter a valid social/profile URL or clear the input");
+        return;
+      }
+    }
+
     const finalUrls =
       pendingUrl && !values.officialProfileUrls.includes(pendingUrl)
         ? [...values.officialProfileUrls, pendingUrl]
@@ -115,7 +179,7 @@ export default function CelebrityForm({
           <FormField
             control={form.control}
             name="legalName"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <FormLabel className="text-base font-semibold text-gray-900">
                   Legal Name <span className="text-red-500">*</span>
@@ -124,10 +188,15 @@ export default function CelebrityForm({
                   <Input
                     placeholder="Enter your full legal name"
                     {...field}
-                    className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
+                    className={cn(
+                      "bg-white rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border !text-base !py-5 px-3.5",
+                      fieldState.error
+                        ? "border-red-500 focus:border-red-500 focus-visible:border-red-500"
+                        : "border-[#e1e1e1] focus-visible:border-primary-black"
+                    )}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500 text-sm mt-1" />
               </FormItem>
             )}
           />
@@ -135,7 +204,7 @@ export default function CelebrityForm({
           <FormField
             control={form.control}
             name="publicName"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <FormLabel className="text-base font-semibold text-gray-900">
                   Public / Stage Name <span className="text-red-500">*</span>
@@ -144,10 +213,15 @@ export default function CelebrityForm({
                   <Input
                     placeholder="Enter your public or stage name"
                     {...field}
-                    className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
+                    className={cn(
+                      "bg-white rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border !text-base !py-5 px-3.5",
+                      fieldState.error
+                        ? "border-red-500 focus:border-red-500 focus-visible:border-red-500"
+                        : "border-[#e1e1e1] focus-visible:border-primary-black"
+                    )}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500 text-sm mt-1" />
               </FormItem>
             )}
           />
@@ -177,19 +251,24 @@ export default function CelebrityForm({
           <FormField
             control={form.control}
             name="officialWebsite"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <FormLabel className="text-base font-semibold text-gray-900">
                   Official Website
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="https://yourwebsite.com"
+                    placeholder="e.g. https://xyz.com, www.abc.com, abc.com"
                     {...field}
-                    className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
+                    className={cn(
+                      "bg-white rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border !text-base !py-5 px-3.5",
+                      fieldState.error
+                        ? "border-red-500 focus:border-red-500 focus-visible:border-red-500"
+                        : "border-[#e1e1e1] focus-visible:border-primary-black"
+                    )}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500 text-sm mt-1" />
               </FormItem>
             )}
           />
@@ -198,7 +277,7 @@ export default function CelebrityForm({
         <FormField
           control={form.control}
           name="officialProfileUrls"
-          render={() => (
+          render={({ fieldState }) => (
             <FormItem>
               <FormLabel className="text-base font-semibold text-gray-900">
                 Official Social / Profile URLs
@@ -208,15 +287,31 @@ export default function CelebrityForm({
                   <div className="flex gap-2">
                     <Input
                       value={profileUrlInput}
-                      onChange={(e) => setProfileUrlInput(e.target.value)}
+                      onChange={(e) => {
+                        setProfileUrlInput(e.target.value);
+                        if (profileUrlError) setProfileUrlError("");
+                      }}
+                      onBlur={() => {
+                        const trimmed = profileUrlInput.trim();
+                        if (trimmed && !isValidUrl(trimmed)) {
+                          setProfileUrlError(
+                            "Please enter a valid URL (e.g. https://xyz.com, www.abc.com, or abc.com)"
+                          );
+                        }
+                      }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
                           handleAddProfileUrl();
                         }
                       }}
-                      placeholder="https://instagram.com/yourprofile"
-                      className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
+                      placeholder="e.g. https://xyz.com, www.abc.com, abc.com"
+                      className={cn(
+                        "bg-white rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border !text-base !py-5 px-3.5",
+                        profileUrlError
+                          ? "border-red-500 focus:border-red-500 focus-visible:border-red-500"
+                          : "border-[#e1e1e1] focus-visible:border-primary-black"
+                      )}
                     />
                     <Button
                       type="button"
@@ -228,6 +323,18 @@ export default function CelebrityForm({
                       Add
                     </Button>
                   </div>
+
+                  {profileUrlError && (
+                    <p className="text-sm font-medium text-red-500">
+                      {profileUrlError}
+                    </p>
+                  )}
+
+                  {fieldState.error && !profileUrlError && (
+                    <p className="text-sm font-medium text-red-500">
+                      {fieldState.error.message}
+                    </p>
+                  )}
 
                   {profileUrls.length > 0 && (
                     <div className="flex flex-wrap gap-2">

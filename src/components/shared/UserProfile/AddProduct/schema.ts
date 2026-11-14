@@ -150,7 +150,7 @@ export const productFormDefaultValues: ProductFormValues = {
   weight_kg: "",
 
   // durationTime: "",
-  returnsPolicy: "",
+  returnsPolicy: "7",
   // returnDescription: "",
   allowOffers: true,
 };

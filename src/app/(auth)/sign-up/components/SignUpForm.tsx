@@ -29,6 +29,9 @@ import SocailloginFinish from "@/app/(auth)/sign-up/components/SocailloginFinish
 
 import { GoogleAuthProvider, OAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/firebase.init";
+import SelectCountry from "@/app/(public)/checkout/cart/[cartGroupId]/_components/Billing/SelectCountry";
+import { countries } from "@/utils/constant";
+import { useAutoSelectCountry } from "@/hooks/useAutoSelectCountry";
 
 const SignUpForm = ({ isCharity = false, role }: { isCharity?: boolean; role: UserRole }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -48,6 +51,9 @@ const SignUpForm = ({ isCharity = false, role }: { isCharity?: boolean; role: Us
   });
 
   const watchedUsername = form.watch("userName");
+  const watchedCountry = form.watch("country");
+
+  useAutoSelectCountry(form.setValue, watchedCountry);
 
   useEffect(() => {
     if (!watchedUsername || watchedUsername.trim() === "") {
@@ -121,17 +127,15 @@ const SignUpForm = ({ isCharity = false, role }: { isCharity?: boolean; role: Us
       return;
     }
 
+    const countryDetail = countries.find((c) => c.name === data?.country);
+
     try {
-      const res = await createAccount({ ...data, role }).unwrap();
+      const res = await createAccount({ ...data, role, country: countryDetail?.code }).unwrap();
       if (res?.data?.otpToken) {
         sessionStorage.removeItem("signUpToken");
         sessionStorage.setItem("verifyOtpToken", res?.data?.otpToken);
         sessionStorage.setItem("signupRole", role);
         sessionStorage.setItem("otpEmail", data.email);
-        toast.success("Account created successfully");
-        toast.success(
-          "Please verify your email with OTP, which has been sent to your email.",
-        );
         router.push(`/verify-otp`);
       }
     } catch (error: any) {
@@ -195,10 +199,10 @@ const SignUpForm = ({ isCharity = false, role }: { isCharity?: boolean; role: Us
                 name="fname"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{isCharity ? "Organization Name" : "First Name"}</FormLabel>
+                    <FormLabel>{isCharity ? "Organisation Name" : "First Name"}</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={isCharity ? "Organization Name" : "First Name"}
+                        placeholder={isCharity ? "Organisation Name" : "First Name"}
                         {...field}
                         className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-6 px-3.5"
                       />
@@ -259,6 +263,8 @@ const SignUpForm = ({ isCharity = false, role }: { isCharity?: boolean; role: Us
                   </FormItem>
                 )}
               />
+
+              <SelectCountry setValue={form.setValue} control={form.control} />
 
               <FormField
                 control={form.control}

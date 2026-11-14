@@ -8,6 +8,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +22,6 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import { DonateDirectMoney } from "@/lib/Actions/Donation.action";
 import { toast } from "sonner";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
@@ -30,6 +30,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IUser } from "@/types";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
     amount: z.string().min(1, "Please select or enter an amount"),
@@ -42,10 +43,12 @@ type FormData = z.infer<typeof formSchema>;
 
 export function DonationFromProfile({
     children,
-    charity
+    charity,
+    className,
 }: {
     children?: React.ReactNode;
-    charity: IUser
+    charity: IUser;
+    className?: string;
 }) {
 
     const [selectedPreset, setSelectedPreset] = useState<string>("");
@@ -111,9 +114,9 @@ export function DonationFromProfile({
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogTrigger asChild className="w-auto">
+            <DialogTrigger asChild className={className}>
                 {children ? (
-                    <div>{children}</div>
+                    <div className={cn("w-auto", className)}>{children}</div>
                 ) : (
                     <span className="text-green-600 lg:text-base md:text-xs uppercase cursor-pointer">
                         Donate now

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import FolowUnFolow from '@/app/(public)/member/[username]/_components/FolowUnFolow';
 import { Button } from '@/components/ui/button';
 import FolowerFolowing from '@/app/(public)/member/[username]/_components/FolowerFolowing';
-import { BadgeCheck, Check, FileText, Heart, ImagePlus, Link as LLink } from 'lucide-react';
+import { BadgeCheck, BookImage, Check, FileText, Heart, ImagePlus, Link as LLink } from 'lucide-react';
 import { countries } from '@/utils/constant';
 import fb from "@/assets/icons/facebook.png"
 import wb from "@/assets/icons/web-logo.png"
@@ -19,6 +19,10 @@ import Flag from '@/components/shared/Flag';
 import { defaultImg } from '@/utils/defaultImg';
 import { DonationFromProfile } from './DonationFromProfile';
 import DonationsRaisedDialog from '@/components/shared/Modal/Donation/DonationsRaisedDialog';
+import userBannerPlaceholder from "@/assets/banner/user-placeholder.png";
+import CharityGallery from './CharityGallery';
+import ExpandableText from '@/components/shared/ExpandableText';
+import { CharityOrgOverviewDonationMoney } from '../(profile)/overview/_components/CharityOverviewDonation'
 
 type User = {
     data:
@@ -62,10 +66,29 @@ function CharityProfile1({ user }: { user: User }) {
 
     const emptySocialLinks = socialLinks.length === 0;
 
+    const bannerSrc = (userData?.bannerUrl && userData.bannerUrl.trim()) ? userData.bannerUrl : userBannerPlaceholder;
+    const isPlaceholder = bannerSrc === userBannerPlaceholder;
+
+    const iscurrentUser = user?.data?.isCurrentUser;
+
     return (
-        <div>
+        <div className='pt-5'>
+            {/* Profile Banner */}
+            <div className="relative w-full h-44 sm:h-56 md:h-64 lg:h-72 rounded-2xl overflow-hidden bg-muted mb-6">
+                <Image
+                    src={bannerSrc}
+                    alt={`${userData?.userName || "Charity"} banner`}
+                    fill
+                    priority
+                    quality={100}
+                    unoptimized={isPlaceholder}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 1200px, 1400px"
+                    className="object-cover"
+                />
+            </div>
+
             {/* Profile Header Section */}
-            <div className='flex flex-col lg:flex-row lg:justify-between items-start lg:items-center gap-5 pt-5'>
+            <div className='flex flex-col lg:flex-row lg:justify-between items-start lg:items-center gap-5'>
 
                 <div className='flex flex-col md:flex-row md:items-center gap-y-5 gap-x-0 md:gap-x-16 lg:gap-x-20'>
 
@@ -159,7 +182,6 @@ function CharityProfile1({ user }: { user: User }) {
                                 `${userData?.fname || ""} ${userData?.lname || ""}`.trim() ||
                                 userData?.userName
                             }
-                            totalRaisedDonation={user?.data?.totalRaisedDonation}
                         >
                             <button
                                 type="button"
@@ -219,9 +241,11 @@ function CharityProfile1({ user }: { user: User }) {
             {/* Bio Section */}
             {
                 userData?.bio && <div className="mt-5 md:mt-8 lg:mt-10">
-                    <pre className="text-foreground leading-relaxed md:text-lg max-w-xl whitespace-pre-wrap break-words font-figtree">
-                        {userData?.bio}
-                    </pre>
+                    <ExpandableText
+                        text={userData?.bio}
+                        lines={4}
+                        className="text-foreground leading-relaxed md:text-lg max-w-xl"
+                    />
                 </div>
             }
 
@@ -241,22 +265,39 @@ function CharityProfile1({ user }: { user: User }) {
                             About us
                         </h2>
                         {!user?.data?.user?.description ? <EmptyAbout /> : <div className="space-y-6 text-base leading-relaxed text-text-main/80">
-                            {/* <p>
-                                {user?.data?.user?.description}
-                            </p> */}
-                            <pre className="text-foreground leading-relaxed max-w-xl whitespace-pre-wrap break-words font-figtree">
-                                {user?.data?.user?.description}
-                            </pre>
+                            <ExpandableText
+                                text={user?.data?.user?.description}
+                                lines={4}
+                                className="text-foreground leading-relaxed max-w-xl"
+                            />
                         </div>}
 
                     </section>
 
-                    <section className='mt-4 border-t border-gray-200 pt-4'>
+                    <section className='border border-gray-200 rounded-md p-4'>
+                        <h2 className="text-xl font-semibold text-foreground">Gallery</h2>
+                        {/* <p className="mt-1 text-sm text-gray-700">
+                    Moments from our recent programmes on the ground.
+                </p> */}
+                        {user?.data?.user?.charityGalleries.length > 0 ? (
+                            <CharityGallery images={user?.data?.user?.charityGalleries} />
+                        ) : <div className="flex flex-col items-center px-4 pb-4 pt-1 text-center">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200">
+                                <BookImage className="h-7 w-7 text-slate-800" />
+                            </div>
+
+                            <p className="mt-4 text-base lg:text-lg font-semibold text-black">No photos yet</p>
+                            <p className="mt-1 text-sm text-gray-600">
+                                This charity hasn’t added any photos yet.
+                            </p>
+                        </div>}
+                    </section>
+
+                    {/* <section className='mt-4 border-t border-gray-200 pt-4'>
                         <h2 className="text-xl font-semibold text-foreground mb-2">
                             Links & contact
                         </h2>
 
-                        {/* //social links */}
                         {emptySocialLinks ? <EmptyLink /> : <div className="mt-1 space-y-3">
                             {socialLinks.map((link) => (
                                 <Link key={link.name} href={link?.url || ""} target="_blank" rel="noopener noreferrer" className="flex gap-1 text-sm font-medium gap-x-2 items-center text-gray-700 hover:text-gray-900 duration-150">
@@ -265,13 +306,13 @@ function CharityProfile1({ user }: { user: User }) {
                                 </Link>
                             ))}
                         </div>}
+                    </section> */}
 
-                    </section>
                 </div>
 
                 <div className='col-span-1'>
 
-                    {!user?.data?.isCurrentUser && <div className="rounded-xl bg-[#0f172a] text-white p-5 shadow-sm">
+                    {iscurrentUser ? <CharityOrgOverviewDonationMoney /> : <div className="rounded-xl bg-[#0f172a] text-white p-5 shadow-sm">
                         <div className="text-[10px] uppercase tracking-wider text-[#64748b] mb-1 font-semibold">Ready to give?</div>
                         <div className="text-lg font-bold mb-1 leading-tight" style={{ textWrap: "pretty" }}>100% goes to this charity</div>
                         <p className="text-[12.5px] text-white mb-4 leading-relaxed">FASHION doesn't take a cut. Donate directly from this page.</p>
@@ -283,26 +324,6 @@ function CharityProfile1({ user }: { user: User }) {
                             </button>
                         </DonationFromProfile>
                     </div>}
-
-                    <div className='mt-3'>
-                        {user?.data?.user?.charityGalleries.length > 0 ? <section className='mt-3'>
-                            <h2 className="text-lg font-semibold text-foreground">Gallery</h2>
-                            <div className="mt-2 grid grid-cols-2 gap-3 md:grid-cols-3">
-                                {user?.data?.user?.charityGalleries?.map((image) => (
-                                    <Image
-                                        src={image.url || defaultImg?.placeholderImg}
-                                        key={image?.id}
-                                        alt={image?.caption || `Gallery Image`}
-                                        placeholder='blur'
-                                        blurDataURL={defaultImg?.placeholderImg}
-                                        width={1024}
-                                        height={768}
-                                        className="aspect-4/3 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                    />
-                                ))}
-                            </div>
-                        </section> : <EmptyGallery />}
-                    </div>
 
                 </div>
 

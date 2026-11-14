@@ -69,7 +69,7 @@ const ProfileFeatures = async ({
   return (
     <div>
       {totalProducts > 0 && <p className="font-semibold mb-3">{totalProducts} Items Available</p>}
-      <ProductsListContainer initialData={prodData?.data?.data} initialMeta={prodData?.data?.meta} query={query} userName={userName} key={JSON.stringify(query)} isCharityShop={isCharityShop} user={user?.data?.user} />
+      <ProductsListContainer initialData={prodData?.data?.data} initialMeta={prodData?.data?.meta} query={query} userName={userName} key={JSON.stringify(query)} isCharityShop={isCharityShop} user={user?.data?.user} isMyprofile={isMyProfile} />
     </div>
   );
 };

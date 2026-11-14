@@ -23,6 +23,9 @@ import { useAppDispatch } from '@/redux/hooks';
 import { setUser } from '@/redux/features/authSlice';
 import { userNameSchema } from './SignSchema';
 import { getRoleKey } from '@/data/dummyData.tsx/userRoleData';
+import { countries } from '@/utils/constant';
+import SelectCountry from '@/app/(public)/checkout/cart/[cartGroupId]/_components/Billing/SelectCountry';
+import { useAutoSelectCountry } from '@/hooks/useAutoSelectCountry';
 
 const formSchema = z.object({
   fname: z
@@ -30,6 +33,11 @@ const formSchema = z.object({
     .min(1, { message: "Name is required" }),
 
   userName: userNameSchema,
+
+  country: z
+    .string({ required_error: "Country is required" })
+    .min(1, { message: "Country is required" }),
+
 });
 
 function SocailloginFinish({ socialLoginToken, role, isCharity = false }: { socialLoginToken: { token: string, name: string | null }, role: UserRole, isCharity?: boolean }) {
@@ -54,6 +62,9 @@ function SocailloginFinish({ socialLoginToken, role, isCharity = false }: { soci
   const dispatch = useAppDispatch();
 
   const watchedUsername = form.watch("userName");
+  const watchedCountry = form.watch("country");
+
+  useAutoSelectCountry(form.setValue, watchedCountry);
 
   useEffect(() => {
     if (!watchedUsername || watchedUsername.trim() === "") {
@@ -127,8 +138,10 @@ function SocailloginFinish({ socialLoginToken, role, isCharity = false }: { soci
       return;
     }
 
+    const countryDetail = countries.find((c) => c.name === data?.country);
+
     try {
-      const res = await createAccount({ ...data, role: role, idToken: socialLoginToken?.token }).unwrap();
+      const res = await createAccount({ ...data, role: role, idToken: socialLoginToken?.token, country: countryDetail?.code }).unwrap();
 
       if (role !== UserRole.INDIVIDUAL_USER) {
         const finishToken = res?.data?.accessToken;
@@ -136,7 +149,6 @@ function SocailloginFinish({ socialLoginToken, role, isCharity = false }: { soci
           sessionStorage.setItem("signUpToken", finishToken);
         }
         sessionStorage.setItem("signupRole", role);
-        toast.success("Account created! Please complete your verification details.");
 
         const encodeRole = getRoleKey(role);
 
@@ -181,10 +193,10 @@ function SocailloginFinish({ socialLoginToken, role, isCharity = false }: { soci
             name="fname"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{isCharity ? "Organization Name" : "First Name"}</FormLabel>
+                <FormLabel>{isCharity ? "Organisation Name" : "First Name"}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={isCharity ? "Organization Name" : "First Name"}
+                    placeholder={isCharity ? "Organisation Name" : "First Name"}
                     {...field}
                     className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-6 px-3.5"
                   />
@@ -229,6 +241,8 @@ function SocailloginFinish({ socialLoginToken, role, isCharity = false }: { soci
               </FormItem>
             )}
           />
+
+          <SelectCountry setValue={form.setValue} control={form.control} />
 
           <Button variant={"default"} disabled={isLoading} type="submit" className="rounded-full h-11 w-full cursor-pointer text-base">{isLoading ? <span className="loader"></span> : "Finish"}</Button>
 

@@ -1,5 +1,5 @@
 "use client"
-import { IMeta, IProduct, IUser } from "@/types";
+import { IMeta, IProduct, IUser, UserRole } from "@/types";
 import ProductCard from "../../Cards/ProductCard";
 import { useRef } from "react";
 import useLazyLoad from "@/hooks/useLazyLoad";
@@ -7,20 +7,25 @@ import Image from "next/image";
 import { useLazyProductsGetByMemberQuery } from "@/redux/api/productApi";
 import { Heart } from "lucide-react";
 import ClothesDonationDialog from "../../Modal/clothesDonation/ClothesDonationDialog";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 type Props = {
   query: { [key: string]: string | undefined },
   userName: string,
   initialData: IProduct[],
   initialMeta: IMeta,
-  isCharityShop: boolean
+  isCharityShop: boolean;
+  isMyprofile: boolean;
   user: IUser
 }
 
-const ProductsListContainer = ({ query, userName, initialData, initialMeta, isCharityShop, user }: Props) => {
+const ProductsListContainer = ({ query, userName, initialData, initialMeta, isCharityShop, user, isMyprofile }: Props) => {
 
   const [loadSellerProds, { isLoading }] = useLazyProductsGetByMemberQuery();
   const triggerRef = useRef(null);
+
+  const cuser = useSelector((state: RootState) => state?.auth?.user);
 
   const loadNextPage = async (page: number) => {
     try {
@@ -49,11 +54,13 @@ const ProductsListContainer = ({ query, userName, initialData, initialMeta, isCh
     initialHasMore: initialMeta ? initialMeta?.page < initialMeta?.totalPage : true
   });
 
+  const isImCharity = cuser?.auth ? (cuser?.auth?.role == UserRole.CHARITABLE_ORGANIZATION || cuser?.auth?.role == UserRole.CHARITY_SHOP) : false;
+
   return (
     <div>
 
       {
-        data?.length === 0 && !isLoading && (isCharityShop ? <EmptyCharityShop user={user} /> : <div className="py-20 md:py-24 lg:py-28 max-w-md mx-auto">
+        data?.length === 0 && !isLoading && ((isCharityShop && (!isImCharity || !isMyprofile)) ? <EmptyCharityShop user={user} /> : <div className="py-20 md:py-24 lg:py-28 max-w-md mx-auto">
           <Image src={"/emty-box.png"} unoptimized alt="empty-cart" className="h-16 lg:h-24 w-auto mx-auto" height={500} width={500} />
 
           <p className="text-center text-gray-900 font-semibold text-base lg:text-xl mb-2">No items available</p>

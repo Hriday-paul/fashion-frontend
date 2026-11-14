@@ -1,4 +1,4 @@
-import { INotification } from "@/types";
+import { INotification, NotificationType } from "@/types";
 import Image from "next/image";
 import { defaultImg } from "@/utils/defaultImg";
 
@@ -26,6 +26,27 @@ const PostImage = ({ notification }: { notification: INotification }) => {
 }
 
 export const NotificationRender = ({ notification }: { notification: INotification }) => {
+    if (
+        notification?.type === NotificationType.WELLCOME ||
+        (notification?.type as unknown) === "WELLCOME"
+    ) {
+        return {
+            avatar: (
+                <Image
+                    src={defaultImg?.fashionIcon}
+                    alt="welcome icon"
+                    width={1200}
+                    height={1200}
+                    placeholder="blur"
+                    blurDataURL={defaultImg?.placeholderImg}
+                    className="w-10 h-10 rounded-full object-cover"
+                />
+            ),
+            link: "/profile/edit",
+            postImg: null,
+        };
+    }
+
     switch (notification?.entityType) {
         case "PRODUCT":
             switch (notification?.type) {

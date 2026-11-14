@@ -41,13 +41,15 @@ export function PriceOverview({
           ${finalPrice.toFixed(2)}
         </span>
       </p>
-      <p className="text-gray-900">
-        Donation Amount:{" "}
-        <span className="font-semibold text-red-500">
-          ${donationAmount.toFixed(2)}
-          {numericDonationPct > 0 ? ` (${numericDonationPct}%)` : ""}
-        </span>
-      </p>
+      {numericDonationPct > 0 && (
+        <p className="text-gray-900">
+          Donation Amount:{" "}
+          <span className="font-semibold text-red-500">
+            ${donationAmount.toFixed(2)}
+            {` (${numericDonationPct}%)`}
+          </span>
+        </p>
+      )}
       <p className="text-gray-900">
         Seller Earning:{" "}
         <span className="font-bold text-green-700">

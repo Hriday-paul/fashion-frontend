@@ -223,6 +223,9 @@ export interface IUser {
   celebrity: Celebrity | null;
   ambassador: Ambassador | null;
   professionalSeller: ProfessionalSeller | null;
+
+  bannerUrl: string | null
+  bannerKey: string | null
 }
 
 
@@ -352,6 +355,7 @@ export enum NotificationEntityType {
 }
 
 export enum NotificationType {
+  WELLCOME = "WELLCOME",
   //for product
   PRODUCT_LIKE = "PRODUCT_LIKE",
   PRICE_DROP = "PRICE_DROP",
@@ -958,8 +962,8 @@ export interface IShipment {
   events: IShipmentEvent[],
   createdAt: Date,
   updatedAt: Date,
-  isPaid : boolean,
-  payment : IPayment | null
+  isPaid: boolean,
+  payment: IPayment | null
 }
 
 export enum ShipmentStatus {

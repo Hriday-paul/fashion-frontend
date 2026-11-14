@@ -15,6 +15,7 @@ import { IUser, UserRole } from '@/types';
 import Image from 'next/image';
 import { defaultImg } from '@/utils/defaultImg';
 import { UpdateProfile } from '@/lib/Actions/Profile.action';
+import userBannerPlaceholder from "@/assets/banner/user-placeholder.png";
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import profileUpdateSchema, { charitySchema } from './Schema';
 import { PhoneInput } from '@/components/ui/PhoneInput';
@@ -23,6 +24,7 @@ import { cn } from '@/lib/utils';
 import SelectCountry from '@/app/(public)/checkout/cart/[cartGroupId]/_components/Billing/SelectCountry';
 import { countries } from '@/utils/constant';
 import CountrySellNotAvaialbleAlert from '../CountrySellNotAvaialbleAlert';
+import { useRouter } from 'next/navigation';
 
 const AboutMe = ({ user }: { user: IUser }) => {
     const role = user?.auth?.role;
@@ -41,13 +43,20 @@ const ImageEditorModal = dynamic(() => import('@/components/shared/ImageEditorMo
 const MAX_PHOTOS = 8;
 const INPUT_ID = "photo-uploader-input";
 const THUMBNAIL_INPUT_ID = "charity-thumbnail-input";
+const BANNER_INPUT_ID = "user-banner-input";
 
-type EditorTarget = "profile" | "thumbnail";
+type EditorTarget = "profile" | "thumbnail" | "banner";
 
 function MyProfile({ user }: { user: IUser }) {
 
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string>("");
+
+    const router = useRouter();
+
+    // Banner
+    const [banner, setBanner] = useState<File | null>(null);
+    const [bannerPreview, setBannerPreview] = useState<string>("");
 
     // Charity thumbnail
     const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -82,6 +91,17 @@ function MyProfile({ user }: { user: IUser }) {
         return () => URL.revokeObjectURL(url);
     }, [image]);
 
+    // Banner preview URL
+    useEffect(() => {
+        if (!banner) {
+            setBannerPreview("");
+            return;
+        }
+        const url = URL.createObjectURL(banner);
+        setBannerPreview(url);
+        return () => URL.revokeObjectURL(url);
+    }, [banner]);
+
     // Thumbnail preview URL
     useEffect(() => {
         if (!thumbnail) {
@@ -93,7 +113,7 @@ function MyProfile({ user }: { user: IUser }) {
         return () => URL.revokeObjectURL(url);
     }, [thumbnail]);
 
-    const isCharity = user?.auth?.role == UserRole.CHARITABLE_ORGANIZATION || user?.auth?.role == UserRole.CHARITY_SHOP
+    const isCharity = user?.auth?.role == UserRole.CHARITABLE_ORGANIZATION || user?.auth?.role == UserRole.CHARITY_SHOP;
 
     const profileSchema = isCharity ? profileUpdateSchema.merge(charitySchema) : profileUpdateSchema;
 
@@ -143,6 +163,10 @@ function MyProfile({ user }: { user: IUser }) {
                 form.append('picture', image);
             }
 
+            if (banner) {
+                form.append('banner', banner);
+            }
+
             if (isCharity && thumbnail) {
                 form.append('charityThumbnail', thumbnail);
             }
@@ -157,6 +181,8 @@ function MyProfile({ user }: { user: IUser }) {
             }
 
             toast.success(res.message || "Profile Updated Successfully");
+
+            router.push(`/member/${user?.userName}`);
 
         } catch (error: any) {
             if (isRedirectError(error)) {
@@ -230,18 +256,54 @@ function MyProfile({ user }: { user: IUser }) {
         setEditorModalOpen(true);
     };
 
+    // ---------------- Banner ----------------
+    const bannerOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        e.target.value = "";
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            toast.error("Please select a valid image file");
+            return;
+        }
+
+        setEditingImage({
+            file,
+            name: file.name || `banner-${Date.now()}.jpg`,
+            target: "banner",
+        });
+        setEditorModalOpen(true);
+    };
+
+    const handleAdjustBanner = () => {
+        if (!banner) return;
+        setEditingImage({
+            file: banner,
+            name: banner.name,
+            target: "banner",
+        });
+        setEditorModalOpen(true);
+    };
+
     // ---------------- Shared editor handlers ----------------
     const handleSaveEditor = useCallback((blob: Blob) => {
         const isThumb = editingImage?.target === "thumbnail";
+        const isBanner = editingImage?.target === "banner";
         const filename =
             editingImage?.name ||
-            (isThumb ? `charity-thumbnail-${Date.now()}.jpg` : `profile-${Date.now()}.jpg`);
+            (isBanner
+                ? `banner-${Date.now()}.jpg`
+                : isThumb
+                    ? `charity-thumbnail-${Date.now()}.jpg`
+                    : `profile-${Date.now()}.jpg`);
 
         const finalFile = new File([blob], filename, {
             type: blob.type || "image/jpeg",
         });
 
-        if (isThumb) {
+        if (isBanner) {
+            setBanner(finalFile);
+        } else if (isThumb) {
             setThumbnail(finalFile);
         } else {
             setImage(finalFile);
@@ -296,6 +358,77 @@ function MyProfile({ user }: { user: IUser }) {
 
     return (
         <div className="md:space-y-8 space-y-6 max-w-4xl">
+
+            {/* Profile Banner Section */}
+            <div className="space-y-2">
+                <div className="flex items-center justify-between">
+
+                    {banner && (
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setBanner(null)}
+                            className="text-xs text-muted-foreground hover:text-destructive h-8 px-2 cursor-pointer"
+                        >
+                            <X className="size-3.5 mr-1" />
+                            Discard Change
+                        </Button>
+                    )}
+                </div>
+
+                <div className="relative w-full h-44 sm:h-56 md:h-64 rounded-xl overflow-hidden bg-muted group">
+                    <Image
+                        src={bannerPreview || user?.bannerUrl || userBannerPlaceholder}
+                        alt="Profile banner"
+                        fill
+                        priority
+                        quality={100}
+                        unoptimized={!bannerPreview && !user?.bannerUrl?.trim()}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 1200px, 1400px"
+                        className="object-cover"
+                    />
+
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                        <label htmlFor={BANNER_INPUT_ID} className="cursor-pointer">
+                            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-white text-gray-800 text-sm font-medium hover:bg-gray-100 shadow-sm transition">
+                                <Camera className="size-4" />
+                                {banner || user?.bannerUrl ? "Change Banner" : "Upload Banner"}
+                            </span>
+                        </label>
+
+                        {banner && (
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleAdjustBanner}
+                                className="cursor-pointer text-xs h-9 bg-white/90 hover:bg-white text-gray-800"
+                            >
+                                Adjust Banner
+                            </Button>
+                        )}
+                    </div>
+
+                    <div className="absolute bottom-3 right-3 flex items-center gap-2 group-hover:hidden">
+                        <label htmlFor={BANNER_INPUT_ID} className="cursor-pointer">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-black/60 hover:bg-black/80 text-white text-xs font-medium backdrop-blur shadow-sm transition">
+                                <Camera className="size-3.5" />
+                                {banner || user?.bannerUrl ? "Change Banner" : "Upload Banner"}
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <input
+                    id={BANNER_INPUT_ID}
+                    name={BANNER_INPUT_ID}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={bannerOnChange}
+                />
+            </div>
 
             <div className="flex pb-4">
                 <div className="flex items-center gap-4">
@@ -446,7 +579,7 @@ function MyProfile({ user }: { user: IUser }) {
                             <SelectCountry setValue={form.setValue} control={form.control} />
 
                             {
-                                country && !user?.countryAvaialblity && <CountrySellNotAvaialbleAlert currentCountry={country?.name} />
+                                country && !user?.countryAvaialblity && !isCharity && <CountrySellNotAvaialbleAlert currentCountry={country?.name} />
                             }
 
                         </div>
@@ -639,7 +772,7 @@ function MyProfile({ user }: { user: IUser }) {
                                                     </label>
                                                 )}
                                             </div>
-                                            
+
                                         </div>
                                     </div>
 

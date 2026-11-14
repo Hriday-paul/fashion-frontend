@@ -1,8 +1,6 @@
 import GetUserDetails from '@/lib/services/UserDetails';
 import { IUser } from '@/types';
-import { defaultImg } from '@/utils/defaultImg';
 import { BookImage, File, Heart, LucideIcon, Shirt } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import React, { Suspense } from 'react'
@@ -15,6 +13,9 @@ import {
 } from "lucide-react";
 import ClothesDonationDialog from '@/components/shared/Modal/clothesDonation/ClothesDonationDialog';
 import { DonationFromProfile } from '../../_components/DonationFromProfile';
+import CharityGallery from '../../_components/CharityGallery';
+import CharityOverviewDonationMoney, { CharityOverviewClothDonation } from './_components/CharityOverviewDonation';
+import ExpandableText from '@/components/shared/ExpandableText';
 
 async function CharityDetails({ params }: { params: Promise<{ username: string }> }) {
     const { username } = await params;
@@ -34,7 +35,7 @@ async function CharityDetails({ params }: { params: Promise<{ username: string }
 
 export default CharityDetails;
 
-const OverViewDetails = async ({ userPromise }: { userPromise: Promise<{ data: { user: IUser } }> }) => {
+const OverViewDetails = async ({ userPromise }: { userPromise: Promise<{ data: { user: IUser, isCurrentUser: boolean } }> }) => {
 
     const userD = await userPromise;
 
@@ -51,7 +52,7 @@ const OverViewDetails = async ({ userPromise }: { userPromise: Promise<{ data: {
 
         <div className='order-2 col-span-1 space-y-4 md:space-y-4 lg:space-y-5'>
 
-            <div className="rounded-xl bg-[#0f172a] text-white p-5 shadow-sm">
+            {userD?.data?.isCurrentUser ? <CharityOverviewDonationMoney /> : <section className="rounded-xl bg-[#0f172a] text-white p-5 shadow-sm">
                 <div className="text-[10px] uppercase tracking-wider text-[#64748b] mb-1 font-semibold">Ready to give?</div>
                 <div className="text-lg font-bold mb-1 leading-tight" style={{ textWrap: "pretty" }}>100% goes to this charity</div>
                 <p className="text-[12.5px] text-white mb-4 leading-relaxed">FASHION doesn't take a cut. Donate directly from this page.</p>
@@ -62,9 +63,9 @@ const OverViewDetails = async ({ userPromise }: { userPromise: Promise<{ data: {
                         Make your donation
                     </button>
                 </DonationFromProfile>
-            </div>
+            </section>}
 
-            <section className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            {userD?.data?.isCurrentUser ? <CharityOverviewClothDonation /> : <section className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                 <p className="text-sm font-bold uppercase tracking-widest text-black">
                     Donate clothes
                 </p>
@@ -88,9 +89,9 @@ const OverViewDetails = async ({ userPromise }: { userPromise: Promise<{ data: {
                         </ClothesDonationDialog>
                     </div>
                 </div>
-            </section>
+            </section>}
 
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            {/* <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                 <p className="text-sm font-bold uppercase tracking-widest text-black mb-3">
                     Socials
                 </p>
@@ -111,7 +112,7 @@ const OverViewDetails = async ({ userPromise }: { userPromise: Promise<{ data: {
                         <SocialRow icon={Twitter} value={user?.data?.twitter} href={user?.data?.twitter} placeholder="Twitter not added yet" />
                     )}
                 </ul>
-            </div>
+            </div> */}
 
             {user?.data?.support_email && <div>
                 <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-text-muted mb-4">
@@ -131,11 +132,15 @@ const OverViewDetails = async ({ userPromise }: { userPromise: Promise<{ data: {
 
             <section className='border border-gray-200 rounded-md p-4'>
                 <h2 className="text-xl font-semibold text-foreground">About</h2>
-                {user?.data?.description ? <div className="mt-3 space-y-4 text-base leading-relaxed text-gray-800">
-                    <p>
-                        {user?.data?.description}
-                    </p>
-                </div> : <div className="flex flex-col items-center px-4 pb-4 pt-1 text-center">
+                {user?.data?.description ? (
+                    <div className="mt-3">
+                        <ExpandableText
+                            text={user?.data?.description}
+                            lines={4}
+                            className="text-base leading-relaxed text-gray-800"
+                        />
+                    </div>
+                ) : <div className="flex flex-col items-center px-4 pb-4 pt-1 text-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200">
                         <File className="h-7 w-7 text-slate-800" />
                     </div>
@@ -153,20 +158,9 @@ const OverViewDetails = async ({ userPromise }: { userPromise: Promise<{ data: {
                 {/* <p className="mt-1 text-sm text-gray-700">
                     Moments from our recent programmes on the ground.
                 </p> */}
-                {user?.data?.charityGalleries.length > 0 ? <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">
-                    {user?.data?.charityGalleries?.map((image) => (
-                        <Image
-                            src={image.url || defaultImg?.placeholderImg}
-                            key={image?.id}
-                            alt={image?.caption || `Gallery Image`}
-                            placeholder='blur'
-                            blurDataURL={defaultImg?.placeholderImg}
-                            width={1024}
-                            height={768}
-                            className="aspect-4/3 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                    ))}
-                </div> : <div className="flex flex-col items-center px-4 pb-4 pt-1 text-center">
+                {user?.data?.charityGalleries.length > 0 ? (
+                    <CharityGallery images={user?.data?.charityGalleries} />
+                ) : <div className="flex flex-col items-center px-4 pb-4 pt-1 text-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200">
                         <BookImage className="h-7 w-7 text-slate-800" />
                     </div>

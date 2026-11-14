@@ -66,7 +66,7 @@ function ChatList() {
 
                     {
                         isLoading && <div className='min-h-40 flex items-center justify-center'>
-                            <div className="w-8 aspect-square rounded-full border-[3px] border-white border-r-primary-black animate-spin"></div>
+                            <div className="w-8 aspect-square rounded-full border-[3px] border-gray-200 border-r-primary-black animate-spin"></div>
                         </div>
                     }
 

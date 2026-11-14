@@ -10,6 +10,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Pagination } from "react-pagination-bar";
 import { NotificationRender } from "@/components/shared/Navbar/NavIconsWithDropDown/NotificationRender";
+import { NotificationType } from "@/types";
 import Link from "next/link";
 
 export default function NotificationContainer() {
@@ -59,55 +60,75 @@ export default function NotificationContainer() {
 
       {isSuccess && <div className="space-y-3 py-3">
         {notifications?.data?.data?.map((notification) => {
-
           const renderNotification = NotificationRender({ notification });
+          const isWelcome =
+            notification?.type === NotificationType.WELLCOME ||
+            (notification?.type as unknown) === "WELLCOME";
 
-          return <div key={notification?.id}>
-            <Link href={renderNotification?.link || "#"} className="w-full">
-              <Card className="p-4 shadow-none rounded">
-                <div className="flex items-start gap-3">
-                  <Avatar className="size-10 bg-gray-900 flex justify-center items-center flex-shrink-0">
-                    {renderNotification.avatar}
-                  </Avatar>
+          const cardContent = (
+            <Card className="p-4 shadow-none rounded w-full">
+              <div className="flex items-start gap-3">
+                <Avatar className="size-10 bg-gray-900 flex justify-center items-center flex-shrink-0">
+                  {renderNotification.avatar}
+                </Avatar>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="gap-1">
-
-                          <div className="flex flex-row justify-between items-start">
-                            <p className="text-base text-gray-700">
-                              {notification.message.split(/(\*\*.*?\*\*)/g).map((part, index) =>
-                                part.startsWith("**") && part.endsWith("**") ? (
-                                  <strong key={index} className="text-primary-black">
-                                    {part.slice(2, -2)}
-                                  </strong>
-                                ) : (
-                                  <span key={index}>{part}</span>
-                                )
-                              )}
-                            </p>
-                            {notification?.isRead && <CheckCheck className="inline-block ml-1 text-cyan-600 size-4" />}
-                          </div>
-
-                          <span className="text-xs text-gray-500 whitespace-nowrap">
-                            {moment(notification?.createdAt).fromNow()}
-                          </span>
-
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="gap-1">
+                        <div className="flex flex-row justify-between items-start">
+                          <p className="text-base text-gray-700">
+                            {notification.message.split(/(\*\*.*?\*\*)/g).map((part, index) =>
+                              part.startsWith("**") && part.endsWith("**") ? (
+                                <strong key={index} className="text-primary-black">
+                                  {part.slice(2, -2)}
+                                </strong>
+                              ) : (
+                                <span key={index}>{part}</span>
+                              )
+                            )}
+                          </p>
+                          {notification?.isRead && <CheckCheck className="inline-block ml-1 text-cyan-600 size-4" />}
                         </div>
 
-                        {
-                          renderNotification?.postImg
-                        }
+                        <span className="text-xs text-gray-500 whitespace-nowrap">
+                          {moment(notification?.createdAt).fromNow()}
+                        </span>
 
+                        {isWelcome && (
+                          <div className="mt-3">
+                            <Button
+                              asChild
+                              size="sm"
+                              className="rounded-none text-xs h-8 px-4 font-medium cursor-pointer"
+                            >
+                              <Link href="/profile/edit">
+                                Complete your profile
+                              </Link>
+                            </Button>
+                          </div>
+                        )}
                       </div>
 
+                      {renderNotification?.postImg}
                     </div>
                   </div>
                 </div>
-              </Card>
-            </Link>
-          </div>
+              </div>
+            </Card>
+          );
+
+          return (
+            <div key={notification?.id}>
+              {isWelcome ? (
+                <div className="w-full">{cardContent}</div>
+              ) : (
+                <Link href={renderNotification?.link || "#"} className="w-full">
+                  {cardContent}
+                </Link>
+              )}
+            </div>
+          );
         })}
       </div>}
 

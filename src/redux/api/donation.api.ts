@@ -71,6 +71,13 @@ export interface IRaisedDonationQueryParams {
   searchTerm?: string;
 }
 
+export interface ICharityRaisedStats {
+  directDonationraised: number;
+  extraDonationRaised: number;
+  sellDonationRaised: number;
+  totalRaised: number;
+}
+
 export interface IClothDonationQueryParams {
   page?: number;
   limit?: number;
@@ -345,6 +352,19 @@ const donationApi = baseApi.injectEndpoints({
         params: params || undefined,
       }),
     }),
+
+    getCharityRaisedStats: builder.query<
+      {
+        message: string;
+        data: ICharityRaisedStats;
+      },
+      string
+    >({
+      query: (userName) => ({
+        url: `/donations/charity-stats/${userName}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -369,4 +389,6 @@ export const {
   useLazyGetMemberDirectDonationsRaisedQuery,
   useGetMemberExtraDonationsRaisedQuery,
   useLazyGetMemberExtraDonationsRaisedQuery,
+  useGetCharityRaisedStatsQuery,
+  useLazyGetCharityRaisedStatsQuery,
 } = donationApi;

@@ -114,7 +114,8 @@ export default function AddProductForm() {
   // =============================== product api ==============================
   // const [uploadProduct, { isLoading }] = useCreateProductMutation();
 
-  const required_donation = !(user?.auth?.role == role.ECO_FRIENDLY_STORE || user?.auth?.role == role.CHARITY_SHOP);
+  const isCharityShop = user?.auth?.role === role.CHARITY_SHOP;
+  const required_donation = !(user?.auth?.role == role.ECO_FRIENDLY_STORE || isCharityShop);
 
   const productSchema = useMemo(() => buildProductSchema(required_donation), [required_donation]);
 
@@ -557,129 +558,131 @@ export default function AddProductForm() {
             </div>
 
 
-            <>
-              {/* ======================================== donation input ============================================== */}
-              <div className="space-y-4 mt-16">
+            {!isCharityShop && (
+              <>
+                {/* ======================================== donation input ============================================== */}
+                <div className="space-y-4 mt-16">
 
-                <div className="flex lg:flex-row flex-col justify-between items-start gap-2 mb-6">
-                  <div>
-                    <div className="flex flex-row gap-x-0.5 items-center">
-                      <p className="text-lg lg:text-2xl font-bold text-gray-900">Donation</p>
+                  <div className="flex lg:flex-row flex-col justify-between items-start gap-2 mb-6">
+                    <div>
+                      <div className="flex flex-row gap-x-0.5 items-center">
+                        <p className="text-lg lg:text-2xl font-bold text-gray-900">Donation</p>
 
-                      <DonationAbout />
+                        <DonationAbout />
 
+                      </div>
+                      <>
+                        <span className="text-xs">
+                          {required_donation ? "(Minimum 5% donation required)" : "(Optional donation)"}
+                        </span>
+                        {/* <SelectDonationOption /> */}
+                      </>
                     </div>
-                    <>
-                      <span className="text-xs">
-                        {required_donation ? "(Minimum 5% donation required)" : "(Optional donation)"}
-                      </span>
-                      {/* <SelectDonationOption /> */}
-                    </>
+
+                    <div className="flex items-start gap-2 rounded-lg bg-blue-50 px-4 py-4 sm:px-5 sm:py-5 max-w-md">
+                      <Info
+                        className="mt-0.5 size-6 shrink-0 fill-blue-400 text-white"
+                        strokeWidth={2.5}
+                        aria-hidden="true"
+                      />
+                      <p className="text-sm text-gray-800">
+                        Your chosen percentage will be donated to the selected charity once the item is sold.{" "}
+                        <Link
+                          href="/help/donations"
+                          className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-700"
+                        >
+                          Learn more about donations
+                        </Link>
+                        .
+                      </p>
+                    </div>
+
                   </div>
 
-                  <div className="flex items-start gap-2 rounded-lg bg-blue-50 px-4 py-4 sm:px-5 sm:py-5 max-w-md">
-                    <Info
-                      className="mt-0.5 size-6 shrink-0 fill-blue-400 text-white"
-                      strokeWidth={2.5}
-                      aria-hidden="true"
+
+                  <div className="my-5 space-y-3 grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+                    <FormField
+                      control={form.control}
+                      name="donation_percent"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Donation Percent (%)</FormLabel>
+                          <div className="flex items-center bg-white border border-[#e1e1e1] rounded focus-within:border-primary-black">
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger className="flex-1 border-0 shadow-none rounded focus-visible:ring-0 focus:ring-0 !text-base !py-5 px-3 cursor-pointer">
+                                  <SelectValue placeholder="Select Donation Percent" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="rounded-none p-0">
+                                
+                                {Array.from({ length: 20 }, (_, i) => (i + 1) * 5).map((item) => (
+                                  <SelectItem
+                                    value={item.toString()}
+                                    key={item}
+                                    className="rounded-none cursor-pointer"
+                                  >
+                                    {item}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            <span className="pr-3 text-lg text-primary-black pointer-events-none select-none">
+                              %
+                            </span>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                    <p className="text-sm text-gray-800">
-                      Your chosen percentage will be donated to the selected charity once the item is sold.{" "}
-                      <Link
-                        href="/help/donations"
-                        className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-700"
-                      >
-                        Learn more about donations
-                      </Link>
-                      .
-                    </p>
+
+                    <InputCharityDonationInput charities={charitiesData?.data || []} form={form} name="charities" />
+
                   </div>
 
                 </div>
 
 
-                <div className="my-5 space-y-3 grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+                {/* Donation Privacy */}
+                <div>
+                  <p className="mb-5 font-medium flex flex-row gap-1 items-center">
+                    Donation Privacy: Would you like to remain anonymous?
+                    <DonationPrivacyAbout />
+                  </p>
                   <FormField
                     control={form.control}
-                    name="donation_percent"
+                    name="donationPrivacy"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Donation Percent (%)</FormLabel>
-                        <div className="flex items-center bg-white border border-[#e1e1e1] rounded focus-within:border-primary-black">
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger className="flex-1 border-0 shadow-none rounded focus-visible:ring-0 focus:ring-0 !text-base !py-5 px-3 cursor-pointer">
-                                <SelectValue placeholder="Select Donation Percent" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="rounded-none p-0">
-                              
-                              {Array.from({ length: 20 }, (_, i) => (i + 1) * 5).map((item) => (
-                                <SelectItem
-                                  value={item.toString()}
-                                  key={item}
-                                  className="rounded-none cursor-pointer"
-                                >
-                                  {item}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                      <FormItem className="md:space-y-3 space-y-1">
 
-                          <span className="pr-3 text-lg text-primary-black pointer-events-none select-none">
-                            %
-                          </span>
-                        </div>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={(value) => field.onChange(value === "true")}
+                            defaultValue={field.value ? "true" : "false"}
+                            className="flex flex-col md:space-y-1"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="true" id="anonymous" />
+                              <label htmlFor="anonymous" className="text-sm">
+                                Yes, keep my donation anonymous
+                              </label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="false" id="show-name" />
+                              <label htmlFor="show-name" className="text-sm">
+                                No, show my name
+                              </label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  <InputCharityDonationInput charities={charitiesData?.data || []} form={form} name="charities" />
-
                 </div>
-
-              </div>
-
-
-              {/* Donation Privacy */}
-              <div>
-                <p className="mb-5 font-medium flex flex-row gap-1 items-center">
-                  Donation Privacy: Would you like to remain anonymous?
-                  <DonationPrivacyAbout />
-                </p>
-                <FormField
-                  control={form.control}
-                  name="donationPrivacy"
-                  render={({ field }) => (
-                    <FormItem className="md:space-y-3 space-y-1">
-
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={(value) => field.onChange(value === "true")}
-                          defaultValue={field.value ? "true" : "false"}
-                          className="flex flex-col md:space-y-1"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="true" id="anonymous" />
-                            <label htmlFor="anonymous" className="text-sm">
-                              Yes, keep my donation anonymous
-                            </label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="false" id="show-name" />
-                            <label htmlFor="show-name" className="text-sm">
-                              No, show my name
-                            </label>
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </>
+              </>
+            )}
 
 
           </div>
@@ -742,7 +745,7 @@ export default function AddProductForm() {
             <PriceOverview
               price={watchedPrice}
               discountPct={watchedDiscount}
-              donationPercent={watchedDonation || 0}
+              donationPercent={isCharityShop ? 0 : watchedDonation || 0}
             />
           </div>
 
