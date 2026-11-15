@@ -34,8 +34,7 @@ export function ParcelSizeSuggestion({
   }
 
   const height = suggestion.height_cm ?? (suggestion as any).hight_cm ?? 0;
-  const displayName =
-    suggestion.category?.name || categoryName || "Selected category";
+  const displayName = suggestion.category?.name || categoryName || "Selected category";
 
   return (
     <div className="bg-blue-50 border border-[#D6E4FF] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 shadow-xs">

@@ -113,28 +113,15 @@ const CharityFormSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 export function AssistedSellerForm() {
-  const formTopRef = useRef<HTMLDivElement>(null);
   const { data: charitiesData } = useGetCharitiesQuery();
   const user = useSelector((state: RootState) => state.auth.user);
   const { symbol } = useCurrency();
   const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
   const router = useRouter();
 
-  const scrollToFormTop = useCallback(() => {
-    if (typeof window !== "undefined") {
-      if (formTopRef.current) {
-        formTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, []);
-
   const handleSuccessDialogChange = useCallback((open: boolean) => {
     setOpenSuccessDialog(open);
-    if (!open) {
-      scrollToFormTop();
-    }
-  }, [scrollToFormTop]);
+  }, []);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -225,7 +212,6 @@ export function AssistedSellerForm() {
       });
       setImages([]);
 
-      scrollToFormTop();
       router.push(`/profile/assisted-sell`)
       // setOpenSuccessDialog(true);
       toast.success("Request submited successfull");
@@ -335,7 +321,7 @@ export function AssistedSellerForm() {
   const priceType = form.watch("priceType")
 
   return (
-    <div ref={formTopRef} className="md:space-y-6 space-y-3 max-w-2xl mx-auto">
+    <div className="md:space-y-6 space-y-3 max-w-2xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Assited Sell</h1>
         <p className="text-muted-foreground">Complete the form below to submit items for our assisted seller service. <Link href="/help/assisted-seller" className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-700">Learn more about assisted selling</Link>.</p>
