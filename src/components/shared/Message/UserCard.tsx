@@ -1,4 +1,5 @@
 import CustomAvatar from "@/components/shared/CustomAvatar";
+import { useCurrency } from "@/hooks/useCurrency";
 import { cn } from "@/lib/utils";
 import { RootState } from "@/redux/store";
 import { IChatUser, MsgType } from "@/types";
@@ -10,7 +11,7 @@ import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 
 const UserCard = ({ chat }: { chat: IChatUser }) => {
-
+  const { format } = useCurrency();
   const user = useSelector((state: RootState) => state?.auth?.user);
 
   const pathName = usePathname();
@@ -58,12 +59,12 @@ const UserCard = ({ chat }: { chat: IChatUser }) => {
           <CustomAvatar img={friendUser?.picture?.url} name={friendUser?.userName || "Unknown User"} className="md:size-12 size-10" fallbackClass="text-base md:text-base" />
         </div>
 
-        <div className="flex-grow">
-          <div className="flex items-center justify-between">
-            <p className={cn("text-base font-medium text-black")}>
+        <div className="flex-grow min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <p className={cn("text-base font-medium text-black truncate")}>
               {friendUser?.userName}
             </p>
-            {<p className={`text-xs px-1.5 py-0.5 rounded-full font-normal text-secondary-2 text-gray-800`}>{moment(chat?.messages[0]?.createdAt).calendar(null, {
+            {<p className={`text-xs px-1.5 py-0.5 rounded-full font-normal text-secondary-2 text-gray-800 shrink-0`}>{moment(chat?.messages[0]?.createdAt).calendar(null, {
               sameDay: "hh:mm A",
               lastDay: "[Yesterday]",
               sameElse: "DD-MM-YYYY",
@@ -71,46 +72,56 @@ const UserCard = ({ chat }: { chat: IChatUser }) => {
 
           </div>
 
-          <div className="flex items-center justify-between">
-
-            <div>
-              {offer? <p className="text-sm text-black/60">{offerStatusMsg}</p> : lastmsg}
-
-              <div className={cn(
-                "flex gap-2 cursor-pointer justify-start"
-              )}>
-                {chat?.items?.map((item, i) => (
-                  <Image
-                    src={item?.product?.images[0]?.url || defaultImg?.product}
-                    alt={`item-${i}`}
-                    key={i}
-                    width={500}
-                    height={500}
-                    placeholder="blur"
-                    blurDataURL={defaultImg?.placeholderImg}
-                    className="h-10 w-10 rounded object-cover"
-                  />
-                ))}
-
-                {remainingCount > 0 && (
-                  <button
-                    // onClick={() => setOpen(true)}
-                    className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-gray-100"
-                  >
-                    <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-sm font-medium text-white">
-                      +{remainingCount}
-                    </span>
-                  </button>
-                )}
-              </div>
-
+          <div className="flex items-center justify-between gap-2 mt-0.5">
+            <div className="min-w-0 flex-1">
+              {offer ? (
+                <p className="line-clamp-1 text-sm text-black/60">{offerStatusMsg}</p>
+              ) : (
+                lastmsg
+              )}
             </div>
 
-            {unreadCount > 0 && <p className={`text-xs w-5 h-5 flex justify-center items-center rounded-full font-semibold text-secondary-2  bg-primary-black text-white`}>{unreadCount}</p>}
-
+            <div className="flex items-center gap-2 shrink-0">
+              {offer && offer?.offeredPrice != null && (
+                <span className="text-sm font-semibold text-primary-black">
+                  {format(offer.offeredPrice)}
+                </span>
+              )}
+              {unreadCount > 0 && (
+                <p className={`text-xs w-5 h-5 flex justify-center items-center rounded-full font-semibold text-secondary-2 bg-primary-black text-white`}>
+                  {unreadCount}
+                </p>
+              )}
+            </div>
           </div>
 
+          {(chat?.items?.length ?? 0) > 0 && (
+            <div className={cn("flex gap-2 cursor-pointer justify-start mt-2")}>
+              {chat?.items?.map((item, i) => (
+                <Image
+                  src={item?.product?.images[0]?.url || defaultImg?.product}
+                  alt={`item-${i}`}
+                  key={i}
+                  width={500}
+                  height={500}
+                  placeholder="blur"
+                  blurDataURL={defaultImg?.placeholderImg}
+                  className="h-10 w-10 rounded object-cover"
+                />
+              ))}
 
+              {remainingCount > 0 && (
+                <button
+                  // onClick={() => setOpen(true)}
+                  className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-gray-100"
+                >
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-sm font-medium text-white">
+                    +{remainingCount}
+                  </span>
+                </button>
+              )}
+            </div>
+          )}
 
         </div>
 

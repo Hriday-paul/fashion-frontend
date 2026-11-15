@@ -39,9 +39,9 @@ const ROLE_META: Record<
       "Provide your public profile details and identity verification documents to verify your account.",
   },
   [UserRole.AMBASSADOR]: {
-    title: "Finish Ambassador Account Registration",
+    title: "Become a Fashi-ON Ambassador",
     subtitle:
-      "Provide details about the brand or organization you represent and upload your authorization documents.",
+      "Join our ambassador community and help promote pre-loved fashion.",
   },
   [UserRole.PROFESSIONAL_SELLER]: {
     title: "Finish Professional Seller Registration",

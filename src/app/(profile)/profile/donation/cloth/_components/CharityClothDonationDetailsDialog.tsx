@@ -179,7 +179,7 @@ function CharityClothDonationDetailsDialog({
               <div className="flex items-center gap-3 min-w-0">
                 <Avatar className="size-11 border border-gray-200 shrink-0">
                   <AvatarImage
-                    src={donor?.picture?.url || defaultImg?.empty_user}
+                    src={donor?.picture?.url}
                     alt={donorName}
                     className="object-cover"
                   />

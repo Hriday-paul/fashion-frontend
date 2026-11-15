@@ -63,9 +63,12 @@ export const AcceptOffer = async ({ payload }: { payload: { offerId: string } })
     }
 }
 
-export const DeclineOffer = async ({ payload }: { payload: { offerId: string, offerPrice: number } }) => {
+export const DeclineOffer = async ({ payload }: { payload: { offerId: string } }) => {
     try {
-        const res = await serverQueryWithReauth({ payload, endPoint: `/products/offer/decline`, method: "POST" });
+        let res = await serverQueryWithReauth({ payload, endPoint: `/products/offer/decline`, method: "POST" });
+        if (!res?.success && (res?.message?.includes("404") || res?.message?.toLowerCase().includes("not found"))) {
+            res = await serverQueryWithReauth({ payload, endPoint: `/offer/decline`, method: "POST" });
+        }
         return {
             success: res?.success !== undefined ? Boolean(res.success) : true,
             message: res?.message || "Offer declined successfully",
@@ -78,6 +81,29 @@ export const DeclineOffer = async ({ payload }: { payload: { offerId: string, of
         return {
             success: false,
             message: error?.message || "Failed to decline offer",
+            data: null,
+        };
+    }
+}
+
+export const SendCounterOffer = async ({ payload }: { payload: { offerId: string, offerPrice: number } }) => {
+    try {
+        let res = await serverQueryWithReauth({ payload, endPoint: `/products/offer/counter`, method: "POST" });
+        if (!res?.success && (res?.message?.includes("404") || res?.message?.toLowerCase().includes("not found"))) {
+            res = await serverQueryWithReauth({ payload, endPoint: `/offer/counter`, method: "POST" });
+        }
+        return {
+            success: res?.success !== undefined ? Boolean(res.success) : true,
+            message: res?.message || "Counter offer sent successfully",
+            data: res?.data !== undefined ? res.data : (res ?? null),
+        };
+    } catch (error: any) {
+        if (isRedirectError(error)) {
+            throw error;
+        }
+        return {
+            success: false,
+            message: error?.message || "Failed to send counter offer",
             data: null,
         };
     }

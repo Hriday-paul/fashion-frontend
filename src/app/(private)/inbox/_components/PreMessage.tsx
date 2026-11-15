@@ -10,8 +10,11 @@ import { RootState } from '@/redux/store';
 import { IMessage, MsgType } from '@/types';
 import moment from 'moment';
 import Image from 'next/image';
+import Link from 'next/link';
 import React, { useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { defaultImg } from '@/utils/defaultImg';
 
 const formatChatDate = (date: Date | string) => {
     const mDate = moment(date);
@@ -187,26 +190,37 @@ function PreMessage({
                                 <SystemMsgCard msg={message} />
                             ) : !isMyMessage ?
                                 <div className="flex items-start gap-x-4">
-                                    <Image
-                                        src={message?.sender?.picture?.url || "/empty-user.png"}
-                                        alt="user image"
-                                        className="h-10 w-10 shrink-0 object-cover rounded-full"
-                                        height={500}
-                                        width={500}
-                                    />
+                                    <Link
+                                        href={message?.sender?.userName ? `/member/${message.sender.userName}` : "#"}
+                                        className="shrink-0 hover:opacity-85 transition-opacity"
+                                    >
+                                        <Avatar className="h-10 w-10 shrink-0 border border-gray-200">
+                                            <AvatarImage
+                                                src={message?.sender?.picture?.url}
+                                                alt={message?.sender?.userName || "user image"}
+                                                className="object-cover"
+                                            />
+                                            <AvatarFallback className="uppercase font-semibold">
+                                                {(message?.sender?.userName || "U").charAt(0).toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </Link>
                                     <div className="min-w-0 space-y-3 overflow-auto">
                                         <ReceiverMsgCard msg={message} />
                                     </div>
                                 </div>
                                 :
                                 <div className="flex flex-row-reverse items-start gap-x-4">
-                                    <Image
-                                        src={message?.sender?.picture?.url || "/empty-user.png"}
-                                        alt="user image"
-                                        className="h-10 w-10 shrink-0 object-cover rounded-full"
-                                        height={500}
-                                        width={500}
-                                    />
+                                    <Avatar className="h-10 w-10 shrink-0 border border-gray-200">
+                                        <AvatarImage
+                                            src={message?.sender?.picture?.url}
+                                            alt={message?.sender?.userName || "user image"}
+                                            className="object-cover"
+                                        />
+                                        <AvatarFallback className="uppercase font-semibold">
+                                            {(message?.sender?.userName || "U").charAt(0).toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
                                     <div className="flex min-w-0 flex-col items-end space-y-3 overflow-auto">
                                         <OwnerMsgCard msg={message} />
                                     </div>

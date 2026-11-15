@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import moment from 'moment';
 import Link from 'next/link';
 import CustomAvatar from '@/components/shared/CustomAvatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useGetChatDetailsQuery } from '@/redux/api/message.api';
 import { IProduct, IUser } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -46,10 +47,16 @@ function ChatHeader({ chatId }: { chatId: string }) {
         return <Skeleton className="w-full h-16 rounded-none" />
     }
 
+    const chatUser = userData?.data?.user;
+    const userName = chatUser?.userName || 'Unknown';
+    const profilePic = chatUser?.picture?.url;
+
+    const initials = userName.charAt(0);
+
     return (
         isSuccess ? <div className="w-full">
 
-            <div className="border-b border-gray-200 flex items-center justify-between gap-2 px-3 sm:px-4 py-2.5">
+            <div className="border-b border-gray-200 flex items-center justify-between gap-2 px-3 sm:px-4 py-2 bg-white">
                 <Link
                     href="/inbox"
                     className="lg:hidden p-1 -ml-1 text-gray-700 hover:text-black transition-colors shrink-0"
@@ -58,10 +65,24 @@ function ChatHeader({ chatId }: { chatId: string }) {
                     <ArrowLeft className="size-5" />
                 </Link>
 
-                <div className="flex items-center gap-x-2 min-w-0 flex-1 justify-center">
-                    <Link href={`/member/${userData?.data?.user?.userName}`} className="min-w-0 max-w-full">
-                        <h3 className="text-sm sm:text-base font-semibold truncate">
-                            {userData?.data?.user?.userName || 'Unknown'}
+                <div className="flex items-center min-w-0 flex-1 justify-center">
+                    <Link
+                        href={`/member/${userName}`}
+                        className="flex items-center gap-x-2.5 min-w-0 max-w-full hover:opacity-85 transition-opacity"
+                    >
+                        <Avatar className="size-8 sm:size-9 shrink-0 border border-gray-200">
+                            <AvatarImage
+                                src={profilePic}
+                                alt={userName}
+                                className="object-cover"
+                            />
+                            <AvatarFallback className="uppercase font-semibold">
+                                {initials.toUpperCase() || 'U'}
+                            </AvatarFallback>
+                        </Avatar>
+
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">
+                            {userName}
                         </h3>
                     </Link>
                 </div>

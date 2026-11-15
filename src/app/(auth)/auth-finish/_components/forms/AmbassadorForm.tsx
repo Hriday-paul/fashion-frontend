@@ -13,21 +13,37 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useFinishAuthMutation } from "@/redux/api/authApi";
 import { getFirstErrorMessage } from "@/utils/modifyFormError";
-import DocumentUploadField from "../DocumentUploadField";
 import { buildAuthFinishFormData } from "../submitAuthFinish";
 
+export const AMBASSADOR_CATEGORIES = [
+  "Fashion Enthusiast",
+  "Content Creator",
+  "Sustainable Fashion Advocate",
+  "Community Ambassador",
+] as const;
+
 const ambassadorSchema = z.object({
-  ambassadorType: z
-    .string({ required_error: "Ambassador type is required" })
-    .min(1, "Ambassador type is required"),
-  representedBrand: z.string().optional(),
-  representedOrganization: z.string().optional(),
-  agreementVersion: z.string().optional(),
+  ambassadorCategory: z
+    .string({ required_error: "Ambassador category is required" })
+    .min(1, "Ambassador category is required"),
+  instagramUsername: z.string().optional(),
+  tiktokUsername: z.string().optional(),
+  aboutYou: z
+    .string({ required_error: "Please tell us a little about yourself" })
+    .min(1, "Please tell us a little about yourself"),
   agreementAcceptedAt: z.string().optional(),
 });
 
@@ -38,18 +54,17 @@ export default function AmbassadorForm({
 }: {
   onSuccess: (message?: string) => void;
 }) {
-  const [documents, setDocuments] = useState<File[]>([]);
-  const [acceptedAgreement, setAcceptedAgreement] = useState(true);
+  const [acceptedAgreement, setAcceptedAgreement] = useState(false);
   const [finishAuth, { isLoading }] = useFinishAuthMutation();
 
   const form = useForm<AmbassadorFormValues>({
     resolver: zodResolver(ambassadorSchema),
     defaultValues: {
-      ambassadorType: "",
-      representedBrand: "",
-      representedOrganization: "",
-      agreementVersion: "1.0",
-      agreementAcceptedAt: new Date().toISOString(),
+      ambassadorCategory: "",
+      instagramUsername: "",
+      tiktokUsername: "",
+      aboutYou: "",
+      agreementAcceptedAt: "",
     },
   });
 
@@ -58,20 +73,22 @@ export default function AmbassadorForm({
   };
 
   const onSubmit = async (values: AmbassadorFormValues) => {
-    if (documents.length === 0) {
-      toast.error("Please upload your verification documents");
+    if (!acceptedAgreement) {
+      toast.error("Please agree to the Fashi-ON Ambassador Programme Terms & Conditions");
       return;
     }
 
     try {
       const token = sessionStorage.getItem("signUpToken") || undefined;
       const payload = {
-        ...values,
-        agreementAcceptedAt: acceptedAgreement
-          ? values.agreementAcceptedAt || new Date().toISOString()
-          : undefined,
+        ambassadorType: values?.ambassadorCategory,
+        instagramUsername: values?.instagramUsername || undefined,
+        tiktokUsername: values?.tiktokUsername || undefined,
+        about: values?.aboutYou,
+        agreementVersion: "1.0",
+        agreementAcceptedAt: new Date().toISOString(),
       };
-      const formData = buildAuthFinishFormData(payload, documents);
+      const formData = buildAuthFinishFormData(payload, []);
       const res = await finishAuth({ formData, token }).unwrap();
       onSuccess(res?.message);
     } catch (error: any) {
@@ -87,19 +104,34 @@ export default function AmbassadorForm({
       >
         <FormField
           control={form.control}
-          name="ambassadorType"
+          name="ambassadorCategory"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-base font-semibold text-gray-900">
-                Ambassador Type <span className="text-red-500">*</span>
+                Ambassador Category <span className="text-red-500">*</span>
               </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="e.g. Brand Ambassador, Charity Ambassador, Sustainability Advocate"
-                  {...field}
-                  className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
-                />
-              </FormControl>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                value={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5 w-full cursor-pointer">
+                    <SelectValue placeholder="Select an ambassador category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="bg-white">
+                  {AMBASSADOR_CATEGORIES.map((category) => (
+                    <SelectItem
+                      key={category}
+                      value={category}
+                      className="cursor-pointer"
+                    >
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -108,15 +140,15 @@ export default function AmbassadorForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
           <FormField
             control={form.control}
-            name="representedBrand"
+            name="instagramUsername"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-base font-semibold text-gray-900">
-                  Represented Brand
+                  Instagram Username
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter represented brand name"
+                    placeholder="e.g. yourusername"
                     {...field}
                     className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
                   />
@@ -128,15 +160,15 @@ export default function AmbassadorForm({
 
           <FormField
             control={form.control}
-            name="representedOrganization"
+            name="tiktokUsername"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-base font-semibold text-gray-900">
-                  Represented Organization
+                  TikTok Username
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter represented organization name"
+                    placeholder="e.g. yourusername"
                     {...field}
                     className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
                   />
@@ -149,17 +181,18 @@ export default function AmbassadorForm({
 
         <FormField
           control={form.control}
-          name="agreementVersion"
+          name="aboutYou"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-base font-semibold text-gray-900">
-                Agreement Version
+                About You <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Input
-                  placeholder="e.g. 1.0"
+                <Textarea
+                  placeholder="Tell us a little about yourself and why you’d like to become a Fashi-ON Ambassador."
+                  rows={4}
                   {...field}
-                  className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3.5"
+                  className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base px-3.5 py-3"
                 />
               </FormControl>
               <FormMessage />
@@ -183,30 +216,25 @@ export default function AmbassadorForm({
           />
           <label
             htmlFor="ambassador-agreement"
-            className="text-sm text-gray-700 leading-snug cursor-pointer"
+            className="text-sm text-gray-700 leading-snug cursor-pointer select-none"
           >
-            I confirm that I am authorized to represent the stated brand or organization and accept the ambassador agreement terms.
+            I agree to the Fashi-ON Ambassador Programme Terms & Conditions.
           </label>
         </div>
 
-        <DocumentUploadField
-          documents={documents}
-          setDocuments={setDocuments}
-          label="Authorization Documents"
-          description="Upload your brand/organization authorization letter or ambassador agreement (PDF, JPG, PNG)."
-          inputId="ambassador-docs"
-        />
-
         <Button
           variant="default"
-          disabled={isLoading}
+          disabled={isLoading || !acceptedAgreement}
           type="submit"
           className="rounded-full h-11 w-full cursor-pointer text-base"
         >
-          {isLoading ? <span className="loader"></span> : "Submit for Verification"}
+          {isLoading ? (
+            <span className="loader"></span>
+          ) : (
+            "Apply to Become an Ambassador"
+          )}
         </Button>
       </form>
     </Form>
   );
 }
-

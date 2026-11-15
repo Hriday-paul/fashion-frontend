@@ -39,7 +39,9 @@ export const profileRouts: ProfileRoute[] = [
         id: 3,
         title: "Purchase",
         rout: "/profile/purchase",
-        roles: SELLER_ROLES,
+        roles: SELLER_ROLES.filter(
+            (role) => (role !== UserRole.ECO_FRIENDLY_STORE && role !== UserRole.CHARITY_SHOP)
+        ),
         routs: [
             { id: 4, title: "Orders", rout: "/profile/purchase/orders" },
             { id: 5, title: "Returns", rout: "/profile/purchase/returns" },

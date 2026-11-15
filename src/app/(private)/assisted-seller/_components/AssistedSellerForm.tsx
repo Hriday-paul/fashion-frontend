@@ -19,7 +19,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { UserRole } from "@/types";
 import Image from "next/image";
-import { defaultImg } from "@/utils/defaultImg";
 import UpdateShippingAddress from "@/components/shared/UserProfile/AddProduct/UpdateShippingAddress";
 import { RequestNewAssitentSell } from "@/lib/Actions/AssistentSell.action";
 import { toast } from "sonner";
@@ -32,6 +31,8 @@ import { getFirstErrorMessage } from "@/utils/modifyFormError";
 import { AssistedParcelSizeGuide, ParcelDimensions } from "./AssistedParcelSizeGuide";
 import DonationPrivacyAbout from "@/components/shared/DonationPrivacyAbout";
 import DonationAbout from "@/components/shared/DonationAbout";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const ImageEditorModal = dynamic(() => import("@/components/shared/ImageEditorModal"), {
   ssr: false,
@@ -59,7 +60,22 @@ export const formSchema = z.object({
 
   targetPrice: z.string().optional(),
 
-  contactNumber: z.string().optional(),
+  email: z
+    .string({ required_error: "Email is required" })
+    .min(1, { message: "Email is required" })
+    .email({ message: "Please enter a valid email address" }),
+
+  contactNumber: z
+    .string({ required_error: "Contact number is required." })
+    .trim()
+    .min(1, { message: "Contact number is required." })
+    .refine(
+      (val) => {
+        const digits = val.replace(/\D/g, "");
+        return digits.length >= 7;
+      },
+      { message: "Please enter a valid contact number (at least 7 digits)." }
+    ),
 
   charities: z.array(z.string()).optional(),
   donationPct: z.string().optional(),
@@ -102,6 +118,7 @@ export function AssistedSellerForm() {
   const user = useSelector((state: RootState) => state.auth.user);
   const { symbol } = useCurrency();
   const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
+  const router = useRouter();
 
   const scrollToFormTop = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -155,8 +172,19 @@ export function AssistedSellerForm() {
       images: [],
       donationAnonymous: true,
       priceType: "MARKET_PRICE",
+      email: user?.email || "",
+      contactNumber: user?.phone || "",
     },
   })
+
+  useEffect(() => {
+    if (user?.email && !form.getValues("email")) {
+      form.setValue("email", user.email, { shouldValidate: true });
+    }
+    if (user?.phone && !form.getValues("contactNumber")) {
+      form.setValue("contactNumber", user.phone, { shouldValidate: true });
+    }
+  }, [user?.email, user?.phone, form]);
 
   const onError = (errors: any) => {
     const firstErrorMessage = getFirstErrorMessage(errors);
@@ -186,12 +214,21 @@ export function AssistedSellerForm() {
       }
 
       //reset the form and uploaded images
-      form.reset();
+      form.reset({
+        charities: [],
+        donationPct: required_Charity ? "5" : "0",
+        images: [],
+        donationAnonymous: true,
+        priceType: "MARKET_PRICE",
+        email: user?.email || "",
+        contactNumber: user?.phone || "",
+      });
       setImages([]);
 
       scrollToFormTop();
-
-      setOpenSuccessDialog(true);
+      router.push(`/profile/assisted-sell`)
+      // setOpenSuccessDialog(true);
+      toast.success("Request submited successfull");
 
     } catch (err: any) {
       toast.error(err?.message || "An error occurred while submitting the form.");
@@ -382,19 +419,58 @@ export function AssistedSellerForm() {
 
           <FormField
             control={form.control}
-            name="contactNumber"
-            render={({ field }) => (
+            name="email"
+            render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel className="text-base font-semibold text-gray-900">Contact Number</FormLabel>
+                <FormLabel>
+                  Email Address <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
-                  <PhoneInput
-                    // @ts-ignore
-                    value={field.value}
-                    onChange={field.onChange}
-                    international
-                    defaultCountry="US"
+                  <Input
+                    placeholder="abc@gmail.com"
+                    {...field}
+                    type="email"
+                    className={cn(
+                      "bg-white border rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-6 px-3.5",
+                      fieldState.error ? "border-red-500" : "border-[#e1e1e1]"
+                    )}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="contactNumber"
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormLabel>
+                  Contact Number <span className="text-red-500">*</span>
+                </FormLabel>
+                <div
+                  className={cn(
+                    "flex items-center gap-2 rounded border bg-white focus-within:border-neutral-900 transition-colors py-1",
+                    fieldState.error ? "border-red-500" : "border-[#e1e1e1]"
+                  )}
+                >
+                  <FormControl>
+                    <PhoneInput
+                      // @ts-ignore
+                      value={field.value}
+                      onChange={field.onChange}
+                      international
+                      defaultCountry="US"
+                      className={cn(
+                        "flex-1",
+                        // strip inner borders/backgrounds so it looks like one field
+                        "[&_button]:!border-0 [&_button]:!bg-transparent [&_button]:!shadow-none [&_button]:!rounded-none",
+                        "[&_input]:!border-0 [&_input]:!bg-transparent [&_input]:!shadow-none [&_input]:!rounded-none"
+                      )}
+                    />
+                  </FormControl>
+                </div>
                 <FormMessage />
               </FormItem>
             )}

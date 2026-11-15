@@ -76,6 +76,8 @@ export const productFormSchema = z.object({
     message: "Height must be a valid positive number.",
   }),
 
+  shippingAddress: z.string().optional(),
+
 });
 
 
@@ -91,6 +93,14 @@ export const CharityFormSchema = z.object({
 
 export const buildProductSchema = (requiredDonation: boolean) =>
   productFormSchema.superRefine((data, ctx) => {
+    if (!data.shippingAddress || !data.shippingAddress.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["shippingAddress"],
+        message: "Shipping address is required. Please add your address.",
+      });
+    }
+
     const hasCharity = (data.charities?.length ?? 0) > 0;
     const hasPercent = !!data.donation_percent && Number(data.donation_percent) > 0;
 
@@ -148,6 +158,7 @@ export const productFormDefaultValues: ProductFormValues = {
   length_cm: "",
   width_cm: "",
   weight_kg: "",
+  shippingAddress: "",
 
   // durationTime: "",
   returnsPolicy: "7",

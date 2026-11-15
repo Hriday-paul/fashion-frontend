@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState, useEffect, useCallback } from "react";
-import { X, Camera, CheckCircle2, Pencil, Info, } from "lucide-react";
+import { X, Camera, CheckCircle2, Pencil, Info, Eye, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -48,7 +48,7 @@ import BrandSelector from "./Brand/Brandselector";
 import MaterialSelector from "./Material/MaterialSelector";
 import { getFirstErrorMessage } from "@/utils/modifyFormError";
 import { toast } from "sonner";
-import { useGetCharitiesQuery } from "@/redux/api/userApi";
+import { useGetCharitiesQuery, useUserAddressesQuery } from "@/redux/api/userApi";
 import { formattedData } from "./utils";
 import Image from "next/image";
 import { useGetSizesQuery } from "@/redux/api/size.api";
@@ -68,6 +68,7 @@ import { role } from "@/lib/userRole";
 import { SuccessModal } from "../../Modal/SuccessModal";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import DonationAbout from "../../DonationAbout";
 import DonationPrivacyAbout from "../../DonationPrivacyAbout";
 
@@ -79,6 +80,8 @@ const MAX_PHOTOS = 8;
 const INPUT_ID = "photo-uploader-input";
 
 export default function AddProductForm() {
+  const router = useRouter();
+  const [createdProductId, setCreatedProductId] = useState<string | null>(null);
   const [images, setImages] = useState<File[]>([]);
   const [showCustomPicker, setShowCustomPicker] = useState(false);
 
@@ -123,6 +126,29 @@ export default function AddProductForm() {
     resolver: zodResolver(productSchema),
     defaultValues: productFormDefaultValues,
   });
+
+  const { data: addressResponse, isLoading: isAddressLoading } = useUserAddressesQuery();
+  const sellingAddress = addressResponse?.data?.sellingAddress;
+  const hasAddress = Boolean(
+    sellingAddress &&
+      (sellingAddress.address1?.trim() ||
+        sellingAddress.city?.trim() ||
+        sellingAddress.zip_code?.trim() ||
+        sellingAddress.full_name?.trim())
+  );
+
+  useEffect(() => {
+    if (hasAddress) {
+      form.setValue("shippingAddress", "available", {
+        shouldValidate: form.formState.isSubmitted,
+      });
+      form.clearErrors("shippingAddress");
+    } else if (!isAddressLoading && addressResponse) {
+      form.setValue("shippingAddress", "", {
+        shouldValidate: form.formState.isSubmitted,
+      });
+    }
+  }, [hasAddress, isAddressLoading, addressResponse, form]);
 
   const { isSubmitting: isLoading } = form.formState;
 
@@ -217,6 +243,29 @@ export default function AddProductForm() {
   const brands = brandData?.data || [];
   const materials = materialData?.data || [];
 
+  const handleViewList = useCallback(() => {
+    setOpenSuccessDialog(false);
+    if (createdProductId) {
+      router.push(`/shop/${createdProductId}`);
+    } else {
+      router.push("/profile/sell/products");
+    }
+  }, [createdProductId, router]);
+
+  const handleAddAnother = useCallback(() => {
+    form.reset({
+      ...productFormDefaultValues,
+      shippingAddress: hasAddress ? "available" : "",
+    });
+    setImages([]);
+    setSelectedCategory(null);
+    setShowCustomPicker(false);
+    setCreatedProductId(null);
+    setOpenSuccessDialog(false);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [form, hasAddress]);
 
   // ===================================== submitting error ===============================
   const onError = (errors: any) => {
@@ -230,27 +279,44 @@ export default function AddProductForm() {
   async function onSubmit(data: ProductFormValues) {
     if (images?.length === 0) {
       toast.error("Please upload at least one product image");
-    } else {
-      const formData = new FormData();
+      return;
+    }
+    if (!hasAddress) {
+      form.setError("shippingAddress", {
+        type: "manual",
+        message: "Shipping address is required. Please add your address.",
+      });
+      toast.error("Shipping address is required. Please add your address.");
+      return;
+    }
+    const formData = new FormData();
 
-      for (let i = 0; i < images.length; i++) {
-        formData.append("images", images[i]);
-      }
-      const formattedValues = formattedData(data);
+    for (let i = 0; i < images.length; i++) {
+      formData.append("images", images[i]);
+    }
+    const formattedValues = formattedData(data);
 
-      formData.append("data", JSON.stringify(formattedValues));
-      try {
-        const res = await AddNewProduct({ payload: formData });
-        if (!res.success) {
-          throw new Error(res.message);
-        }
-        form.reset();
-        setImages([]);
-        setOpenSuccessDialog(true);
-        // router.push("/")
-      } catch (error: any) {
-        toast.error(error?.message || "An error occurred while uploading the product.");
+    formData.append("data", JSON.stringify(formattedValues));
+    try {
+      const res = await AddNewProduct({ payload: formData });
+      if (!res.success) {
+        throw new Error(res.message);
       }
+      const newId =
+        res?.data?.id ||
+        res?.data?.product?.id ||
+        (typeof res?.data === "string" ? res.data : null);
+
+      setCreatedProductId(newId || null);
+      form.reset({
+        ...productFormDefaultValues,
+        shippingAddress: hasAddress ? "available" : "",
+      });
+      setImages([]);
+      setOpenSuccessDialog(true);
+      // router.push("/")
+    } catch (error: any) {
+      toast.error(error?.message || "An error occurred while uploading the product.");
     }
   }
 
@@ -753,8 +819,21 @@ export default function AddProductForm() {
           {/* ============Shipment================ */}
 
           <div className="space-y-3 mt-12">
-            <p className="text-lg lg:text-2xl font-bold text-gray-900">Shipping</p>
-            <UpdateShippingAddress />
+            <FormField
+              control={form.control}
+              name="shippingAddress"
+              render={({ fieldState }) => (
+                <FormItem>
+                  <FormLabel className="text-lg lg:text-2xl font-bold text-gray-900 block">
+                    Shipping <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <UpdateShippingAddress hasError={Boolean(fieldState.error)} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="mt-8">
               <p className="text-lg lg:text-xl font-semibold text-gray-900 mb-5">Parcel Size</p>
@@ -929,29 +1008,45 @@ export default function AddProductForm() {
         open={openSuccessDialog}
         setOpen={setOpenSuccessDialog}
         content={
-          <div className="p-6 sm:p-8">
-
-            {/* Icon with soft glow background */}
-            <div className="flex justify-center mb-6">
-              <div className="relative flex items-center justify-center w-20 h-20 rounded-full bg-green-50">
-                <div className="absolute inset-0 rounded-full bg-green-100 animate-ping opacity-40" />
-                <CheckCircle2
-                  className="w-11 h-11 text-green-500 relative"
-                  strokeWidth={2}
-                />
+          <div className="p-6 sm:p-8 text-center bg-white">
+            {/* Elegant Icon Badge */}
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 mb-5">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-white shadow-md shadow-emerald-600/25">
+                <CheckCircle2 className="h-6 w-6 stroke-[2.5]" />
               </div>
             </div>
 
             {/* Heading */}
-            <p className="text-center text-2xl font-semibold text-gray-900 leading-snug mb-2">
+            <h3 className="text-2xl font-semibold text-gray-900 mb-2 font-serif">
               Listing Published!
-            </p>
+            </h3>
 
             {/* Subtext */}
-            <p className="text-center text-sm text-gray-500 leading-relaxed mb-8 max-w-xs mx-auto">
-              Your item has been listed successfully and is now visible to buyers.
+            <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
+              Your item has been listed successfully and is now visible to buyers across the marketplace.
             </p>
 
+            {/* 2 Buttons: view list, add another */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Button
+                type="button"
+                onClick={handleViewList}
+                className="w-full sm:flex-1 h-11 bg-black hover:bg-zinc-800 text-white font-medium rounded cursor-pointer flex items-center justify-center gap-2 transition-colors"
+              >
+                <Eye className="size-4" />
+                view list
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAddAnother}
+                className="w-full sm:flex-1 h-11 border border-gray-300 hover:bg-gray-100 text-gray-800 font-medium rounded cursor-pointer flex items-center justify-center gap-2 transition-colors"
+              >
+                <Plus className="size-4" />
+                add another
+              </Button>
+            </div>
           </div>
         }
       />

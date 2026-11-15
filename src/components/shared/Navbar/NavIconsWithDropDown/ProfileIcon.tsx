@@ -176,7 +176,8 @@ export default function ProfileIcon() {
       icon: <Package className="size-5" />,
       name: "My Orders",
       link: "/profile/purchase/orders",
-      roles: SELLER_ROLES,
+      roles: SELLER_ROLES.filter(
+        (role) => (role !== UserRole.ECO_FRIENDLY_STORE && role !== UserRole.CHARITY_SHOP)),
     },
     {
       icon: <Settings className="size-5" />,

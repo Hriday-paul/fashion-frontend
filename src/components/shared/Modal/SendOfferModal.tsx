@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCurrency } from "@/hooks/useCurrency";
+import { useRouter } from "next/navigation";
 
 export default function SendOfferModal({
   open,
@@ -25,6 +26,8 @@ export default function SendOfferModal({
   sellerId: string;
 }) {
   const { format } = useCurrency();
+
+  const router = useRouter();
 
   const [offerPrice, setOfferPrice] = useState<number>(0);
   const [isCustomOffer, setIsCustomOffer] = useState<boolean>(false);
@@ -43,11 +46,15 @@ export default function SendOfferModal({
       };
 
       const res = await AddNewOffer({ payload });
-      if (!res.success) {
-        throw new Error(res.message);
+      if (!res?.success) {
+        throw new Error(res?.message);
       }
 
-      toast.success(res.message || "Offer sent successfully!");
+      toast.success(res?.message || "Offer sent successfully!");
+
+      if (res?.data?.id) {
+        router.push(`/inbox/${res?.data?.id}`)
+      }
 
       setError(null);
       setOpen(false);

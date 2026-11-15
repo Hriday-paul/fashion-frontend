@@ -6,21 +6,30 @@ import Image from "next/image";
 import { defaultImg } from "@/utils/defaultImg";
 import { Button } from "@/components/ui/button";
 import moment from "moment";
-import { AcceptOffer } from "@/lib/Actions/Product.api";
+import { AcceptOffer, DeclineOffer } from "@/lib/Actions/Product.api";
 import { toast } from "sonner";
 import CounterOffer from "./CounterOffer";
 import OfferView from "./OfferView";
 import { useRouter } from "next/navigation";
 import { useCurrency } from "@/hooks/useCurrency";
 import { Check, CheckCheck } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const VISIBLE_COUNT = 3;
 
 function OfferCard({ offer, isSent, isSeen, isImSellerForThisOffer }: { offer: IOffer, isSent: boolean, isSeen?: boolean, isImSellerForThisOffer: boolean }) {
   const { format } = useCurrency();
+  const currentUser = useSelector((state: RootState) => state.auth.user);
+
+  const isSeller = Boolean((currentUser?.id == offer?.sellerId));
+
+  console.log(offer)
+
   const [open, setOpen] = useState(false);
 
   const [loadingAccept, setLoadingAccept] = useState(false);
+  const [loadingDecline, setLoadingDecline] = useState(false);
 
   const [transition, setTransition] = useTransition();
 
@@ -44,6 +53,21 @@ function OfferCard({ offer, isSent, isSeen, isImSellerForThisOffer }: { offer: I
     }
   }
 
+  const declineOfferHandler = async (offerId: string) => {
+    setLoadingDecline(true);
+    try {
+      const res = await DeclineOffer({ payload: { offerId } });
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+      toast.success(res.message || "Offer declined successfully");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to decline offer");
+    } finally {
+      setLoadingDecline(false);
+    }
+  }
+
   const haveStockOutItem = offer?.offerItems?.some(item => item?.product?.stock === 0);
 
   const isOfferExpired = !offer?.expiredAt || moment().isAfter(moment(offer?.expiredAt));
@@ -54,8 +78,43 @@ function OfferCard({ offer, isSent, isSeen, isImSellerForThisOffer }: { offer: I
     });
   }
 
+  const offerItems = offer?.offerItems ?? [];
+  const offeredPrice = Number(offer?.offeredPrice ?? 0);
+
+  const itemsTotalPrice = offerItems.reduce(
+    (acc, item) => acc + Number(item?.product?.finalPrice ?? item?.product?.price ?? 0),
+    0
+  );
+
+  const totalDonation = offerItems.reduce((acc, offerItem) => {
+    const unitPrice = Number(offerItem?.product?.finalPrice ?? offerItem?.product?.price ?? 0);
+    const donationPct = Number(offerItem?.product?.donation_percent ?? 0);
+
+    // avoid division by zero
+    const itemRatio = itemsTotalPrice > 0
+      ? unitPrice / itemsTotalPrice
+      : (offerItems.length > 0 ? 1 / offerItems.length : 0);
+
+    // this item's share of the negotiated offer price
+    const allocatedPrice = offeredPrice * itemRatio;
+
+    const donationAmount = allocatedPrice * (donationPct / 100);
+
+    return acc + donationAmount;
+  }, 0);
+
+  // round to 2 decimals for display
+  const totalDonationRounded = Math.round(totalDonation * 100) / 100;
+  const effectiveDonationPct = offeredPrice > 0 ? (totalDonation / offeredPrice) * 100 : 0;
+  const formattedDonationPct =
+    Number(effectiveDonationPct.toFixed(2)) % 1 === 0
+      ? effectiveDonationPct.toFixed(0)
+      : effectiveDonationPct.toFixed(1);
+
+  const sellerEarnings = Math.max(0, offeredPrice - totalDonationRounded);
+
   return (
-    <div className="rounded-xl min-w-48 bg-[#DFE1E3] border border-gray-200 p-4 space-y-1">
+    <div className="rounded-xl min-w-48 max-w-full bg-[#DFE1E3] border border-gray-200 p-4 space-y-1">
       <p className={cn(isSent ? "text-right" : "text-left", " text-sm font-medium text-gray-900")}>
         {offer?.offerItems?.length} items on offer
       </p>
@@ -101,81 +160,178 @@ function OfferCard({ offer, isSent, isSeen, isImSellerForThisOffer }: { offer: I
         </span>
       </div>
 
-      {!isSent ? <div className={cn("flex gap-2 justify-start")}>
-        {
-          offer?.status === "PENDING" ? isImSellerForThisOffer ? <>
-            {
-              haveStockOutItem ? <p className="text-sm text-yellow-700 font-medium text-right">Some items are sold out</p> : <>
+      {isSeller && (
+        <div
+          className={cn(
+            "pt-1.5 pb-0.5 border-t border-gray-300/80 text-xs space-y-0.5",
+            isSent ? "text-right" : "text-left"
+          )}
+        >
+          <p className="text-gray-700">
+            Donation:{" "}
+            <span className="font-semibold text-emerald-800">
+              {format(totalDonationRounded)} ({formattedDonationPct}%)
+            </span>
+          </p>
+          <p className="text-gray-900">
+            Final to seller:{" "}
+            <span className="font-bold text-gray-900">
+              {format(sellerEarnings)}
+            </span>
+          </p>
+        </div>
+      )}
 
-                <CounterOffer offer={offer} />
-                <Button disabled={loadingAccept} onClick={() => acceptOfferhandler(offer?.id)} className="cursor-pointer bg-green-800 hover:bg-green-700 duration-150 transition-colors">
-                  {loadingAccept ? <span className="loader" /> : "Accept Offer"}
-                </Button>
+      {!isSent ? (
+        <div className={cn("flex flex-wrap gap-2 justify-start pt-1")}>
+          {offer?.status === "PENDING" ? (
+            isImSellerForThisOffer ? (
+              <>
+                {haveStockOutItem ? (
+                  <p className="text-sm text-yellow-700 font-medium text-right">
+                    Some items are sold out
+                  </p>
+                ) : (
+                  <>
+                    <Button
+                      disabled={loadingDecline}
+                      onClick={() => declineOfferHandler(offer?.id)}
+                      variant="outline"
+                      className="cursor-pointer border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 duration-150 transition-colors"
+                    >
+                      {loadingDecline ? <span className="loader" /> : "Decline"}
+                    </Button>
+                    <CounterOffer offer={offer} />
+                    <Button
+                      disabled={loadingAccept}
+                      onClick={() => acceptOfferhandler(offer?.id)}
+                      className="cursor-pointer bg-green-800 hover:bg-green-700 duration-150 transition-colors"
+                    >
+                      {loadingAccept ? <span className="loader" /> : "Accept Offer"}
+                    </Button>
+                  </>
+                )}
               </>
-            }
-          </> : <p className="text-sm text-gray-700 font-medium text-right">Waiting for response</p> : <div>
-            {offer?.status === "ACCEPTED" ?
-
-              !isImSellerForThisOffer ? <>
-
-                {
-                  isOfferExpired ? <p className="text-sm text-yellow-700 font-medium text-right">Offer Expired</p> : haveStockOutItem ? <p className="text-sm text-yellow-700 font-medium text-right">Some items are sold out</p> : <div className="space-y-1">
+            ) : (
+              <p className="text-sm text-gray-700 font-medium text-right">
+                Waiting for response
+              </p>
+            )
+          ) : (
+            <div>
+              {offer?.status === "ACCEPTED" ? (
+                !isImSellerForThisOffer ? (
+                  <>
+                    {isOfferExpired ? (
+                      <p className="text-sm text-yellow-700 font-medium text-right">
+                        Offer Expired
+                      </p>
+                    ) : haveStockOutItem ? (
+                      <p className="text-sm text-yellow-700 font-medium text-right">
+                        Some items are sold out
+                      </p>
+                    ) : (
+                      <div className="space-y-1">
+                        <Button
+                          onClick={() => handleBuyNow(offer?.id)}
+                          disabled={transition}
+                          className={cn(
+                            "cursor-pointer bg-green-800 hover:bg-green-700 duration-150 transition-colors"
+                          )}
+                        >
+                          {transition ? (
+                            <div className="w-4 aspect-square rounded-full border-[2px] border-white border-r-gray-400 animate-spin"></div>
+                          ) : (
+                            "Buy Now"
+                          )}
+                        </Button>
+                        <p className="text-red-700 text-xs">
+                          Offer will expire{" "}
+                          {moment(offer?.expiredAt).calendar(null, {
+                            sameDay: "[today]",
+                            lastDay: "[yesterday]",
+                            nextDay: "[tomorrow]",
+                            sameElse: "MMM D, YYYY",
+                          })}{" "}
+                          at {moment(offer?.expiredAt).format("h:mm a")}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-green-700 font-medium text-right">
+                    Offer Accepted
+                  </p>
+                )
+              ) : offer?.status === "REJECTED" ? (
+                <p className="text-sm text-red-700 font-medium text-right">
+                  Offer Rejected
+                </p>
+              ) : (
+                <p className="text-sm text-gray-700 font-medium text-right">
+                  Waiting for response
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-2 justify-end pt-1">
+          {offer?.status === "ACCEPTED" ? (
+            isImSellerForThisOffer ? (
+              <p className="text-sm text-gray-800 font-medium text-right">
+                Offer Sent
+              </p>
+            ) : (
+              <>
+                {isOfferExpired ? (
+                  <p className="text-sm text-yellow-700 font-medium text-right">
+                    Offer Expired
+                  </p>
+                ) : haveStockOutItem ? (
+                  <p className="text-sm text-yellow-700 font-medium text-right">
+                    Some items are sold out
+                  </p>
+                ) : (
+                  <div className="space-y-1 flex flex-col items-end justify-end">
                     <Button
                       onClick={() => handleBuyNow(offer?.id)}
                       disabled={transition}
                       className={cn(
-                        "cursor-pointer bg-green-800 hover:bg-green-700 duration-150 transition-colors")}>
-                      {transition ? <div className="w-4 aspect-square rounded-full border-[2px] border-white border-r-gray-400 animate-spin"></div> : "Buy Now"}
+                        "cursor-pointer bg-green-800 hover:bg-green-700 duration-150 transition-colors"
+                      )}
+                    >
+                      {transition ? (
+                        <div className="w-4 aspect-square rounded-full border-[2px] border-white border-r-gray-400 animate-spin"></div>
+                      ) : (
+                        "Buy Now"
+                      )}
                     </Button>
                     <p className="text-red-700 text-xs">
-                      Offer will expire {moment(offer?.expiredAt).calendar(null, {
+                      Offer will expire{" "}
+                      {moment(offer?.expiredAt).calendar(null, {
                         sameDay: "[today]",
                         lastDay: "[yesterday]",
                         nextDay: "[tomorrow]",
                         sameElse: "MMM D, YYYY",
-                      })} at {moment(offer?.expiredAt).format("h:mm a")}
+                      })}{" "}
+                      at {moment(offer?.expiredAt).format("h:mm a")}
                     </p>
                   </div>
-                }
-
-              </> : <p className="text-sm text-green-700 font-medium text-right">Offer Accepted</p>
-
-              : offer?.status === "REJECTED" ? <p className="text-sm text-red-700 font-medium text-right">Offer Rejected</p> : <p className="text-sm text-gray-700 font-medium text-right">Waiting for response</p>}
-
-          </div>
-        }</div>
-
-        :
-
-        <div className="flex gap-2 justify-end">
-          {offer?.status === "ACCEPTED" ?
-
-            isImSellerForThisOffer ? <p className="text-sm gray-800 font-medium text-right">Offer Sent</p> : <>
-
-              {
-                isOfferExpired ? <p className="text-sm text-yellow-700 font-medium text-right">Offer Expired</p> : haveStockOutItem ? <p className="text-sm text-yellow-700 font-medium text-right">Some items are sold out</p> : <div className="space-y-1 flex flex-col items-end justify-end">
-                  <Button
-                    onClick={() => handleBuyNow(offer?.id)}
-                    disabled={transition}
-                    className={cn(
-                      "cursor-pointer bg-green-800 hover:bg-green-700 duration-150 transition-colors")}>
-                    {transition ? <div className="w-4 aspect-square rounded-full border-[2px] border-white border-r-gray-400 animate-spin"></div> : "Buy Now"}
-                  </Button>
-                  <p className="text-red-700 text-xs">
-                    Offer will expire {moment(offer?.expiredAt).calendar(null, {
-                      sameDay: "[today]",
-                      lastDay: "[yesterday]",
-                      nextDay: "[tomorrow]",
-                      sameElse: "MMM D, YYYY",
-                    })} at {moment(offer?.expiredAt).format("h:mm a")}
-                  </p>
-                </div>
-              }
-
-            </>
-
-            : offer?.status === "REJECTED" ? <p className="text-sm text-red-700 font-medium text-right">Offer Rejected</p> : <p className="text-sm text-gray-700 font-medium text-right">Waiting for response</p>}
-        </div>}
+                )}
+              </>
+            )
+          ) : offer?.status === "REJECTED" ? (
+            <p className="text-sm text-red-700 font-medium text-right">
+              Offer Rejected
+            </p>
+          ) : (
+            <p className="text-sm text-gray-700 font-medium text-right">
+              Waiting for response
+            </p>
+          )}
+        </div>
+      )}
 
       <div className={cn("flex items-center gap-1 text-[10px] text-gray-700", isSent ? "justify-end" : "justify-start")}>
         <span>{moment(offer?.createdAt).format("h:mm a")}</span>

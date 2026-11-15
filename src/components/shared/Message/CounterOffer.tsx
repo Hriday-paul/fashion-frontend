@@ -23,8 +23,9 @@ import { Input } from "@/components/ui/input";
 import { defaultImg } from "@/utils/defaultImg";
 import Image from "next/image";
 import Link from "next/link";
-import { DeclineOffer } from "@/lib/Actions/Product.api";
+import { SendCounterOffer } from "@/lib/Actions/Product.api";
 import { useCurrency } from "@/hooks/useCurrency";
+import { toast } from "sonner";
 
 const reportSchema = z.object({
     offerPrice: z.string({ required_error: "Price is required." }).refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
@@ -51,14 +52,16 @@ export function CounterOffer({
 
     const onSubmit = async (data: ReportFormValues) => {
         try {
-            const res = await DeclineOffer({ payload: { offerId: offer?.id, offerPrice: Number(data.offerPrice) } });
+            const res = await SendCounterOffer({ payload: { offerId: offer?.id, offerPrice: Number(data.offerPrice) } });
             if (!res.success) {
                 throw new Error(res.message);
             }
+            toast.success(res.message || "Counter offer sent successfully");
             setOpen(false);
             form.reset();
         } catch (err: any) {
-            setError(err?.message || "Failed to send offer");
+            setError(err?.message || "Failed to send counter offer");
+            toast.error(err?.message || "Failed to send counter offer");
         }
     };
 
@@ -70,7 +73,7 @@ export function CounterOffer({
 
             <DialogTrigger asChild>
                 <Button onClick={() => setOpen(true)} variant={"outline"} className="cursor-pointer border-primary-black">
-                    Decline & Counter
+                    Counter
                 </Button>
             </DialogTrigger>
 

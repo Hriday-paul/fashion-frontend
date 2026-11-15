@@ -63,6 +63,7 @@ import InputCharityDonationInput from "@/components/shared/UserProfile/AddProduc
 import UpdateShippingAddress from "@/components/shared/UserProfile/AddProduct/UpdateShippingAddress";
 import DonationAbout from "@/components/shared/DonationAbout";
 import DonationPrivacyAbout from "@/components/shared/DonationPrivacyAbout";
+import { useRouter } from "next/navigation";
 
 const MAX_PHOTOS = 8;
 const INPUT_ID = "photo-uploader-input";
@@ -105,6 +106,8 @@ function getDefaultValues(product: IProduct): ProductFormValues {
 }
 
 function EditlistingForm({ product }: { product: IProduct }) {
+
+    const router = useRouter();
 
     // Photo grid state: existing product images + newly added files, in one ordered list.
     const [photoSlots, setPhotoSlots] = useState<PhotoSlot[]>(
@@ -259,6 +262,7 @@ function EditlistingForm({ product }: { product: IProduct }) {
         try {
             // await UpdateProduct({ id: product.id, payload: formData });
             toast.success("Product updated successfully!");
+            router.push(`/shop/${product?.id}`)
         } catch (error: any) {
             toast.error(error?.message || "An error occurred while updating the product.");
         }
