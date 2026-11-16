@@ -9,6 +9,7 @@ import BrandSelect from "./_components/BrandSelect";
 import PriceSelect from "./_components/PriceSelect";
 import SizeSelect from "./_components/SizeSelect";
 import ColorSelect from "./_components/ColorSelect";
+import MaterialSelect from "./_components/MaterialSelect";
 import ConditionSelect from "./_components/ConditionSelect";
 import { SellerProfileProductSorting } from "@/components/shared/CategoryFilter/SellerProfileProductSorting";
 import SelectedAttributes from "./_components/SelectedAttributes";
@@ -21,7 +22,7 @@ export const metadata = {
 const ShopPage = async ({ searchParams: ssp }: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
 
   const sspResult = await ssp;
-  const { category, sortBy: sort, brand, priceMin, priceMax, size, color, condition, search } = sspResult;
+  const { category, sortBy: sort, brand, priceMin, priceMax, size, color, condition, search, material } = sspResult;
 
   let sortBy = "createdAt";
   let orderBy = "desc"
@@ -58,6 +59,9 @@ const ShopPage = async ({ searchParams: ssp }: { searchParams: Promise<{ [key: s
   if (color) {
     query.colors = color
   }
+  if (material) {
+    query.materials = material
+  }
   if (condition) {
     query.conditions = condition
   }
@@ -90,6 +94,8 @@ const ShopPage = async ({ searchParams: ssp }: { searchParams: Promise<{ [key: s
             <SizeSelect categoryId={category} />
 
             <ColorSelect />
+
+            <MaterialSelect categoryId={category} />
 
             <ConditionSelect />
           </div>

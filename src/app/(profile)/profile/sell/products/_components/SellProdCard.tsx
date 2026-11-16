@@ -5,11 +5,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { CartIcon } from '@/icons'
 import { IProduct } from '@/types'
 import { defaultImg } from '@/utils/defaultImg'
-import { BadgePercent, Heart } from 'lucide-react'
+import { BadgePercent, Heart, Pencil } from 'lucide-react'
 import moment from 'moment'
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
+import DeleteProduct from './DeleteProduct'
+import MarkSold from './MarkSold'
 import DropPrice from './DropPrice'
 import { useCurrency } from '@/hooks/useCurrency'
 
@@ -23,6 +25,12 @@ export type IProductExtra = Omit<IProduct, "_count"> & {
 
 function SellProdCard({ data }: { data: IProductExtra }) {
     const { format } = useCurrency();
+    const [isDeleted, setIsDeleted] = useState(false);
+    const [isSold, setIsSold] = useState(false);
+    const stock = isSold ? 0 : data?.stock;
+
+    if (isDeleted) return null;
+
     return (
         <div className='space-y-3 border border-gray-200 p-2'>
 
@@ -37,7 +45,7 @@ function SellProdCard({ data }: { data: IProductExtra }) {
                         blurDataURL={defaultImg?.placeholderImg}
                         className="h-28 w-40 object-cover origin-center cursor-pointer"
                     ></Image>
-                    {data?.stock < 1 && <div className="h-full w-full flex justify-center items-center absolute bottom-0 left-0">
+                    {stock < 1 && <div className="h-full w-full flex justify-center items-center absolute bottom-0 left-0">
                         <span className=" text-white text-[10px] py-0.5 w-full flex items-center justify-center bg-destructive">
                             SOLD OUT
                         </span>
@@ -104,21 +112,21 @@ function SellProdCard({ data }: { data: IProductExtra }) {
                 </div>
             </div>
 
-            <div className='flex flex-row gap-x-2 items-center'>
-                <>
-                    {
-                        data?.stock > 0 && <>
+            <div className="space-y-2 [&_button]:w-full">
+                {stock > 0 && (
+                    <Link href={`/sell/${data?.id}`} className="block">
+                        <Button size={"sm"} className="h-10 gap-1.5 rounded-none cursor-pointer text-sm font-medium"><Pencil className="size-4" />Edit Listing</Button>
+                    </Link>
+                )}
+                <div className={`grid gap-2 ${stock > 0 ? "grid-cols-3" : "grid-cols-1"}`}>
+                    {stock > 0 && (
+                        <>
                             <DropPrice product={data} />
-                            <div className=' flex-1'>
-                                <Link href={`/sell/${data?.id}`} className='flex-1'>
-                                    <Button size={"sm"} variant={"outline"} className='border border-primary-black rounded-none cursor-pointer w-full'>Edit</Button>
-                                </Link>
-                            </div>
+                            <MarkSold productId={data?.id} title={data?.title} onMarked={() => setIsSold(true)} />
                         </>
-                    }
-                </>
-                {/* <Button size={"sm"} variant={"outline"} className='border border-primary-black rounded-none flex-1 cursor-pointer'>Bump Up</Button> */}
-                <Button size={"sm"} variant={"outline"} className='border border-destructive rounded-none cursor-pointer text-destructive hover:text-destructive'>Delete</Button>
+                    )}
+                    <DeleteProduct productId={data?.id} title={data?.title} onDeleted={() => setIsDeleted(true)} />
+                </div>
             </div>
 
 

@@ -12,7 +12,7 @@ const ProfileFeatures = async ({
   searchParams: { [key: string]: string | undefined };
 }) => {
 
-  const { category, sortBy: sort, brand, priceMin, priceMax, size, color, condition, stock } = ssp;
+  const { category, sortBy: sort, brand, priceMin, priceMax, size, color, condition, stock, material } = ssp;
 
   let sortBy = "createdAt";
   let orderBy = "desc"
@@ -48,6 +48,9 @@ const ProfileFeatures = async ({
   }
   if (color) {
     query.colors = color
+  }
+  if (material) {
+    query.materials = material
   }
   if (condition) {
     query.conditions = condition

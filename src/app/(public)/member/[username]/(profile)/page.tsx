@@ -8,6 +8,7 @@ import BrandSelect from '@/app/(public)/shop/_components/BrandSelect';
 import PriceSelect from '@/app/(public)/shop/_components/PriceSelect';
 import SizeSelect from '@/app/(public)/shop/_components/SizeSelect';
 import ColorSelect from '@/app/(public)/shop/_components/ColorSelect';
+import MaterialSelect from '@/app/(public)/shop/_components/MaterialSelect';
 import ConditionSelect from '@/app/(public)/shop/_components/ConditionSelect';
 import { SellerProfileProductSorting } from '@/components/shared/CategoryFilter/SellerProfileProductSorting';
 import { SmallDeviceFilter } from '@/app/(public)/shop/_components/SmallDeviceFilter';
@@ -44,6 +45,8 @@ async function SellerProducts({ params, searchParams }: { params: Promise<{ user
             <SizeSelect categoryId={category} />
 
             <ColorSelect />
+
+            <MaterialSelect categoryId={category} />
 
             <ConditionSelect />
 

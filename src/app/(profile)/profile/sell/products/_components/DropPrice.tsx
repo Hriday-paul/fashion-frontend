@@ -118,7 +118,7 @@ export function DropPriceComponenet({
         <Dialog open={open} onOpenChange={setOpen}>
 
             <DialogTrigger asChild>
-                <Button onClick={() => setOpen(open)} size={"sm"} variant={"outline"} className='border border-primary-black rounded-none flex-1 cursor-pointer'>Drop Price</Button>
+                <Button onClick={() => setOpen(open)} size={"sm"} variant={"outline"} className='border border-primary-black h-8 px-2 text-sm font-medium rounded-none cursor-pointer'>Drop Price</Button>
             </DialogTrigger>
 
             <DialogContent className="w-[450px] rounded-none overflow-y-auto max-h-screen">

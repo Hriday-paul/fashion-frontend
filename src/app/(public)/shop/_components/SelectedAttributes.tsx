@@ -2,6 +2,7 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { useFilteredAttributesQuery } from '@/redux/api/categoryApi';
 import { X } from 'lucide-react';
+import { useGetMaterialsQuery } from '@/redux/api/material.api';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback } from 'react'
 import { useCurrency } from '@/hooks/useCurrency';
@@ -28,6 +29,8 @@ function SelectedAttributes({ ssp }: { ssp: { [key: string]: string | undefined 
     const pathname = usePathname();
 
     const colors = color?.split(",") || [];
+    const materialIds = ssp.material?.split(",").filter(Boolean) || [];
+    const { data: materialsData } = useGetMaterialsQuery({});
     const conditions = condition?.split(",") || [];
 
     const updateQueryParam = useCallback(
@@ -131,6 +134,17 @@ function SelectedAttributes({ ssp }: { ssp: { [key: string]: string | undefined 
                             colors.map((color) => (<div key={color} className='bg-zinc-100 rounded-full px-3.5 py-0.5 hover:bg-zinc-50 cursor-pointer flex-row gap-x-1 items-center inline-flex'>
                                 <p className='text-base text-gray-800'>{color}</p>
                                 <button onClick={() => updateQueryParam('color', color)} className='cursor-pointer'><X className='size-4' /></button>
+                            </div>))
+                        }
+                    </div>
+                }
+
+                {
+                    materialIds.length > 0 && <div className='flex flex-row gap-x-3 items-center flex-wrap'>
+                        {
+                            materialIds.map((id) => (<div key={id} className='bg-zinc-100 rounded-full px-3.5 py-0.5 hover:bg-zinc-50 cursor-pointer flex-row gap-x-1 items-center inline-flex'>
+                                <p className='text-base text-gray-800'>{materialsData?.data?.find((m) => m.id === id)?.name || "Material"}</p>
+                                <button onClick={() => updateQueryParam('material', id)} className='cursor-pointer'><X className='size-4' /></button>
                             </div>))
                         }
                     </div>

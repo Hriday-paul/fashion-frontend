@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import SmBrandFilter from "./SmFilter/SmBrandFilter";
 import SmPriceFilter from "./SmFilter/SmPriceFilter";
 import SmColorFilter from "./SmFilter/SmColorFilter";
+import SmMaterialFilter from "./SmFilter/SmMaterialFilter";
 import SmSizeFilter from "./SmFilter/SmSizeFilter";
 import SmConditionFilter from "./SmFilter/SmConditionFilter";
 import SelectedAttributes from "./SelectedAttributes";
@@ -23,6 +24,7 @@ export function SmallDeviceFilter({ categoryId, sspResult }: { categoryId?: stri
   const minPrice = searchParams.get("priceMin");
   const sizes = searchParams.get("size")?.split(",") || [];
   const colors = searchParams.get("color")?.split(",") || [];
+  const materials = searchParams.get("material")?.split(",").filter(Boolean) || [];
   const conditions = searchParams.get("condition")?.split(",") || [];
 
   const options = [
@@ -31,6 +33,7 @@ export function SmallDeviceFilter({ categoryId, sspResult }: { categoryId?: stri
     { id: 3, label: <span className={cn((minPrice || maxPrice) && "font-semibold")}>Price</span>, render: () => <SmPriceFilter /> },
     { id: 4, label: <span className={cn(colors.length > 0 && "font-semibold")}>Color</span>, render: () => <SmColorFilter /> },
     { id: 5, label: <span className={cn(sizes.length > 0 && "font-semibold")}>Size</span>, render: () => <SmSizeFilter categoryId={categoryId} /> },
+    { id: 6, label: <span className={cn(materials.length > 0 && "font-semibold")}>Material</span>, render: () => <SmMaterialFilter categoryId={categoryId} /> },
     { id: 7, label: <span className={cn(conditions.length > 0 && "font-semibold")}>Condition</span>, render: () => <SmConditionFilter /> },
   ];
 

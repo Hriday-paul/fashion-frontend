@@ -87,6 +87,22 @@ const productApi = baseApi.injectEndpoints({
       }),
     }),
 
+    deleteProduct: builder.mutation<{ success: boolean; message: string }, { productId: string }>({
+      query: ({ productId }) => ({
+        url: `/products/${productId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [tagTypes.product],
+    }),
+
+    markProductSold: builder.mutation<{ success: boolean; message: string }, { productId: string }>({
+      query: ({ productId }) => ({
+        url: `/products/${productId}/mark-sold`,
+        method: "PATCH",
+      }),
+      invalidatesTags: [tagTypes.product],
+    }),
+
     productsByIds: builder.query<{
       data: {
         products: IProduct[],
@@ -104,4 +120,4 @@ const productApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useCreateProductMutation, useGetProductsQuery, useLazyProductsGetByMemberQuery, useLazyGetProductsQuery, useGetProductStatsQuery, useProductsByIdsQuery, useLazyMyProductsGetQuery, useSearchKeywordsQuery, useSearchPeoplesQuery } = productApi;
+export const { useCreateProductMutation, useGetProductsQuery, useLazyProductsGetByMemberQuery, useLazyGetProductsQuery, useGetProductStatsQuery, useProductsByIdsQuery, useLazyMyProductsGetQuery, useDeleteProductMutation, useMarkProductSoldMutation, useSearchKeywordsQuery, useSearchPeoplesQuery } = productApi;
