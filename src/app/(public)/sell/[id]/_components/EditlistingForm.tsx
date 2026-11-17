@@ -41,7 +41,7 @@ import { toast } from "sonner";
 import { useGetCharitiesQuery } from "@/redux/api/userApi";
 
 import Image from "next/image";
-import { useGetSizesQuery } from "@/redux/api/size.api";
+import { useGetSizeGroupsQuery } from "@/redux/api/size.api";
 import { useGetBrandsQuery } from "@/redux/api/brand.api";
 import { useGetMaterialsQuery } from "@/redux/api/material.api";
 
@@ -82,6 +82,7 @@ function getDefaultValues(product: IProduct): ProductFormValues {
         productDescription: product.description ?? "",
         categoryId: product.categoryId ?? product.category?.id ?? "",
         sizeId: product.size?.id ?? product.sizeId ?? "",
+        SizeFormat: product.SizeFormat ?? "",
         brandId: product.brand?.id ?? product.brandId ?? "",
         tags: product.tags ?? [],
         fabric: product?.materials?.length
@@ -127,7 +128,7 @@ function EditlistingForm({ product }: { product: IProduct }) {
     );
 
     // ======================= category size ===========================
-    const { data: sizeData } = useGetSizesQuery(
+    const { data: sizeData } = useGetSizeGroupsQuery(
         { categoryId: selectedCategory?.id },
         { skip: !selectedCategory }
     );
@@ -205,6 +206,7 @@ function EditlistingForm({ product }: { product: IProduct }) {
         form.setValue("categoryId", cat.id, { shouldValidate: true });
         // Category changed -> previously selected size/brand/materials may no longer be valid
         form.setValue("sizeId", "", { shouldValidate: false });
+        form.setValue("SizeFormat", "", { shouldValidate: false });
         form.setValue("brandId", "", { shouldValidate: false });
         form.setValue("fabric", [], { shouldValidate: false });
     }
@@ -219,7 +221,7 @@ function EditlistingForm({ product }: { product: IProduct }) {
     };
 
     const categories = categoriesData?.data || [];
-    const sizes = sizeData?.data || [];
+    const sizeGroups = sizeData?.data || [];
     const brands = brandData?.data || [];
     const materials = materialData?.data || [];
 
@@ -427,7 +429,7 @@ function EditlistingForm({ product }: { product: IProduct }) {
                                 <FormLabel>Size</FormLabel>
                                 <SizeSelector
                                     control={form.control}
-                                    sizes={sizes}
+                                    groups={sizeGroups}
                                     selectedCategory={selectedCategory}
                                     placeholder="Select size"
                                 />

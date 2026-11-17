@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { formatSize } from "@/lib/formatSize";
 import Image from "next/image";
 import Link from "next/link";
 import { IOrderItem } from "@/types";
@@ -60,7 +61,7 @@ export function OrderItemsList({ items = [] }: OrderItemsListProps) {
 
                 <div className="flex flex-wrap items-center gap-2 text-[11px] text-neutral-500">
                   {product?.category?.name && <span>{product.category.name}</span>}
-                  {product?.size?.title && <span>· Size: {product.size.title}</span>}
+                  {product?.size?.title && <span>· Size: {formatSize(product.size, product?.SizeFormat)}</span>}
                   {product?.condition && <span>· {product.condition}</span>}
                 </div>
 

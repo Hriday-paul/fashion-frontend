@@ -1,11 +1,12 @@
 "use client"
 import Link from "next/link";
+import { formatSize } from "@/lib/formatSize";
 import ActionButtons from "../ActionButtons";
 import SellerDetails from "../SellerDetails";
 import { CheckIcon } from "@/icons";
 import ProductDetailsHeader from "./ProductDetailsHeader";
 import DisplayLargeDescriptionText from "@/components/shared/DisplayLargeDescriptionText";
-import { IProduct, ISize, IUser, UserRole } from "@/types";
+import { IProduct, ISizeGroupItem, IUser, UserRole } from "@/types";
 import Sizechart from "../dialog/Sizechart";
 import { Eye } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -29,7 +30,7 @@ export type IProductWithUser = Omit<IProduct, "user"> & {
     cartItems: number;
     favourites: number;
   },
-  sizechart: ISize[],
+  sizechart: Pick<ISizeGroupItem, "groupName" | "isLetter" | "sizes"> | null,
   isMyProduct: boolean
 };
 
@@ -98,9 +99,9 @@ const ProductDetails = ({ product }: { product: IProductWithUser }) => {
         <div className="flex flex-col md:flex-row justify-between gap-x-2">
           <div className="flex md:gap-x-8 gap-x-4 items-center">
             <h2 className="w-30">Available Size: </h2>
-            <Link href={`/shop?size=${product?.size?.id}`} className="hover:underline">{product?.size?.title}</Link>
+            <Link href={`/shop?size=${product?.size?.id}`} className="hover:underline">{formatSize(product?.size, product?.SizeFormat)}</Link>
           </div>
-          <Sizechart sizes={product?.sizechart} />
+          <Sizechart group={product?.sizechart} selectedSizeId={product?.size?.id} />
         </div>
         <div className="flex md:gap-x-8 gap-x-4 items-center">
           <h2 className="w-[120px]">Colour: </h2>

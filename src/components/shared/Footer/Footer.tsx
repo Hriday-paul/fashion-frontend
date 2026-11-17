@@ -94,7 +94,7 @@ function FooterColumn({ links, title }: { title: string, links: { name: string; 
             <Link
               href={link?.link}
               prefetch={link?.prefetch}
-              className="text-gray-400 hover:text-white transition-colors text-sm sm:text-base"
+              className="text-gray-400 hover:text-white transition-colors text-base"
             >
               {link?.name}
             </Link>

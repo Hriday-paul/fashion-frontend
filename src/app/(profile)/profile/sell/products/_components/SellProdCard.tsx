@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from '@/components/ui/button'
+import { formatSize } from "@/lib/formatSize";
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { CartIcon } from '@/icons'
 import { IProduct } from '@/types'
@@ -58,7 +59,7 @@ function SellProdCard({ data }: { data: IProductExtra }) {
                         <p className='text-base font-semibold line-clamp-1'>{format(data?.finalPrice)}</p>
                     </div>
                     <p className='text-base font-semibold line-clamp-1'>{data?.title}</p>
-                    <p className='text-sm text-gray-500 line-clamp-1'>{data?.size?.title}</p>
+                    <p className='text-sm text-gray-500 line-clamp-1'>{formatSize(data?.size, data?.SizeFormat)}</p>
 
                     <div className='flex flex-row gap-x-1 items-center mt-2'>
 

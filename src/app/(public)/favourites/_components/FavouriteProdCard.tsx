@@ -1,4 +1,5 @@
 import React from 'react'
+import { formatSize } from "@/lib/formatSize";
 import FavouritesWithServer from "@/app/(public)/shop/[productId]/_components/FavouritesWithServer";
 import { Card, CardContent } from "@/components/ui/card";
 import { defaultImg } from "@/utils/defaultImg";
@@ -40,7 +41,7 @@ function FavouriteProdCard({ favoriteItem }: { favoriteItem: IFavoriteItem }) {
                         </p>
                         <div className='flex flex-row justify-between items-center'>
                             <p className="md:text-lg text-primary-black">{data?.brand?.name}</p>
-                            <p className="md:text-lg text-primary-black">{data?.size?.title}</p>
+                            <p className="md:text-lg text-primary-black">{formatSize(data?.size, data?.SizeFormat)}</p>
                         </div>
                         <div className='flex flex-row gap-x-2 items-center'>
                             <p className="font-medium text-gray-600 line-through text-sm">${data?.price?.toFixed(2)}</p>

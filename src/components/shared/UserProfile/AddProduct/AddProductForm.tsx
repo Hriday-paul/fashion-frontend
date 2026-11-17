@@ -51,7 +51,7 @@ import { toast } from "sonner";
 import { useGetCharitiesQuery, useUserAddressesQuery } from "@/redux/api/userApi";
 import { formattedData } from "./utils";
 import Image from "next/image";
-import { useGetSizesQuery } from "@/redux/api/size.api";
+import { useGetSizeGroupsQuery } from "@/redux/api/size.api";
 import { useGetBrandsQuery } from "@/redux/api/brand.api";
 import { useGetMaterialsQuery } from "@/redux/api/material.api";
 
@@ -101,7 +101,7 @@ export default function AddProductForm() {
   const { data: categoriesData } = useGetCategoryQuery(undefined);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   // ======================= category size ===========================
-  const { data: sizeData } = useGetSizesQuery({ categoryId: selectedCategory?.id }, {
+  const { data: sizeData } = useGetSizeGroupsQuery({ categoryId: selectedCategory?.id }, {
     skip: !selectedCategory
   });
   // ======================= category brand ===========================
@@ -226,6 +226,7 @@ export default function AddProductForm() {
     setSelectedCategory(cat);
     form.setValue("categoryId", cat.id, { shouldValidate: true });
     form.setValue("sizeId", "", { shouldValidate: false });
+    form.setValue("SizeFormat", "", { shouldValidate: false });
     form.setValue("brandId", "", { shouldValidate: false });
     form.setValue("fabric", [], { shouldValidate: false });
   }
@@ -239,7 +240,7 @@ export default function AddProductForm() {
   };
 
   const categories = categoriesData?.data || [];
-  const sizes = sizeData?.data || [];
+  const sizeGroups = sizeData?.data || [];
   const brands = brandData?.data || [];
   const materials = materialData?.data || [];
 
@@ -460,7 +461,7 @@ export default function AddProductForm() {
                 <FormLabel>Size</FormLabel>
                 <SizeSelector
                   control={form.control}
-                  sizes={sizes}
+                  groups={sizeGroups}
                   selectedCategory={selectedCategory}  // null = disabled
                   placeholder="Select size"
                 />

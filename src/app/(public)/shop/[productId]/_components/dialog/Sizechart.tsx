@@ -5,10 +5,22 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { ISize } from "@/types";
+import { ISizeGroupItem } from "@/types";
 import React from "react";
 
-export default function Sizechart({ sizes }: { sizes: ISize[] }) {
+const FORMATS = ["US", "UK", "EU", "FR", "IT"] as const;
+
+type Props = {
+    // the full size group of the product (size group or letter group)
+    group: Pick<ISizeGroupItem, "groupName" | "isLetter" | "sizes"> | null | undefined;
+    // the product's own size, highlighted in the table
+    selectedSizeId?: string;
+};
+
+export default function Sizechart({ group, selectedSizeId }: Props) {
+
+    // letter sizes hold one value in every format, so one column is enough
+    const columns = group?.isLetter ? ["Size"] : [...FORMATS];
 
     return (
         <Dialog>
@@ -28,42 +40,54 @@ export default function Sizechart({ sizes }: { sizes: ISize[] }) {
                         <div className="w-full max-w-md">
                             {/* Header */}
                             <h1 className="text-center text-xl font-semibold tracking-wide text-neutral-900">
-                                Conversion Guide
+                                {group?.groupName || "Conversion Guide"}
                             </h1>
-                            <p className="mt-2 mb-6 text-center text-sm text-neutral-500 flex items-center justify-center gap-1">
-                                <span>Conversion between different size systems</span>
-                            </p>
+                            {!group?.isLetter && (
+                                <p className="mt-2 mb-6 text-center text-sm text-neutral-500 flex items-center justify-center gap-1">
+                                    <span>Conversion between different size systems</span>
+                                </p>
+                            )}
 
                             {/* Table */}
-                            <div className="overflow-hidden rounded-sm border border-neutral-200">
-                                <table className="w-full border-collapse text-sm">
-                                    <thead>
-                                        <tr className="bg-white">
-                                            {["INTL", "US", "UK", "EU"].map((h) => (
-                                                <th
-                                                    key={h}
-                                                    className="px-4 py-3 text-left font-semibold text-neutral-900 border-b border-neutral-200"
-                                                >
-                                                    {h}
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {sizes.map((row, i) => (
-                                            <tr
-                                                key={row?.id}
-                                                className={i % 2 === 1 ? "bg-neutral-100" : "bg-white"}
-                                            >
-                                                <td className="px-4 py-3 text-neutral-700">{row?.title}</td>
-                                                <td className="px-4 py-3 text-neutral-700">{row?.US}</td>
-                                                <td className="px-4 py-3 text-neutral-700">{row?.UK}</td>
-                                                <td className="px-4 py-3 text-neutral-700">{row?.EU}</td>
+                            {group?.sizes?.length ? (
+                                <div className="overflow-hidden rounded-sm border border-neutral-200 mt-4">
+                                    <table className="w-full border-collapse text-sm">
+                                        <thead>
+                                            <tr className="bg-white">
+                                                {columns.map((h) => (
+                                                    <th
+                                                        key={h}
+                                                        className="px-4 py-3 text-left font-semibold text-neutral-900 border-b border-neutral-200"
+                                                    >
+                                                        {h}
+                                                    </th>
+                                                ))}
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            {group.sizes.map((row, i) => {
+                                                const isSelected = row.id === selectedSizeId;
+                                                return (
+                                                    <tr
+                                                        key={row.id}
+                                                        className={isSelected ? "bg-neutral-200 font-semibold" : i % 2 === 1 ? "bg-neutral-100" : "bg-white"}
+                                                    >
+                                                        {group.isLetter ? (
+                                                            <td className="px-4 py-3 text-neutral-700">{row.US}</td>
+                                                        ) : (
+                                                            FORMATS.map((format) => (
+                                                                <td key={format} className="px-4 py-3 text-neutral-700">{row[format]}</td>
+                                                            ))
+                                                        )}
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) : (
+                                <p className="mt-6 text-center text-sm text-neutral-500">No size guide available</p>
+                            )}
                         </div>
                     </div>
 

@@ -1,19 +1,20 @@
-import { ISize } from "@/types";
+import { ISizeGroupItem } from "@/types";
 import { tagTypes } from "../tagTypes";
 import { baseApi } from "./baseApi";
 
 const sizeApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        getSizes: builder.query<{ data: ISize[] }, {}>({
+
+        // same endpoint, new grouped shape (letter group first); used by the listing forms
+        getSizeGroups: builder.query<{ data: ISizeGroupItem[] }, { categoryId?: string }>({
             query: (query) => ({
                 url: "/sizes",
                 method: "GET",
-                params : query
+                params: query
             }),
             providesTags: [tagTypes.size],
         }),
-
     }),
 });
 
-export const { useGetSizesQuery } = sizeApi;
+export const { useGetSizeGroupsQuery } = sizeApi;

@@ -1,5 +1,6 @@
 "use client"
 import React, { useState } from "react"
+import { formatSize } from "@/lib/formatSize";
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -145,7 +146,7 @@ const Listings = ({ listings }: { listings: IProduct[] }) => {
                                 <p className="text-base">
                                     {product?.title}
                                 </p>
-                                <p className="text-gray-700">{product?.size?.title}</p>
+                                <p className="text-gray-700">{formatSize(product?.size, product?.SizeFormat)}</p>
                                 <p className="text-gray-700">Price: <span className="font-semibold text-primary-black">{format(product?.finalPrice)}</span></p>
 
                                 {/* <p className="text-[#E12728]">Offer Expire in 24 hrs</p> */}

@@ -27,17 +27,25 @@ export interface IBrand {
   updatedAt: string;
 }
 
-export interface ISize {
+export type SizeFormat = "UK" | "US" | "EU" | "FR" | "IT" | "LETTER";
+
+// one size inside a group returned by GET /sizes
+export interface ISizeItem {
   id: string;
   title: string;
   order: number;
-  createdAt: string;
-  updatedAt: string;
-  "UK": string
-  "US": string
-  "EU": string
-  "parentId": string | null
-  "children": ISize[]
+  UK: string;
+  US: string;
+  EU: string;
+  FR: string;
+  IT: string;
+}
+
+export interface ISizeGroupItem {
+  id: string;
+  groupName: string;
+  isLetter: boolean;
+  sizes: ISizeItem[];
 }
 
 export interface ICategory {
@@ -97,7 +105,8 @@ export interface IProduct {
   updatedAt: string;
   images: IProductImage[];
   brand: IBrand;
-  size: ISize;
+  size: ISizeItem;
+  SizeFormat?: SizeFormat;
   category: ICategory;
   _count: {
     favourites: number;

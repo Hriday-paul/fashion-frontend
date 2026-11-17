@@ -1,4 +1,4 @@
-import { IBrand, ICategory, IParcelSuggestion, ISize } from "@/types";
+import { IBrand, ICategory, IParcelSuggestion, ISizeItem } from "@/types";
 import { tagTypes } from "../tagTypes";
 import { baseApi } from "./baseApi";
 
@@ -35,7 +35,7 @@ const categoryApi = baseApi.injectEndpoints({
     filteredAttributes: builder.query<{
       data: {
         category: ICategory | null,
-        sizeList: ISize[],
+        sizeList: ISizeItem[],
         brandList: IBrand[]
       }
     }, {}>({

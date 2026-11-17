@@ -39,6 +39,10 @@ export const productFormSchema = z.object({
     .min(1, {
       message: "Please specify available sizes.",
     }),
+  // one of UK, US, EU, FR, IT, LETTER (validated by the API)
+  SizeFormat: z.string({ required_error: "Please select a size format." }).min(1, {
+    message: "Please select a size format.",
+  }),
   color: z.string().min(1, {
     message: "Please select colors.",
   }),
@@ -145,6 +149,7 @@ export const productFormDefaultValues: ProductFormValues = {
   fabric: [],
   brandId: "",
   sizeId: "",
+  SizeFormat: "",
   color: "",
   // careInstructions: [],
   donationPrivacy: true,

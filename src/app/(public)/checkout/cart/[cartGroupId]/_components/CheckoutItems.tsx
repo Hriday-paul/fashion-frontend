@@ -1,4 +1,5 @@
 import CustomAvatar from '@/components/ui/custom-avatar';
+import { formatSize } from "@/lib/formatSize";
 import { getCheckoutItems } from '@/lib/services/Cartprods';
 import { ICartGroup } from '@/types';
 import { defaultImg } from '@/utils/defaultImg';
@@ -83,7 +84,7 @@ const CartProds = async ({ cartPromise }: { cartPromise: Promise<{ data: ICartGr
                                                             <p className="text-sm font-bold">+ {item?.extraDonation?.toFixed(2)} (extra donation)</p>
                                                         )}
                                                     </div>
-                                                    <p className="text-sm text-gray-700">{item?.product?.size?.title}</p>
+                                                    <p className="text-sm text-gray-700">{formatSize(item?.product?.size, item?.product?.SizeFormat)}</p>
                                                 </Link>
 
                                             </div>

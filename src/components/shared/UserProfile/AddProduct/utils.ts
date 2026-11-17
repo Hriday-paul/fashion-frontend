@@ -11,6 +11,7 @@ export const formattedData = (data: z.infer<typeof productFormSchema>) => {
     currency: "USD",
     brandId: data?.brandId,
     sizeId: data?.sizeId,
+    SizeFormat: data?.SizeFormat,
     categoryId: data?.categoryId,
     condition: data?.condition,
     color: data?.color,

@@ -1,4 +1,5 @@
 import { IProductWithUser } from '@/app/(public)/shop/[productId]/_components/ProductDetails/ProductDetails';
+import { formatSize } from "@/lib/formatSize";
 import CustomAvatar from '@/components/ui/custom-avatar';
 import { getCheckoutItems, GetOfferItems } from '@/lib/services/Cartprods';
 import GetProductDetails from '@/lib/services/ProductDetails';
@@ -89,7 +90,7 @@ const CartProds = async ({ cartPromise }: { cartPromise: Promise<{ data: IProduc
                   <div className='flex flex-row items-center gap-x-2'>
                     <p className="text-lg font-bold">${item?.product?.finalPrice?.toFixed(2)}</p>
                   </div>
-                  <p className="text-sm text-gray-700">{item?.product?.size?.title}</p>
+                  <p className="text-sm text-gray-700">{formatSize(item?.product?.size, item?.product?.SizeFormat)}</p>
                 </Link>
 
               </div>

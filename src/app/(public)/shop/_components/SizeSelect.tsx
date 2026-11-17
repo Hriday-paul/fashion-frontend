@@ -5,64 +5,42 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/compon
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { cn } from '@/lib/utils';
-import { useGetSizesQuery } from '@/redux/api/size.api';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { ISize } from '@/types'
+import { useGetSizeGroupsQuery } from '@/redux/api/size.api';
+import { ISizeGroupItem } from '@/types'
 
+// group name first, then the sizes of that group
 const BuildDropdownItem = ({
-    sizes,
+    groups,
     selectedSizes,
     onSelect,
 }: {
-    sizes: ISize[]
+    groups: ISizeGroupItem[]
     selectedSizes: string[]
     onSelect: (id: string) => void
 }) => {
-    // separate leaf sizes (no children) from parent sizes (have children)
-    const leafSizes = sizes.filter((size) => !(size?.children?.length > 0));
-    const parentSizes = sizes.filter((size) => size?.children?.length > 0);
-
     return (
         <div>
-            {/* leaf sizes render directly as selectable buttons, no accordion */}
-            {leafSizes.length > 0 && (
-                <div className='flex flex-row gap-2 flex-wrap p-2'>
-                    {leafSizes.map((size) => {
-                        const isSelected = selectedSizes.includes(size?.id?.toString());
-                        return (
-                            <Button
-                                key={size?.id}
-                                variant={isSelected ? "default" : "outline"}
-                                size="sm"
-                                className='rounded-none shadow-none cursor-pointer'
-                                onClick={() => onSelect(size?.id?.toString())}
-                            >
-                                {size?.title}
-                            </Button>
-                        )
-                    })}
+            {groups.map((group) => (
+                <div key={group.id}>
+                    <p className='px-4 pt-3 pb-1 text-sm font-semibold'>{group.groupName}</p>
+                    <div className='flex flex-row gap-2 flex-wrap p-2'>
+                        {group.sizes.map((size) => {
+                            const isSelected = selectedSizes.includes(size.id);
+                            return (
+                                <Button
+                                    key={size.id}
+                                    variant={isSelected ? "default" : "outline"}
+                                    size="sm"
+                                    className='rounded-none shadow-none cursor-pointer'
+                                    onClick={() => onSelect(size.id)}
+                                >
+                                    {size.title}
+                                </Button>
+                            )
+                        })}
+                    </div>
                 </div>
-            )}
-
-            {/* only sizes with children become accordion items */}
-            {parentSizes.length > 0 && (
-                <Accordion type='multiple'>
-                    {parentSizes.map((size) => (
-                        <AccordionItem value={size?.id?.toString()} key={size?.id}>
-                            <AccordionTrigger className={cn("text-sm px-4 hover:no-underline hover:bg-zinc-100 cursor-pointer rounded-none")}>
-                                {size?.title}
-                            </AccordionTrigger>
-                            <AccordionContent className='p-0 space-y-2'>
-                                <BuildDropdownItem
-                                    sizes={size.children}
-                                    selectedSizes={selectedSizes}
-                                    onSelect={onSelect}
-                                />
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
-                </Accordion>
-            )}
+            ))}
         </div>
     )
 }
@@ -71,7 +49,7 @@ export default function SizeSelect({ categoryId }: { categoryId?: string }) {
 
     const searchParams = useSearchParams()
 
-    const { data: sizes, isLoading, isError, isSuccess } = useGetSizesQuery({ categoryId });
+    const { data: sizes, isLoading, isError, isSuccess } = useGetSizeGroupsQuery({ categoryId });
 
     const selectedSizes = searchParams.get("size")?.split(",") || [];
 
@@ -133,7 +111,7 @@ export default function SizeSelect({ categoryId }: { categoryId?: string }) {
 
                     {sizes?.data?.length ? (
                         <BuildDropdownItem
-                            sizes={sizes.data}
+                            groups={sizes.data}
                             selectedSizes={selectedSizes}
                             onSelect={handleSelect}
                         />
@@ -143,7 +121,9 @@ export default function SizeSelect({ categoryId }: { categoryId?: string }) {
                         </div>
                     )}
 
-                </> : <></>}
+                </> : isError ? <div className="p-3 text-sm text-muted-foreground text-center">
+                    Error loading sizes
+                </div> : <></>}
 
             </DropdownMenuContent>
         </DropdownMenu>
