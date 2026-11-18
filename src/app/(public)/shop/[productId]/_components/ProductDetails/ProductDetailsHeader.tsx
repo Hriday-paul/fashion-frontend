@@ -2,6 +2,7 @@ import { IProduct } from "@/types";
 import React from "react";
 import ProductStats from "./ProductStats";
 import FormatCurrency from "@/components/shared/FormatCurrency";
+import GbpChargeNote from "@/components/shared/GbpChargeNote";
 
 export default function ProductDetailsHeader({ product, isMyProduct }: { product: IProduct; isMyProduct: boolean }) {
 
@@ -16,7 +17,8 @@ export default function ProductDetailsHeader({ product, isMyProduct }: { product
 
       <div className="flex space-y-1.5 justify-between flex-col md:justify-start ">
 
-        <h4 className="md:text-2xl text-xl font-semibold">{<FormatCurrency amount={product?.finalPrice} />}</h4>
+        <h4 className="md:text-2xl text-xl font-semibold">{<FormatCurrency withGbp gbpClassName="text-sm font-medium text-gray-800" amount={product?.finalPrice} />}</h4>
+
         {product?.discountPct > 0 && (
           <div className="flex gap-x-3 items-center">
             <p className="line-through text-primary-gray text-base">
@@ -27,6 +29,9 @@ export default function ProductDetailsHeader({ product, isMyProduct }: { product
             </div>
           </div>
         )}
+
+        <GbpChargeNote />
+
       </div>
     </div>
   );

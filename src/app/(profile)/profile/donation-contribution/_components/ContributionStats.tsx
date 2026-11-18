@@ -1,5 +1,6 @@
 "use client";
 
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import React from "react";
 import { useGetContributionStatsQuery } from "@/redux/api/donation.api";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,7 +36,7 @@ function ContributionStats() {
             <Skeleton className="h-8 w-28 rounded-md" />
           ) : (
             <p className="text-2xl md:text-3xl font-semibold tracking-tight text-gray-900">
-              ${formatAmount(totalAmount)}
+              <FormatCurrency fixed amount={totalAmount} />
             </p>
           )}
           <p className="text-xs text-muted-foreground">
@@ -57,7 +58,7 @@ function ContributionStats() {
             <Skeleton className="h-8 w-28 rounded-md" />
           ) : (
             <p className="text-2xl md:text-3xl font-semibold tracking-tight text-gray-900">
-              ${formatAmount(sellAmount)}
+              <FormatCurrency fixed amount={sellAmount} />
             </p>
           )}
           <p className="text-xs text-muted-foreground">
@@ -79,7 +80,7 @@ function ContributionStats() {
             <Skeleton className="h-8 w-28 rounded-md" />
           ) : (
             <p className="text-2xl md:text-3xl font-semibold tracking-tight text-gray-900">
-              ${formatAmount(directAmount)}
+              <FormatCurrency fixed amount={directAmount} />
             </p>
           )}
           <p className="text-xs text-muted-foreground">

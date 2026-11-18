@@ -6,6 +6,7 @@ import { defaultImg } from '@/utils/defaultImg';
 import { Package } from 'lucide-react'
 import Image from 'next/image';
 import React from 'react'
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import ReviewBundleModal from './ReviewBundleModal';
 
 function BundleFooter({ userName }: { userName: string }) {
@@ -65,8 +66,8 @@ function BundleFooter({ userName }: { userName: string }) {
                             <p className="truncate text-xs text-muted-foreground">
                                 {data?.data?.items?.length > 0 ? (
                                     <>
-                                        <span className="font-semibold text-foreground text-base">{data?.data?.total?.toFixed(2)}</span>{" "}
-                                        {data?.data?.bundleDiscountAmount > 0 && <span className="line-through text-sm">{data?.data?.subTotal?.toFixed(2)}</span>}
+                                        <span className="font-semibold text-foreground text-base"><FormatCurrency withGbp amount={data?.data?.total} /></span>{" "}
+                                        {data?.data?.bundleDiscountAmount > 0 && <span className="line-through text-sm"><FormatCurrency amount={data?.data?.subTotal} /></span>}
                                     </>
                                 ) : (
                                     "Pick items below to start your bundle"

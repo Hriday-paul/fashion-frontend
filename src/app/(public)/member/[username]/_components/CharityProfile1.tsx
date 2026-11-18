@@ -23,6 +23,7 @@ import userBannerPlaceholder from "@/assets/banner/user-placeholder.png";
 import CharityGallery from './CharityGallery';
 import ExpandableText from '@/components/shared/ExpandableText';
 import { CharityOrgOverviewDonationMoney } from '../(profile)/overview/_components/CharityOverviewDonation'
+import FormatCurrency from '@/components/shared/FormatCurrency'
 
 type User = {
     data:
@@ -44,7 +45,7 @@ type User = {
 
 function CharityProfile1({ user }: { user: User }) {
 
-    const { format, symbol } = useCurrency();
+    const { formatGbp: format } = useCurrency();
 
     const userData = user?.data?.user;
 
@@ -187,9 +188,7 @@ function CharityProfile1({ user }: { user: User }) {
                                 type="button"
                                 className="text-left cursor-pointer group transition-opacity hover:opacity-85"
                             >
-                                <p className="font-semibold">
-                                    {format(user?.data?.totalRaisedDonation || 0, { decimals: 1 })}
-                                </p>
+                                <FormatCurrency fixed amount={user?.data?.totalRaisedDonation} decimals={2} className='font-semibold' />
                                 <p className="text-gray-700">
                                     Raised
                                 </p>

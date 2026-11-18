@@ -1,4 +1,5 @@
 "use client"
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import { useSellerSellCharitySupportStatsQuery } from '@/redux/api/donation.api'
 import { defaultImg } from '@/utils/defaultImg';
 import { ChevronRight, HandHeart, HeartHandshake, Info } from 'lucide-react';
@@ -6,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react'
 
-function Stat({ value, label }: { value: string; label: string }) {
+function Stat({ value, label }: { value: React.ReactNode; label: string }) {
     return (
         <div className='border-x border-zinc-200 px-5 md:px-6 lg:px-7'>
             <dt className="sr-only">{label}</dt>
@@ -43,7 +44,7 @@ function SupportStats({ userName }: { userName: string }) {
                         </div>
                     </div>
                     <div className="flex">
-                        <Stat value={`$${data?.data?.sellDonatedAmount?.toFixed(2) || 0}`} label="Total donated" />
+                        <Stat value={<FormatCurrency fixed amount={data?.data?.sellDonatedAmount ?? 0} />} label="Total donated" />
                         <Stat value={`${data?.data?.avgSellDonationPercentage.toFixed(1) || 0}%`} label="Pledged avg listing" />
                         <Stat value={`${data?.data?.totalCharitiesToSupport || 0}`} label="Charities Supported" />
                     </div>
@@ -82,7 +83,7 @@ function SupportStats({ userName }: { userName: string }) {
                             <div className='grid grid-cols-2 gap-2 mt-2'>
                                 <div className="border-r border-gray-300">
                                     <p className="text-lg font-bold tabular-nums text-gray-900">
-                                        ${c?.totalDonation?.toFixed(2) || 0}
+                                        <FormatCurrency fixed amount={c?.totalDonation ?? 0} />
                                     </p>
                                     <div className="mt-0.5 flex items-center gap-1.5 text-sm text-gray-500">
                                         <span>Donated so far</span>

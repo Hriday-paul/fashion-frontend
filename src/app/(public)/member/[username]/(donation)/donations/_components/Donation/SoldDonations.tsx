@@ -1,3 +1,4 @@
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import { getBadgeVariant } from '@/components/shared/Modal/Charity/otherUserDonation/data.type';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -59,7 +60,7 @@ const SellDonationlist = async ({ sellPromise }: { sellPromise: Promise<{ data: 
               </Link>}
             </p>
             <p className="text-xs text-muted-foreground">
-              ${campaign?.amount.toFixed(0)} • {moment(campaign?.createdAt).fromNow()} •{" "}
+              <FormatCurrency fixed amount={campaign?.amount} decimals={0} /> • {moment(campaign?.createdAt).fromNow()} •{" "}
               {campaign?.orderItem?.product?.category?.name}
             </p>
           </div>

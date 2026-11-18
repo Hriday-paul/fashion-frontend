@@ -1,3 +1,4 @@
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
@@ -76,7 +77,7 @@ function SellreqCard({ data }: { data: IAssitedSellRequest }) {
                                 <p className="text-xs">{getAssitedPriceTypeFormat(data?.priceType, (data?.targetPrice || 0))?.details}</p>
                             </TooltipContent>
                         </Tooltip>
-                        {data?.priceType == PriceType.TARGET_AMOUNT && <p className='text-base font-semibold'>${data?.targetPrice?.toFixed(2)}</p>}
+                        {data?.priceType == PriceType.TARGET_AMOUNT && <p className='text-base font-semibold'><FormatCurrency fixed amount={data?.targetPrice} decimals={2} /></p>}
                     </div>
 
                 </div>

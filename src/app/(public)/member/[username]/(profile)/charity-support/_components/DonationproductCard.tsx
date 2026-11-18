@@ -1,4 +1,5 @@
 "use client";
+import ProductPrice from "@/components/shared/ProductPrice";
 import FavouritesWithServer from "@/app/(public)/shop/[productId]/_components/FavouritesWithServer";
 import { Card, CardContent } from "@/components/ui/card";
 import { IProduct } from "@/types";
@@ -60,10 +61,7 @@ const DonationProductCard = ({
             <p className="text-primary-gray text-sm group-hover:underline underline-offset-1 duration-150 mt-1 line-clamp-1" >
               {data?.title}
             </p >
-            <div className='flex flex-row gap-x-2 items-center'>
-              <p className="font-medium text-gray-600 line-through text-sm">{format(data?.price)}</p>
-              <p className="font-bold text-primary-black">{format(data?.finalPrice)}</p>
-            </div>
+            <ProductPrice price={data?.price} finalPrice={data?.finalPrice} />
           </Link >
         </div >
 

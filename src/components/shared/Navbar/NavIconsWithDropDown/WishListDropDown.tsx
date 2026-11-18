@@ -1,4 +1,5 @@
 "use client";
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -16,7 +17,6 @@ import Link from "next/link";
 import DltToFavourite from "./DltToFavourite";
 import { useMyFavoriteProductsQuery } from "@/redux/api/favoriteProductApi";
 import { IFavoriteItem } from "@/app/(public)/favourites/_components/WishListContainer";
-import { useCurrency } from "@/hooks/useCurrency";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -47,7 +47,6 @@ export default function WishListDropDown() {
 };
 
 const FavProds = ({ favoriteProds }: { favoriteProds: IFavoriteItem[] }) => {
-  const { format } = useCurrency();
 
   return <div>
     <div className="overflow-y-auto max-h-[450px] space-y-2 mt-2 px-1">
@@ -82,7 +81,7 @@ const FavProds = ({ favoriteProds }: { favoriteProds: IFavoriteItem[] }) => {
 
 
                       <span className="text-sm whitespace-nowrap">
-                        {format(product?.product?.finalPrice)}
+                        <FormatCurrency withGbp amount={product?.product?.finalPrice} />
                       </span>
                     </div>
                   </div>

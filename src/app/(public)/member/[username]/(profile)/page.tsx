@@ -21,7 +21,7 @@ async function SellerProducts({ params, searchParams }: { params: Promise<{ user
 
   const ssp = await searchParams;
 
-  const { category } = ssp;
+  const { category, brand, priceMin, priceMax, size, color, material, condition, search } = ssp;
 
   return (
     <div className='space-y-5'>
@@ -30,7 +30,7 @@ async function SellerProducts({ params, searchParams }: { params: Promise<{ user
 
       <div className='space-y-5'>
         {/* ----------------------------------------- show filter option ------------------------------------- */}
-        <SelectCatBypath categoryId={category} />
+        {category && <SelectCatBypath categoryId={category} />}
 
         {/* ----------------------lg filter-------------------------- */}
         <div className="hidden lg:flex flex-row justify-between gap-x-4 items-center">
@@ -61,9 +61,11 @@ async function SellerProducts({ params, searchParams }: { params: Promise<{ user
           <SmallDeviceFilter categoryId={category} sspResult={ssp}></SmallDeviceFilter>
         </div>
 
-        <div className="hidden md:block">
-          <SelectedAttributes ssp={ssp} />
-        </div>
+        {(category || brand || priceMin || priceMax || size || color || material || condition || search) && (
+          <div className="hidden lg:block">
+            <SelectedAttributes ssp={ssp} />
+          </div>
+        )}
       </div>
 
       <Suspense key={Date.now()} fallback={<ProductGridSkeleton />}>

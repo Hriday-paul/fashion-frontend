@@ -42,10 +42,10 @@ function FilterSold() {
     );
 
     const handleSelect = () => {
-        updateQueryParam("stock", "on-sale")
+        updateQueryParam("stock", "in-sale")
     }
 
-    const isSale = selectedStock === "on-sale";
+    const isSale = selectedStock === "in-sale";
 
     return (
         <div

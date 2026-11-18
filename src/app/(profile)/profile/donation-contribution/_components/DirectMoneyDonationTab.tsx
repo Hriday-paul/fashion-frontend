@@ -1,5 +1,6 @@
 "use client";
 
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import React from "react";
 import { useGetDirectDonationContributedQuery } from "@/redux/api/donation.api";
 import { IDirectDonation } from "@/types";
@@ -119,7 +120,7 @@ function DirectMoneyDonationTab() {
             {/* Right: Amount */}
             <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 pl-[96px] sm:pl-0">
               <p className="text-lg sm:text-xl font-semibold tabular-nums text-green-700">
-                ${Number(don?.amount || 0).toFixed(2)}
+                <FormatCurrency fixed amount={Number(don?.amount || 0)} decimals={2} />
               </p>
               <span className="text-xs text-muted-foreground">
                 Direct Money

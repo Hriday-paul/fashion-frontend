@@ -5,12 +5,17 @@ import { RootState } from '@/redux/store';
 import { useRouter } from 'next/navigation';
 import React from 'react'
 import { useSelector } from 'react-redux';
+import { useCheckoutTotal } from "@/lib/checkoutTotalStore";
+import { useCurrency } from "@/hooks/useCurrency";
 
 function ProcessOrder({ cartGroupId, mode, haveAnyUnavailableItems }: { cartGroupId: string; mode: 'cart' | 'offer' | 'listing'; haveAnyUnavailableItems: boolean }) {
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 
     const router = useRouter();
+
+    const total = useCheckoutTotal(cartGroupId);
+    const { formatGbp } = useCurrency();
 
     const shippingcart = useSelector((state: RootState) => state.cart.carts?.find((cart) => cart?.cartGroupId === cartGroupId));
 
@@ -99,7 +104,7 @@ function ProcessOrder({ cartGroupId, mode, haveAnyUnavailableItems }: { cartGrou
                 disabled={!shippingcart?.shipment?.serviceId || isLoading || haveAnyUnavailableItems}
                 className="flex-1 py-6 cursor-pointer rounded-none w-full font-semibold text-lg bg-green-600 hover:bg-green-500 duration-200 transition-colors">
 
-                {isLoading ? <span className="loader" /> : "Proceed to Payment"}
+                {isLoading ? <span className="loader" /> : (total != null && Number.isFinite(total) ? `Pay ${formatGbp(total, { decimals: total % 1 === 0 ? 0 : 2 })}` : "Proceed to Payment")}
 
             </Button>
         </>

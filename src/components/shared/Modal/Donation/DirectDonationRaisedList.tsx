@@ -1,5 +1,6 @@
 "use client";
 
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import React, { useCallback, useRef } from "react";
 import Link from "next/link";
 import moment from "moment";
@@ -136,7 +137,7 @@ export default function DirectDonationRaisedList({
               {/* Right: Amount */}
               <div className="text-right shrink-0">
                 <p className="text-base sm:text-lg font-bold tabular-nums text-green-700">
-                  ${Number(item?.amount ?? 0).toFixed(2)}
+                  <FormatCurrency fixed amount={Number(item?.amount ?? 0)} decimals={2} />
                 </p>
                 <span className="text-[11px] text-muted-foreground">
                   Direct Donation

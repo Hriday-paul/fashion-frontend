@@ -58,8 +58,8 @@ export default function CountryCurrencyModal() {
   const [countryOpen, setCountryOpen] = useState(false);
 
   // Form state
-  const currentCountry = userRateState?.country || "United States";
-  const currentRate: SupportedCurrency = (userRateState?.rate as SupportedCurrency) || "USD";
+  const currentCountry = userRateState?.country || "United Kingdom";
+  const currentRate: SupportedCurrency = (userRateState?.rate as SupportedCurrency) || "GBP";
 
   const [selectedCountry, setSelectedCountry] = useState<string>(currentCountry);
   const [selectedRate, setSelectedRate] = useState<SupportedCurrency>(currentRate);
@@ -90,6 +90,7 @@ export default function CountryCurrencyModal() {
       setUserRate({
         country: selectedCountry,
         rate: selectedRate,
+        isDefault: false,
       })
     );
     setOpen(false);
@@ -97,7 +98,7 @@ export default function CountryCurrencyModal() {
 
   const displayCountry = currentCountry;
   const displayRate = currentRate;
-  const displaySymbol = currencySymbols[displayRate] || "$";
+  const displaySymbol = currencySymbols[displayRate] || "£";
 
   return (
     <>
@@ -127,7 +128,7 @@ export default function CountryCurrencyModal() {
               Confirm preferences
             </DialogTitle>
             <DialogDescription className="text-sm text-gray-600">
-              Select your country and preferred currency.
+              Choose your preferred currency for estimated prices and donation amounts. All payments, donations and account balances are in GBP. Changing your display currency does not change your account or payment currency.
             </DialogDescription>
           </DialogHeader>
 

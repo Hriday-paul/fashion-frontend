@@ -1,3 +1,4 @@
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import React from 'react'
 import {
     Accordion,
@@ -12,12 +13,12 @@ import { DonationSummary } from '../@stats/page';
 async function DonationStats({ stats }: { stats: DonationSummary }) {
 
     const summary = [
-        { label: "Item Sales Proceeds", value: `$${stats?.totalSellDonationAmount.toFixed(1)}` },
-        { label: "Purchase Contributions", value: `$${stats?.totalPurchaseDonationContribute.toFixed(1)}` },
-        { label: "Extra Donations", value: `$${stats?.totalExtraDonated.toFixed(1)}` },
-        { label: "Direct Donation", value: `$${stats?.directDonation.toFixed(1)}` },
+        { label: "Item Sales Proceeds", value: <FormatCurrency fixed amount={stats?.totalSellDonationAmount} decimals={1} /> },
+        { label: "Purchase Contributions", value: <FormatCurrency fixed amount={stats?.totalPurchaseDonationContribute} decimals={1} /> },
+        { label: "Extra Donations", value: <FormatCurrency fixed amount={stats?.totalExtraDonated} decimals={1} /> },
+        { label: "Direct Donation", value: <FormatCurrency fixed amount={stats?.directDonation} decimals={1} /> },
         { label: "Total Clothing Donated", value: `${stats?.clothDonation} items` },
-        { label: "Total Trees Donated", value: `$ ${stats?.totalTreeDonationAmount.toFixed(1)}` }
+        { label: "Total Trees Donated", value: <FormatCurrency fixed amount={stats?.totalTreeDonationAmount} decimals={1} /> }
     ];
 
     return (
@@ -26,7 +27,7 @@ async function DonationStats({ stats }: { stats: DonationSummary }) {
             <section className="bg-card rounded-2xl border border-border p-5 mb-4">
                 <div className="flex items-baseline justify-between">
                     <span className="text-base font-medium text-gray-800">Donations Made</span>
-                    <span className="text-3xl font-semibold tracking-tight">${stats?.total.toFixed(1)}</span>
+                    <span className="text-3xl font-semibold tracking-tight"><FormatCurrency fixed amount={stats?.total} decimals={1} /></span>
                 </div>
             </section>
 

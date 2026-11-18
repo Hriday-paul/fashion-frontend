@@ -1,5 +1,6 @@
 "use client";
 
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -96,7 +97,7 @@ export function ReturnProductModal({
               <div>
                 <p className="text-sm text-gray-600">Product Price</p>
                 <p className="font-medium">
-                  ${returnRequest.productPrice.toFixed(1)}
+                  <FormatCurrency fixed amount={returnRequest.productPrice} decimals={1} />
                 </p>
               </div>
               <div>

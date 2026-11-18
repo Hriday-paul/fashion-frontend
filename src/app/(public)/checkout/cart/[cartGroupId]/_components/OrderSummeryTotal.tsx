@@ -1,4 +1,6 @@
 "use client";
+import CheckoutTotal from "@/components/shared/CheckoutTotal";
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import { OrderSummeryType } from '@/types'
 import React from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -28,7 +30,7 @@ function OrderSummeryTotal({ summery, cartGroupId }: { summery: OrderSummeryType
             <div className="space-y-3 mt-4">
                 <div className="flex justify-between ">
                     <p className="text-gray-700">Items Total:</p>
-                    <p className="font-medium">${summery?.itemTotal.toFixed(2)}</p>
+                    <p className="font-medium"><FormatCurrency fixed estimate amount={summery?.itemTotal} decimals={2} /></p>
                 </div>
 
                 {summery?.bundleDiscountAmount > 0 && (
@@ -37,18 +39,18 @@ function OrderSummeryTotal({ summery, cartGroupId }: { summery: OrderSummeryType
                             <span className="bg-green-600/20 text-green-600 rounded px-1 py-0.5 ml-1 text-sm">
                                 {summery?.bundleDiscountPercent}%
                             </span> :</p>
-                        <p className="font-medium text-green-600">-${summery?.bundleDiscountAmount?.toFixed(2)}</p>
+                        <p className="font-medium text-green-600">-<FormatCurrency fixed estimate amount={summery?.bundleDiscountAmount} decimals={2} /></p>
                     </div>
                 )}
 
                 {/* <div className="flex justify-between ">
           <p className="text-[#8A8A8A]">Total Shipping:</p>
-          <p className="font-medium">${cart?.total_shippingFee?.toFixed(2)}</p>
+          <p className="font-medium"><FormatCurrency fixed estimate amount={cart?.total_shippingFee} decimals={2} /></p>
         </div> */}
 
                 <div className="flex justify-between ">
                     <p className="text-gray-700">Extra Donation:</p>
-                    <p className="font-medium">${summery?.totalExtraDonation?.toFixed(2)}</p>
+                    <p className="font-medium"><FormatCurrency fixed estimate amount={summery?.totalExtraDonation} decimals={2} /></p>
                 </div>
 
                 {/* <div className="flex justify-between ">
@@ -68,15 +70,15 @@ function OrderSummeryTotal({ summery, cartGroupId }: { summery: OrderSummeryType
                             </TooltipContent>
                         </Tooltip> :
                     </p>
-                    <p className="font-medium">${summery?.serviceFeeCost?.toFixed(2)}</p>
+                    <p className="font-medium"><FormatCurrency fixed estimate amount={summery?.serviceFeeCost} decimals={2} /></p>
                 </div>
                 <div className="flex justify-between ">
                     <p className="text-gray-700">Verify & Authentication of Goods:</p>
-                    <p className="font-medium">${authenticationCost?.toFixed(2)}</p>
+                    <p className="font-medium"><FormatCurrency fixed estimate amount={authenticationCost} decimals={2} /></p>
                 </div>
                 <div className="flex justify-between ">
                     <p className="text-gray-700">Gift Trees:</p>
-                    <p className="font-medium">${treeGiftCost?.toFixed(2)}</p>
+                    <p className="font-medium"><FormatCurrency fixed estimate amount={treeGiftCost} decimals={2} /></p>
                 </div>
 
                 {shippingCost > 0 && <div className="flex justify-between ">
@@ -91,7 +93,7 @@ function OrderSummeryTotal({ summery, cartGroupId }: { summery: OrderSummeryType
                             </TooltipContent>
                         </Tooltip> :
                     </p>
-                    <p className="font-medium">${shippingCost?.toFixed(2)}</p>
+                    <p className="font-medium"><FormatCurrency fixed estimate amount={shippingCost} decimals={2} /></p>
                 </div>}
 
                 {/* <hr />
@@ -103,11 +105,7 @@ function OrderSummeryTotal({ summery, cartGroupId }: { summery: OrderSummeryType
             <Input className="w-1/2 bg-gray-100" placeholder="Enter code" />
           </div> */}
                 <hr />
-                <div className="flex justify-between ">
-                    <p className="text-gray-800 font-semibold text-lg">Total:</p>
-
-                    <p className="font-semibold text-lg">${totalCost?.toFixed(2)}</p>
-                </div>
+                <CheckoutTotal id={cartGroupId} total={totalCost} />
             </div>
         </CardContent>
     )

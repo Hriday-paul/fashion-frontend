@@ -1,5 +1,6 @@
 "use client";
 
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import React from "react";
 import { useCurrency } from "@/hooks/useCurrency";
 
@@ -14,7 +15,7 @@ export function PriceOverview({
   discountPct,
   donationPercent,
 }: PriceOverviewProps) {
-  const { format } = useCurrency();
+  const { formatGbp: format } = useCurrency();
 
   const numericPrice = Math.max(0, parseFloat(String(price)) || 0);
   const numericDiscountPct = Math.min(
@@ -38,14 +39,14 @@ export function PriceOverview({
       <p className="text-gray-900">
         Final Price:{" "}
         <span className="font-semibold text-green-700">
-          ${finalPrice.toFixed(2)}
+          <FormatCurrency fixed amount={finalPrice} decimals={2} />
         </span>
       </p>
       {numericDonationPct > 0 && (
         <p className="text-gray-900">
           Donation Amount:{" "}
           <span className="font-semibold text-red-500">
-            ${donationAmount.toFixed(2)}
+            <FormatCurrency fixed amount={donationAmount} decimals={2} />
             {` (${numericDonationPct}%)`}
           </span>
         </p>
@@ -53,7 +54,7 @@ export function PriceOverview({
       <p className="text-gray-900">
         Seller Earning:{" "}
         <span className="font-bold text-green-700">
-          ${sellerEarnings.toFixed(2)}
+          <FormatCurrency fixed amount={sellerEarnings} decimals={2} />
         </span>
       </p>
     </div>

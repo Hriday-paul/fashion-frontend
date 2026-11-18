@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import GbpInput from "@/components/shared/GbpInput";
 import { AddNewOffer } from "@/lib/Actions/Product.api";
 import { cn } from "@/lib/utils";
 import { IProduct } from "@/types";
@@ -25,7 +25,7 @@ export default function SendOfferModal({
   products: IProduct[];
   sellerId: string;
 }) {
-  const { format } = useCurrency();
+  const { formatGbp: format } = useCurrency();
 
   const router = useRouter();
 
@@ -168,12 +168,11 @@ export default function SendOfferModal({
             </div>
 
             {isCustomOffer && <div className="py-5">
-              <p className="text-sm font-medium text-black mb-2">Custom Offer</p>
-              <Input
-                placeholder="Enter your offer price"
+              <p className="text-sm font-medium text-black mb-2">Custom Offer (£ GBP)</p>
+              <GbpInput
+                placeholder="Enter your offer price in GBP"
                 value={offerPrice}
                 onChange={(e) => setOfferPrice(parseFloat(e.target.value) || 0)}
-                className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3"
               />
               {/* <div className="flex mt-2 items-center gap-x-0.5">
                 <InfoIcon3 />

@@ -123,7 +123,7 @@ function ReqAction({ data }: { data: IAssitedSellRequest }) {
 export default ReqAction;
 
 const Listings = ({ listings }: { listings: IProduct[] }) => {
-    const { format } = useCurrency();
+    const { formatGbp: format } = useCurrency();
     return (
         <div className="">
             {listings?.map((product) => (

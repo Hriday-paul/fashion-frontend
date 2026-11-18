@@ -1,4 +1,5 @@
 "use client";
+import GbpInput from "@/components/shared/GbpInput";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,7 +48,7 @@ export function CharityDonationSelectDialog({
   error,
   loading,
 }: CharityDonationDialogProps) {
-  const { format } = useCurrency();
+  const { formatGbp: format } = useCurrency();
 
   // number = a preset, "other" = custom input visible
   const [selectedPreset, setSelectedPreset] = useState<number | "other">(0);
@@ -202,7 +203,7 @@ export function CharityDonationSelectDialog({
                   onClick={() => handlePreset(amount)}
                   className="cursor-pointer rounded-md shadow-none font-medium"
                 >
-                  {format(amount)}
+                  £{amount}
                 </Button>
               ))}
               <Button
@@ -216,18 +217,17 @@ export function CharityDonationSelectDialog({
             </div>
 
             {selectedPreset === "other" && (
-              <Input
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="Enter your amount"
-                autoFocus
-                className="mt-2 rounded-md focus-visible:ring-0 focus:ring-0 focus-visible:border-black text-base py-5 border-gray-300"
-                value={additionalDonation || ""}
-                onChange={(e) =>
-                  setAdditionalDonation(parseFloat(e.target.value) || 0)
-                }
-              />
+              <div className="mt-2">
+                <GbpInput
+                  step="0.01"
+                  placeholder="Enter your amount in GBP"
+                  autoFocus
+                  value={additionalDonation || ""}
+                  onChange={(e) =>
+                    setAdditionalDonation(parseFloat(e.target.value) || 0)
+                  }
+                />
+              </div>
             )}
           </div>
 

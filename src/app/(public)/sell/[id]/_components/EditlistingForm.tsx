@@ -1,4 +1,5 @@
 "use client";
+import GbpInput from "@/components/shared/GbpInput";
 import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -689,14 +690,9 @@ function EditlistingForm({ product }: { product: IProduct }) {
                                 name="price"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Product Price ($)</FormLabel>
+                                        <FormLabel>Product Price (£ GBP)</FormLabel>
                                         <FormControl>
-                                            <InputGroup className="bg-white border-[#e1e1e1] rounded shadow-none has-[[data-slot=input-group-control]:focus-visible]:ring-0 focus:ring-0 has-[[data-slot=input-group-control]:focus-visible]:border has-[[data-slot=input-group-control]:focus-visible]:border-primary-black !py-5">
-                                                <InputGroupInput type="number" step="any" placeholder="eg: 100" {...field} className="!text-base" />
-                                                <InputGroupAddon align={"inline-start"} className="text-primary-black text-lg">
-                                                    $
-                                                </InputGroupAddon>
-                                            </InputGroup>
+                                            <GbpInput placeholder="eg: 100" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

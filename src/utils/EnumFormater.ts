@@ -335,7 +335,7 @@ export const getAssitedPriceTypeFormat = (
             }
 
         case PriceType.TARGET_AMOUNT:
-            const displayAmount = typeof targetAmount === "string" ? targetAmount : `$${targetAmount?.toFixed(2)}`;
+            const displayAmount = typeof targetAmount === "string" ? targetAmount : `£${targetAmount?.toFixed(2)}`;
             return {
                 label: "Target Amount",
                 color: "bg-green-100 text-green-800",

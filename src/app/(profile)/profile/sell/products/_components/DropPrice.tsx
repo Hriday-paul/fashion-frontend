@@ -11,7 +11,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { IProduct } from "@/types";
-import { Input } from "@/components/ui/input";
+import GbpInput from "@/components/shared/GbpInput";
 import { DropPrice } from "@/lib/Actions/Product.api";
 import { cn } from "@/lib/utils";
 import { MoveDown, Plus } from "lucide-react";
@@ -32,7 +32,7 @@ interface ReportUserDialogProps {
 export function DropPriceComponenet({
     product
 }: ReportUserDialogProps) {
-    const { format } = useCurrency();
+    const { formatGbp: format } = useCurrency();
     const [open, setOpen] = useState(false);
     const [offerPrice, setOfferPrice] = useState<number>(0);
     const [customPriceInput, setCustomPriceInput] = useState<string>("");
@@ -169,17 +169,13 @@ export function DropPriceComponenet({
                         </div>
 
                         {isCustomOffer && <div className="py-5">
-                            <p className="text-sm font-medium text-black mb-2">Custom Price</p>
-                            <Input
-                                placeholder="Set your own price"
+                            <p className="text-sm font-medium text-black mb-2">Custom Price (£ GBP)</p>
+                            <GbpInput
+                                placeholder="Set your own price in GBP"
                                 value={customPriceInput}
                                 onChange={handleCustomPriceChange}
-                                inputMode="decimal"
                                 aria-invalid={!!customPriceError}
-                                className={cn(
-                                    "bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3",
-                                    customPriceError && "border-red-400 focus-visible:border-red-400"
-                                )}
+                                groupClassName={customPriceError ? "border-red-400" : undefined}
                             />
                             {customPriceError && (
                                 <p className="text-[#E12728] text-sm mt-1.5">{customPriceError}</p>

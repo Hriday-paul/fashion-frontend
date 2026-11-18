@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 
 const UserCard = ({ chat }: { chat: IChatUser }) => {
-  const { format } = useCurrency();
+  const { formatGbp: format } = useCurrency();
   const user = useSelector((state: RootState) => state?.auth?.user);
 
   const pathName = usePathname();

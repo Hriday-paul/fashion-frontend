@@ -1,4 +1,6 @@
 "use client";
+import GbpInput from "@/components/shared/GbpInput";
+import ConvertedEstimate from "@/components/shared/ConvertedEstimate";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -169,7 +171,7 @@ export function DonationFromProfile({
                                                 className="flex-1 cursor-pointer shadow-none"
                                                 onClick={() => handlePresetSelect(amount)}
                                             >
-                                                ${amount}
+                                                £{amount}
                                             </Button>
                                         ))}
                                     </div>
@@ -179,21 +181,20 @@ export function DonationFromProfile({
                                             htmlFor="customAmount"
                                             className="text-sm font-medium"
                                         >
-                                            Custom Amount
+                                            Custom Amount (£ GBP)
                                         </Label>
-                                        <Input
+                                        <GbpInput
                                             id="customAmount"
-                                            type="number"
-                                            step="any"
                                             min="1"
-                                            placeholder="Enter your amount"
-                                            className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black text-base !py-5 px-3.5"
+                                            placeholder="Enter your amount in GBP"
                                             value={customInputValue}
                                             onChange={(e) =>
                                                 handleCustomAmountChange(e.target.value)
                                             }
+                                            showEstimate={false}
                                         />
                                     </div>
+                                    <ConvertedEstimate amount={currentAmount} className="-mt-1" />
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -240,7 +241,7 @@ export function DonationFromProfile({
                         />
 
                         <Button disabled={isSubmitting} type="submit" variant={"default"} className="flex-1 group cursor-pointer rounded-none py-6 w-full">
-                            {isSubmitting ? <span className="loader" /> : "Donate Now"}
+                            {isSubmitting ? <span className="loader" /> : Number(currentAmount) > 0 ? `Donate £${currentAmount} GBP` : "Donate Now"}
                         </Button>
 
                     </form>

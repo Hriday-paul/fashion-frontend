@@ -84,7 +84,6 @@ export interface IProduct {
   price: number;
   discountPct: number;
   finalPrice: number;
-  currency: string;
   brandId: string;
   sizeId: string;
   categoryId: string;
@@ -511,7 +510,6 @@ export interface IDirectDonation {
   charity: IUser
 
   amount: number
-  currency: string
 
   // anonymous donation
   isAnonymous: boolean

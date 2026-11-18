@@ -2,7 +2,7 @@ import { EnvConfig } from "@/config";
 
 export const GetRates = async () => {
     try {
-        const res = await fetch(`${EnvConfig.ratesApiBaseUrl}/rates?base=USD&quotes=EUR,GBP`, {
+        const res = await fetch(`${EnvConfig.ratesApiBaseUrl}/rates?base=GBP&quotes=EUR,USD,GBP`, {
             next: { revalidate: 3600 * 12 }, // Revalidate every 12 hours
         });
 

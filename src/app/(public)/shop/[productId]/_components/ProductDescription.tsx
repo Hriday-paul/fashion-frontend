@@ -18,8 +18,8 @@ const careInstructions = [
 ];
 
 const shippingMethods = [
-  "Shipping Cost: 5-7 business days, starting at $15.",
-  "Free Shipping: More than one orders over $50 within the US.",
+  "Shipping Cost: 5-7 business days, starting at £15.",
+  "Free Shipping: More than one orders over £50 within the US.",
 ];
 
 const returns = [

@@ -1,5 +1,6 @@
 "use client";
 
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import React from "react";
 import { IOrder } from "@/types";
 import { Receipt } from "lucide-react";
@@ -31,7 +32,7 @@ export function BuyerPriceOverview({ order }: BuyerPriceOverviewProps) {
       <div className="space-y-2 text-xs">
         <div className="flex justify-between text-neutral-600">
           <span>Items Subtotal</span>
-          <span className="font-medium text-neutral-900">${itemsTotal.toFixed(2)}</span>
+          <span className="font-medium text-neutral-900"><FormatCurrency fixed amount={itemsTotal} decimals={2} /></span>
         </div>
 
         {bundleDiscountPercent > 0 && (
@@ -42,49 +43,49 @@ export function BuyerPriceOverview({ order }: BuyerPriceOverviewProps) {
                 {bundleDiscountPercent}% OFF
               </span>
             </span>
-            <span className="font-medium text-neutral-900">-${bundleDiscountAmount.toFixed(2)}</span>
+            <span className="font-medium text-neutral-900">-<FormatCurrency fixed amount={bundleDiscountAmount} decimals={2} /></span>
           </div>
         )}
 
         {order?.extraDonation > 0 && (
           <div className="flex justify-between text-neutral-600">
             <span>Extra Donation</span>
-            <span className="font-medium text-neutral-900">${order.extraDonation.toFixed(2)}</span>
+            <span className="font-medium text-neutral-900"><FormatCurrency fixed amount={order.extraDonation} decimals={2} /></span>
           </div>
         )}
 
         {order?.serviceFee > 0 && (
           <div className="flex justify-between text-neutral-600">
             <span>Service Fee</span>
-            <span className="font-medium text-neutral-900">${order.serviceFee.toFixed(2)}</span>
+            <span className="font-medium text-neutral-900"><FormatCurrency fixed amount={order.serviceFee} decimals={2} /></span>
           </div>
         )}
 
         {order?.allowedAuthentication && order?.authenticationFee > 0 && (
           <div className="flex justify-between text-neutral-600">
             <span>Authentication Fee</span>
-            <span className="font-medium text-neutral-900">${order.authenticationFee.toFixed(2)}</span>
+            <span className="font-medium text-neutral-900"><FormatCurrency fixed amount={order.authenticationFee} decimals={2} /></span>
           </div>
         )}
 
         {order?.treeCredit > 0 && (
           <div className="flex justify-between text-neutral-600">
             <span>Tree Planting Gift</span>
-            <span className="font-medium text-neutral-900">${order.treeCredit.toFixed(2)}</span>
+            <span className="font-medium text-neutral-900"><FormatCurrency fixed amount={order.treeCredit} decimals={2} /></span>
           </div>
         )}
 
         <div className="flex justify-between text-neutral-600">
           <span>Delivery Charge</span>
           <span className="font-medium text-neutral-900">
-            {order?.totalDelivery > 0 ? `$${order.totalDelivery.toFixed(2)}` : "Free"}
+            {order?.totalDelivery > 0 ? <FormatCurrency fixed amount={order.totalDelivery} /> : "Free"}
           </span>
         </div>
 
         <div className="border-t border-neutral-100 pt-3 flex justify-between items-baseline">
           <span className="text-sm font-bold text-neutral-900">Total Paid</span>
           <span className="text-base font-bold text-neutral-900">
-            ${(order?.totalPrice || 0).toFixed(2)}
+            <FormatCurrency fixed amount={(order?.totalPrice || 0)} decimals={2} />
           </span>
         </div>
       </div>

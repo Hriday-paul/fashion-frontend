@@ -1,3 +1,4 @@
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import {
   Dialog,
   DialogContent,
@@ -90,11 +91,11 @@ export default function ReviewBundleModal({
             <div className="space-y-2">
               <div className="flex gap-2 flex-wrap justify-between text-muted-foreground">
                 <p>Subtotal</p>
-                <p>${data?.subTotal?.toFixed(2)}</p>
+                <p><FormatCurrency withGbp amount={data?.subTotal} decimals={2} /></p>
               </div>
               <div className="flex gap-2 flex-wrap justify-between text-[#059669]">
                 <p>Bundle discount ({data?.bundleDiscountPercent}%)</p>
-                <p>-${data?.bundleDiscountAmount?.toFixed(2)}</p>
+                <p>-<FormatCurrency withGbp amount={data?.bundleDiscountAmount} decimals={2} /></p>
               </div>
               <div className="">
                 <p className="text-sm text-muted-foreground">
@@ -105,7 +106,7 @@ export default function ReviewBundleModal({
               <hr />
               <div className="flex gap-2 flex-wrap justify-between text-lg font-semibold">
                 <h4>Total to pay</h4>
-                <h4> ${data?.total?.toFixed(2)}
+                <h4> <FormatCurrency withGbp amount={data?.total} decimals={2} />
                 </h4>
               </div>
 

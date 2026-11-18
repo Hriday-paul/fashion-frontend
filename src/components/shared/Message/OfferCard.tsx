@@ -19,7 +19,7 @@ import { RootState } from "@/redux/store";
 const VISIBLE_COUNT = 3;
 
 function OfferCard({ offer, isSent, isSeen, isImSellerForThisOffer }: { offer: IOffer, isSent: boolean, isSeen?: boolean, isImSellerForThisOffer: boolean }) {
-  const { format } = useCurrency();
+  const { formatGbp: format } = useCurrency();
   const currentUser = useSelector((state: RootState) => state.auth.user);
 
   const isSeller = Boolean((currentUser?.id == offer?.sellerId));

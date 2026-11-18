@@ -19,7 +19,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { IOffer } from "@/types";
-import { Input } from "@/components/ui/input";
+import GbpInput from "@/components/shared/GbpInput";
 import { defaultImg } from "@/utils/defaultImg";
 import Image from "next/image";
 import Link from "next/link";
@@ -42,7 +42,7 @@ interface ReportUserDialogProps {
 export function CounterOffer({
     offer
 }: ReportUserDialogProps) {
-    const { format } = useCurrency();
+    const { formatGbp: format } = useCurrency();
     const [open, setOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -129,12 +129,10 @@ export function CounterOffer({
                                 name="offerPrice"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Offer Price</FormLabel>
+                                        <FormLabel>Offer Price (£ GBP)</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="Enter your offer price"
-                                                type="text"
-                                                className="bg-white border-[#e1e1e1] md:py-5 rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black text-lg md:text-base py-5"
+                                            <GbpInput
+                                                placeholder="Enter your offer price in GBP"
                                                 {...field}
                                             />
                                         </FormControl>

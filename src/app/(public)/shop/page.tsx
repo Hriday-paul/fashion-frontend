@@ -77,9 +77,11 @@ const ShopPage = async ({ searchParams: ssp }: { searchParams: Promise<{ [key: s
       <div className="space-y-5">
 
         {/* ----------------------------------------- show filter option ------------------------------------- */}
-        <div className="pt-5">
-          <SelectCatBypath categoryId={category} />
-        </div>
+        {category && (
+          <div className="pt-5">
+            <SelectCatBypath categoryId={category} />
+          </div>
+        )}
 
         {/* ----------------------lg filter-------------------------- */}
         <div className="hidden lg:flex flex-row justify-between gap-x-4 items-center mt-5">
@@ -108,9 +110,11 @@ const ShopPage = async ({ searchParams: ssp }: { searchParams: Promise<{ [key: s
           <SmallDeviceFilter categoryId={category} sspResult={sspResult}></SmallDeviceFilter>
         </div>
 
-        <div className="hidden md:block">
-          <SelectedAttributes ssp={sspResult} />
-        </div>
+        {(category || brand || priceMin || priceMax || size || color || material || condition || search) && (
+          <div className="hidden lg:block">
+            <SelectedAttributes ssp={sspResult} />
+          </div>
+        )}
         {/* ----------------------------------------- show products ------------------------------------- */}
         <Suspense fallback={<ProductGridSkeleton />}>
           <ShopPageContainer prodsPromise={prodsPromise} query={query} />

@@ -8,7 +8,6 @@ export const formattedData = (data: z.infer<typeof productFormSchema>) => {
     description: data?.productDescription,
     price: Number(data?.price),
     discountPct: Number(data?.discountPct) || 0,
-    currency: "USD",
     brandId: data?.brandId,
     sizeId: data?.sizeId,
     SizeFormat: data?.SizeFormat,

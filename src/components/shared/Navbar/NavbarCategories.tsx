@@ -1,9 +1,12 @@
 "use client";
 import * as React from "react";
-import { ChevronRight, ChevronDown, X, Grid3X3 } from "lucide-react";
+import { ChevronRight, Grid3X3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGetCategoryQuery } from "@/redux/api/categoryApi";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import SmPopup from "@/app/(public)/shop/_components/SmFilter/SmPopup";
+import { RadioIndicator } from "@/app/(public)/shop/_components/SmFilter/SmCategoryFilter";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -70,93 +73,72 @@ function CollapsibleLeafList({
   );
 }
 
-/** Mobile accordion item — collapses children list beyond COLLAPSE_THRESHOLD */
-function MobileAccordionItem({
-  item,
-  depth,
-  onNavigate,
+/**
+ * Mobile category popup, styled like the small-device filter popup:
+ * root categories open it at their own level, children drill down with a back
+ * arrow, a category is picked with a radio indicator, then "Show results"
+ * goes to the shop with that category.
+ */
+function MobileCategorySheet({
+  root,
+  onClose,
 }: {
-  item: Category;
-  depth: number;
-  onNavigate: () => void;
+  root: Category;
+  onClose: () => void;
 }) {
-  const [open, setOpen] = React.useState(false);
-  const [childrenExpanded, setChildrenExpanded] = React.useState(false);
-  const canShowChildren = depth < 1;
-  const hasChildren = canShowChildren && item.children.length > 0;
-  const needsCollapse = hasChildren && item.children.length > COLLAPSE_THRESHOLD;
-  const visibleChildren =
-    needsCollapse && !childrenExpanded
-      ? item.children.slice(0, COLLAPSE_THRESHOLD)
-      : item.children;
-  const hiddenCount = item.children.length - COLLAPSE_THRESHOLD;
+  const router = useRouter();
+  const [path, setPath] = React.useState<Category[]>([root]);
+  const [selectedId, setSelectedId] = React.useState<string | null>(null);
 
-  const rowClassName = cn(
-    "flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-colors",
-    depth === 0 ? "font-semibold text-sm" : "text-sm",
-    "hover:bg-gray-100"
-  );
-  const rowStyle = { paddingLeft: `${(depth + 1) * 12}px` };
+  const current = path[path.length - 1];
+
+  const handleShowResults = () => {
+    if (selectedId) router.push(categoryHref(selectedId));
+    onClose();
+  };
 
   return (
-    <div>
-      {hasChildren ? (
-        <div
-          className={rowClassName}
-          style={rowStyle}
-          onClick={() => setOpen((p) => !p)}
+    <SmPopup
+      open
+      title={current.name}
+      onClose={onClose}
+      onBack={path.length > 1 ? () => setPath((p) => p.slice(0, -1)) : undefined}
+      onShowResults={handleShowResults}
+      hideShowResults={!selectedId}
+    >
+      <div className="flex flex-col">
+        {/* "All": all items under the current category */}
+        <button
+          onClick={() => setSelectedId(current.id)}
+          className="w-full flex justify-between items-center py-4 px-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
         >
-          <span>{item.name}</span>
-          <ChevronDown
-            className={cn(
-              "h-4 w-4 transition-transform flex-shrink-0",
-              open && "rotate-180"
-            )}
-          />
-        </div>
-      ) : (
-        <Link
-          href={categoryHref(item.id)}
-          onClick={onNavigate}
-          className={rowClassName}
-          style={rowStyle}
-        >
-          <span>{item.name}</span>
-        </Link>
-      )}
+          <span className="text-base">All {current.name}</span>
+          <RadioIndicator selected={selectedId === current.id} />
+        </button>
 
-      {hasChildren && open && (
-        <div className="mt-0.5 space-y-0.5">
-          {visibleChildren.map((child) => (
-            <MobileAccordionItem
-              key={child.id}
-              item={child}
-              depth={depth + 1}
-              onNavigate={onNavigate}
-            />
-          ))}
-          {needsCollapse && (
+        {current.children.map((item) =>
+          item.children.length > 0 ? (
             <button
-              onClick={() => setChildrenExpanded((p) => !p)}
-              style={{ paddingLeft: `${(depth + 2) * 12}px` }}
-              className="flex items-center gap-1 py-2 text-xs font-medium text-gray-400 hover:text-black transition-colors w-full"
+              key={item.id}
+              onClick={() => setPath((p) => [...p, item])}
+              className="w-full flex justify-between items-center py-4 px-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100 text-left"
             >
-              {childrenExpanded ? (
-                <>
-                  <ChevronDown className="h-3 w-3 rotate-180 flex-shrink-0" />
-                  See less
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-3 w-3 flex-shrink-0" />
-                  See {hiddenCount} more
-                </>
-              )}
+              <span className="text-base">{item.name}</span>
+              <ChevronRight className="h-5 w-5 text-gray-500" />
             </button>
-          )}
-        </div>
-      )}
-    </div>
+          ) : (
+            <button
+              key={item.id}
+              onClick={() => setSelectedId(item.id)}
+              className="w-full flex justify-between items-center py-4 px-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100 text-left"
+            >
+              <span className="text-base">{item.name}</span>
+              <RadioIndicator selected={selectedId === item.id} />
+            </button>
+          )
+        )}
+      </div>
+    </SmPopup>
   );
 }
 
@@ -415,47 +397,9 @@ export default function MegaNavigation() {
           </div>
         </div>
 
-        {/* Mobile dropdown sheet */}
+        {/* Mobile category popup */}
         {mobileOpen && mobileRoot && (
-          <div className="fixed inset-0 z-50 flex flex-col bg-white">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-              <span className="font-semibold text-base">{mobileRoot.name}</span>
-              <button
-                onClick={() => {
-                  setMobileOpen(false);
-                  setMobileRootId(null);
-                }}
-                className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto">
-              {/* "All" root option */}
-              <Link
-                href={categoryHref(mobileRoot.id)}
-                onClick={closeMenus}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-500 hover:bg-gray-50 border-b border-gray-100"
-              >
-                <Grid3X3 className="h-4 w-4" />
-                All {mobileRoot.name}
-              </Link>
-
-              <div className="p-3 space-y-1">
-                {mobileRoot.children.map((child) => (
-                  <MobileAccordionItem
-                    key={child.id}
-                    item={child}
-                    depth={0}
-                    onNavigate={closeMenus}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
+          <MobileCategorySheet key={mobileRoot.id} root={mobileRoot} onClose={closeMenus} />
         )}
       </div>
     </>

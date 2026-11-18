@@ -1,3 +1,4 @@
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import CustomAvatar from '@/components/ui/custom-avatar';
 import { formatSize } from "@/lib/formatSize";
 import { getCheckoutItems, GetOfferItems } from '@/lib/services/Cartprods';
@@ -86,7 +87,7 @@ const CartProds = async ({ cartPromise }: { cartPromise: Promise<{ data: IOffer 
                                                 >
                                                     <p className="text-base line-clamp-1 text-gray-700">{item?.product?.title}</p>
                                                     <div className='flex flex-row items-center gap-x-2'>
-                                                        <p className="text-lg font-bold">${item?.product?.finalPrice?.toFixed(2)}</p>
+                                                        <p className="text-lg font-bold"><FormatCurrency fixed estimate amount={item?.product?.finalPrice} decimals={2} /></p>
                                                     </div>
                                                     <p className="text-sm text-gray-700">{formatSize(item?.product?.size, item?.product?.SizeFormat)}</p>
                                                 </Link>

@@ -8,12 +8,14 @@ import { IProductWithUser } from "./ProductDetails/ProductDetails";
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AddToCart } from "@/lib/Actions/Cart.action";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { baseApi } from "@/redux/api/baseApi";
 import { tagTypes } from "@/redux/tagTypes";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { CreateChat } from "@/lib/Actions/Product.api";
 import { toast } from "sonner";
+import { RootState } from "@/redux/store";
+import { UserRole } from "@/types";
 
 export type TPayload = {
   productId: string;
@@ -140,7 +142,7 @@ export const SMActionButtons = ({ product, isSold, isDeleted }: { product: IProd
   const router = useRouter();
   const [showOpenOfferModal, setShowOpenOfferModal] = useState<boolean>(false);
   const [showOpenOpenCharityModal, setShowOpenOpenCharityModal] = useState<boolean>(false);
-
+  const user = useSelector((state: RootState) => state?.auth?.user)
   const [isPending, startTransition] = useTransition();
   const [isChatTransition, startChatTransition] = useTransition();
 
@@ -225,17 +227,21 @@ export const SMActionButtons = ({ product, isSold, isDeleted }: { product: IProd
 
   const isChatSubmitting = chatloading || isChatTransition;
 
-  return (
+  const allowAction = user?.auth?.role ? (user?.auth?.role == UserRole.CHARITY_SHOP || user?.auth?.role == UserRole.CHARITABLE_ORGANIZATION || user?.auth?.role == UserRole.ECO_FRIENDLY_STORE) : false;
+
+  return (isDeleted || isSold || product?.isMyProduct || allowAction) ? null : (
     <>
       <div className="max-w-6xl mx-auto flex items-center gap-3">
 
         {isChatSubmitting ? <div className="w-5 aspect-square rounded-full border-[2px] border-primary-black border-r-gray-400 animate-spin"></div> : <button onClick={handleContact}> <MessageIcon className="size-10" /></button>}
 
-        {isSold ? <div className="py-2.5 bg-yellow-700 px-5 flex-1">
+        {/* isSold ? <div className="py-2.5 bg-yellow-700 px-5 flex-1">
           <p className="text-center text-white">Item Sold Out</p>
         </div> : isDeleted ? <div className="py-2.5 bg-yellow-700 px-5 flex-1">
           <p className="text-center text-white">Item not available</p>
-        </div> : <div className="flex-1 flex flex-row justify-between items-center gap-3">
+        </div> : */}
+
+        {<div className="flex-1 flex flex-row justify-between items-center gap-3">
 
           {product?.allow_offer ? <Button
             onClick={() => setShowOpenOfferModal(true)}

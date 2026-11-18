@@ -19,7 +19,7 @@ export default function DonationRaisedStats({
   activeTab,
   onTabChange,
 }: DonationRaisedStatsProps) {
-  const { format } = useCurrency();
+  const { formatGbp: format } = useCurrency();
   const { data: statsResponse, isLoading } = useGetCharityRaisedStatsQuery(
     userName,
     { skip: !userName }

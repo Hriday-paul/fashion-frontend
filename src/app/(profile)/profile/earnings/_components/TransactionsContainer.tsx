@@ -1,5 +1,6 @@
 "use client";
 
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import React, { useState } from "react";
 import moment from "moment";
 import {
@@ -183,7 +184,7 @@ export default function TransactionsContainer() {
                       isIn ? "text-green-600" : "text-red-600"
                     )}
                   >
-                    {isIn ? "+" : "-"}${formattedAmount}
+                    {isIn ? "+" : "-"}<FormatCurrency fixed amount={tx?.amount || 0} />
                   </p>
                 </div>
               </div>

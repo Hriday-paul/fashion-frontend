@@ -161,7 +161,7 @@ const ChatHeaderDetails = ({ data, chatId }: { data: ChatHeaderDetailsProps, cha
 }
 
 const SingleItemHeader = ({ data }: { data: ChatHeaderDetailsProps }) => {
-    const { format } = useCurrency();
+    const { formatGbp: format } = useCurrency();
     const product = data?.items[0]?.product;
     return <div className='min-w-0'>
         <div className='flex flex-row gap-x-2.5 items-center min-w-0'>
@@ -183,7 +183,7 @@ const SingleItemHeader = ({ data }: { data: ChatHeaderDetailsProps }) => {
 }
 
 const MultipleItemsHeader = ({ data }: { data: ChatHeaderDetailsProps }) => {
-    const { format } = useCurrency();
+    const { formatGbp: format } = useCurrency();
     const itemsCount = data?.items?.length;
 
     const firstProduct = data?.items[0]?.product;

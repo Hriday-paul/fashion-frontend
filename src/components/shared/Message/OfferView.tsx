@@ -20,7 +20,7 @@ function OfferView({
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     title?: string;
 }) {
-    const { format } = useCurrency();
+    const { formatGbp: format } = useCurrency();
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

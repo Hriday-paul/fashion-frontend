@@ -5,7 +5,6 @@ import { X } from 'lucide-react';
 import { useGetMaterialsQuery } from '@/redux/api/material.api';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback } from 'react'
-import { useCurrency } from '@/hooks/useCurrency';
 
 const conditionMap: { [key: string]: string } = {
     "new": "New",
@@ -17,7 +16,6 @@ const conditionMap: { [key: string]: string } = {
 };
 
 function SelectedAttributes({ ssp }: { ssp: { [key: string]: string | undefined } }) {
-    const { symbol } = useCurrency();
     const { category, brand, size, priceMin, priceMax, color, condition, search, stock } = ssp;
 
     const { data: filteredAttributes, isLoading, isError, isSuccess } = useFilteredAttributesQuery({ categoryId: category, brands: brand, sizes: size });
@@ -101,14 +99,14 @@ function SelectedAttributes({ ssp }: { ssp: { [key: string]: string | undefined 
 
                 {
                     priceMin && <div className='bg-zinc-100 rounded-full px-3.5 py-0.5 hover:bg-zinc-50 cursor-pointer flex-row gap-x-1 items-center inline-flex'>
-                        <p className='text-base text-gray-800'>More than {symbol}{priceMin}</p>
+                        <p className='text-base text-gray-800'>More than £{priceMin}</p>
                         <button onClick={() => updateQueryParam('priceMin', priceMin)} className='cursor-pointer'><X className='size-4' /></button>
                     </div>
                 }
 
                 {
                     priceMax && <div className='bg-zinc-100 rounded-full px-3.5 py-0.5 hover:bg-zinc-50 cursor-pointer flex-row gap-x-1 items-center inline-flex'>
-                        <p className='text-base text-gray-800'>Less than {symbol}{priceMax}</p>
+                        <p className='text-base text-gray-800'>Less than £{priceMax}</p>
                         <button onClick={() => updateQueryParam('priceMax', priceMax)} className='cursor-pointer'><X className='size-4' /></button>
                     </div>
                 }

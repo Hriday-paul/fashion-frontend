@@ -1,4 +1,5 @@
 "use client"
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { addShipmentToCart } from "@/redux/features/cart.slice";
@@ -35,7 +36,7 @@ function CourierServiceCards({ rates, cartGroupId }: { rates: ICourierServiceRat
             <Image src={rate?.courier_service?.logo} alt={rate?.courier_service?.name} width={100} height={100} className='h-8 w-auto object-cover' />
             <RadioGroupItem value={rate?.courier_service?.id} id={rate?.courier_service?.id} />
           </div>
-          <p className="text-lg font-bold text-primary-black">${rate?.total_charge?.toFixed(2)}</p>
+          <p className="text-lg font-bold text-primary-black"><FormatCurrency fixed estimate amount={rate?.total_charge} decimals={2} /></p>
           <p className="text-primary-black">{rate?.courier_service?.name}</p>
           <p className="text-sm text-gray-600">
             Delivery within {rate?.min_delivery_time} - {rate?.max_delivery_time} days

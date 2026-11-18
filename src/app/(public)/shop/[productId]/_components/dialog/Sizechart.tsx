@@ -24,7 +24,7 @@ export default function Sizechart({ group, selectedSizeId }: Props) {
 
     return (
         <Dialog>
-            <DialogTrigger className="cursor-pointer underline text-primary-light-blue">
+            <DialogTrigger className="cursor-pointer underline text-primary-light-blue w-auto shrink-0 whitespace-nowrap">
                 Size Guide
             </DialogTrigger>
             <DialogContent className="overflow-y-auto scroll-hide rounded-none max-h-screen">

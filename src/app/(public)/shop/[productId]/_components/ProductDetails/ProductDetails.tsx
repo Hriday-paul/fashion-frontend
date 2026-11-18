@@ -96,7 +96,7 @@ const ProductDetails = ({ product }: { product: IProductWithUser }) => {
           <Link href={`/shop?brand=${product?.brand?.id}`} className="hover:underline">{product?.brand?.name}</Link>
         </div>
         {/* available sizes */}
-        <div className="flex flex-col md:flex-row justify-between gap-x-2">
+        <div className="flex flex-row items-center justify-between gap-x-2 w-full">
           <div className="flex md:gap-x-8 gap-x-4 items-center">
             <h2 className="w-30">Available Size: </h2>
             <Link href={`/shop?size=${product?.size?.id}`} className="hover:underline">{formatSize(product?.size, product?.SizeFormat)}</Link>

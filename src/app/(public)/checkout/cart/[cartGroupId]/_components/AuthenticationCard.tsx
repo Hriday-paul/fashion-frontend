@@ -38,7 +38,7 @@ function AuthenticationCard({ cartGroupId }: { cartGroupId: string }) {
 
                 <div className="flex flex-row justify-between items-center">
 
-                    <p className="font-semibold text-xl">+$15.00</p>
+                    <p className="font-semibold text-xl">+£15.00</p>
 
                     <Switch
                         id="authentication"

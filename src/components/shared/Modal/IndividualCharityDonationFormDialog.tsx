@@ -1,4 +1,5 @@
 "use client";
+import GbpInput from "@/components/shared/GbpInput";
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -28,7 +29,7 @@ import AnimatedArrow from "@/components/animatedArrows/AnimatedArrow";
 import { useCurrency } from "@/hooks/useCurrency";
 
 const donationSchema = z.object({
-  amount: z.number().min(1, "Amount must be at least $1"),
+  amount: z.number().min(1, "Amount must be at least £1"),
   customAmount: z.string().optional(),
   isAnonymous: z.enum(["anonymous", "public"]),
 });
@@ -48,7 +49,7 @@ export function IndividualCharityDonationFormDialog({
   open,
   setOpen,
 }: CharityDonationDialogProps) {
-  const { format } = useCurrency();
+  const { formatGbp: format } = useCurrency();
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [useCustomAmount, setUseCustomAmount] = useState(false);
 
@@ -121,7 +122,7 @@ export function IndividualCharityDonationFormDialog({
                       className="flex-1 h-12"
                       onClick={() => handlePresetAmountClick(amount)}
                     >
-                      {format(amount)}
+                      £{amount}
                     </Button>
                   ))}
                 </div>
@@ -135,23 +136,15 @@ export function IndividualCharityDonationFormDialog({
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <div className="relative">
-                            <Input
-                              {...field}
-                              type="number"
-                              step="any"
-                              placeholder="Enter your amount"
-                              className="h-12 pr-10"
-                              onChange={(e) => {
-                                field.onChange(e);
-                                handleCustomAmountChange(e.target.value);
-                              }}
-                              value={useCustomAmount ? field.value : ""}
-                            />
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                              <ArrowRight className="h-4 w-4 text-muted-foreground rotate-90" />
-                            </div>
-                          </div>
+                          <GbpInput
+                            {...field}
+                            placeholder="Enter your amount in GBP"
+                            onChange={(e) => {
+                              field.onChange(e);
+                              handleCustomAmountChange(e.target.value);
+                            }}
+                            value={useCustomAmount ? field.value : ""}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

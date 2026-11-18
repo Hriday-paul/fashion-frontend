@@ -1,3 +1,4 @@
+import ProductPrice from "@/components/shared/ProductPrice";
 import React from 'react'
 import { formatSize } from "@/lib/formatSize";
 import FavouritesWithServer from "@/app/(public)/shop/[productId]/_components/FavouritesWithServer";
@@ -43,10 +44,7 @@ function FavouriteProdCard({ favoriteItem }: { favoriteItem: IFavoriteItem }) {
                             <p className="md:text-lg text-primary-black">{data?.brand?.name}</p>
                             <p className="md:text-lg text-primary-black">{formatSize(data?.size, data?.SizeFormat)}</p>
                         </div>
-                        <div className='flex flex-row gap-x-2 items-center'>
-                            <p className="font-medium text-gray-600 line-through text-sm">${data?.price?.toFixed(2)}</p>
-                            <p className="font-bold text-primary-black">${data?.finalPrice?.toFixed(2)}</p>
-                        </div>
+                        <ProductPrice price={data?.price} finalPrice={data?.finalPrice} />
                     </Link>
 
                 </div>

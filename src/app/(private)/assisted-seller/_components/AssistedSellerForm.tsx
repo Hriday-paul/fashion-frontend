@@ -1,4 +1,5 @@
 "use client";
+import GbpInput from "@/components/shared/GbpInput";
 import React, { useState, useEffect, useCallback, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -532,12 +533,7 @@ export function AssistedSellerForm() {
                                   render={({ field }) => (
                                     <FormItem>
                                       <FormControl>
-                                        <InputGroup className="bg-white border-[#e1e1e1] rounded shadow-none has-[[data-slot=input-group-control]:focus-visible]:ring-0 focus:ring-0 has-[[data-slot=input-group-control]:focus-visible]:border has-[[data-slot=input-group-control]:focus-visible]:border-primary-black !py-5">
-                                          <InputGroupInput type="number" step="any" placeholder="eg: 100" {...field} className="!text-base" />
-                                          <InputGroupAddon align={"inline-start"} className="text-primary-black text-lg" >
-                                            {symbol}
-                                          </InputGroupAddon>
-                                        </InputGroup>
+                                        <GbpInput placeholder="eg: 100" {...field} />
                                       </FormControl>
                                     </FormItem>
                                   )}

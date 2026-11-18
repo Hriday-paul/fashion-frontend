@@ -107,7 +107,7 @@ const CartProds = async ({ cartPromise }: { cartPromise: Promise<{ data: ICartGr
                                                         href={`/shop/${item?.product?.id}`}
                                                         className="cursor-pointer shrink-0">
                                                         <div className='relative'>
-                                                            <Image src={item?.product?.images?.[0]?.url || defaultImg?.product} alt={item?.product?.title} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} width={200} height={200} className="size-28 object-cover" />
+                                                            <Image src={item?.product?.images?.[0]?.url || defaultImg?.product} alt={item?.product?.title} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} width={200} height={200} className="w-28 h-30 object-cover" />
 
                                                             {item?.product?.stock < 1 && <div className="h-full w-full flex justify-center items-center absolute bottom-0 left-0">
                                                                 <span className=" text-white text-[10px] py-0.5 w-full flex items-center justify-center bg-destructive">
@@ -120,10 +120,10 @@ const CartProds = async ({ cartPromise }: { cartPromise: Promise<{ data: ICartGr
                                                     <div>
                                                         <Link
                                                             href={`/shop/${item?.product?.id}`}
-                                                            className="space-y-1">
+                                                            className="block space-y-1">
                                                             <p className="text-lg line-clamp-1 text-gray-700">{item?.product?.title}</p>
-                                                            <div className='flex flex-row items-center gap-x-2'>
-                                                                <p className="text-lg font-bold"><FormatCurrency amount={item?.product?.finalPrice} /></p>
+                                                            <div className="flex flex-row items-start gap-x-2">
+                                                                <p className="text-lg font-bold"><FormatCurrency withGbp amount={item?.product?.finalPrice} /></p>
                                                                 {item?.extraDonation > 0 && (
                                                                     <p className="text-sm font-bold">+ <FormatCurrency amount={item?.extraDonation} /> (extra donation)</p>
                                                                 )}
@@ -145,7 +145,7 @@ const CartProds = async ({ cartPromise }: { cartPromise: Promise<{ data: ICartGr
                             <div className="flex-1 w-full">
                                 <div className="flex justify-between items-center pb-3 ">
                                     <span className="font-semibold text-neutral-900">Item(s)</span>
-                                    <span className="font-bold text-neutral-900"><FormatCurrency amount={itemTotal} /></span>
+                                    <span className="font-bold text-neutral-900"><FormatCurrency withGbp amount={itemTotal} /></span>
                                 </div>
 
                                 {bundleDiscountAmount > 0 && (
@@ -154,19 +154,19 @@ const CartProds = async ({ cartPromise }: { cartPromise: Promise<{ data: ICartGr
                                             <span className="bg-green-600/20 text-green-600 rounded px-1 py-0.5 ml-1 text-sm">
                                                 {bundleDiscountPercent}%
                                             </span> :</p>
-                                        <p className="font-medium text-green-600">-<FormatCurrency amount={bundleDiscountAmount} /></p>
+                                        <p className="font-medium text-green-600">-<FormatCurrency withGbp amount={bundleDiscountAmount} /></p>
                                     </div>
                                 )}
 
                                 <div className="flex justify-between items-center pb-3 ">
                                     <span className="font-semibold text-neutral-900">Extra Donation</span>
-                                    <span className="font-bold text-neutral-900"><FormatCurrency amount={totalExtraDonation} /></span>
+                                    <span className="font-bold text-neutral-900"><FormatCurrency withGbp amount={totalExtraDonation} /></span>
                                 </div>
                                 <p className="text-gray-700 text-sm mb-3">Shipping calculated at checkout</p>
 
                                 <div className="flex justify-between items-center py-3 border-t border-neutral-200">
                                     <span className="font-bold text-neutral-900">Total</span>
-                                    <span className="font-bold text-neutral-900"><FormatCurrency amount={subTotal} /></span>
+                                    <span className="font-bold text-neutral-900"><FormatCurrency withGbp amount={subTotal} /></span>
                                 </div>
 
                                 {haveAnyStockoutItems && (

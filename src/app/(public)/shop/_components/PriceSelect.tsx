@@ -10,7 +10,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useCurrency } from '@/hooks/useCurrency';
 
 const schema = z.object({
     minPrice: z.string().optional(),
@@ -32,7 +31,6 @@ const blockInvalidKeys = (e: React.KeyboardEvent<HTMLInputElement>) => {
 };
 
 export default function PriceSelect() {
-    const { symbol } = useCurrency();
     const searchParams = useSearchParams()
 
     const selectedMinPrice = searchParams.get("priceMin")
@@ -108,7 +106,7 @@ export default function PriceSelect() {
                                                 onKeyDown={blockInvalidKeys}
                                                 onChange={(e) => field.onChange(sanitizeDigits(e.target.value))}
                                                 className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 border focus-visible:border-primary-black text-sm h-10"
-                                                placeholder={`${symbol} Min`}
+                                                placeholder="£ Min GBP"
                                             />
                                         </FormControl>
                                     </FormItem>
@@ -128,7 +126,7 @@ export default function PriceSelect() {
                                                 onKeyDown={blockInvalidKeys}
                                                 onChange={(e) => field.onChange(sanitizeDigits(e.target.value))}
                                                 className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 border focus-visible:border-primary-black text-sm h-10"
-                                                placeholder={`${symbol} Max`}
+                                                placeholder="£ Max GBP"
                                             />
                                         </FormControl>
                                     </FormItem>

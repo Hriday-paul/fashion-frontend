@@ -142,7 +142,13 @@ Server-side cart contents are not in Redux; they come from the backend via `serv
 
 ## Currency
 
-All prices from the API are in **USD**. The root layout loads rates server-side and `SetRates` stores them in the `rate` slice. `useCurrency()` (`src/hooks/useCurrency.ts`) exposes `convert`, `format`, `symbol`, `code` and `country` based on the user's selection (GBP, EUR or USD; default USD). `FormatCurrency` (`src/components/shared/FormatCurrency.tsx`) is the component wrapper. Avoid formatting raw amounts by hand.
+All prices from and to the API are in **GBP** (the base currency). The root layout loads rates server-side (`GetRates`, `base=GBP`, so each rate is GBP to quote) and `SetRates` stores them in the `rate` slice. `useCurrency()` (`src/hooks/useCurrency.ts`) exposes `convert`, `format`, `formatWithCode`, `symbol`, `code`, `isGbp`, `isDefault` and `country` based on the user's selection (GBP, EUR or USD; default GBP). `rate.user.isDefault` is `true` while the currency is the default or auto-detected and `false` once the user picks one in the footer modal. `FormatCurrency` (`src/components/shared/FormatCurrency.tsx`) is the component wrapper. Avoid formatting raw amounts by hand and never hardcode `$`.
+
+Conversion is for browsing prices only (product cards, details, cart, wishlist). Records that must not change with the preference (orders, purchases, returns, checkout totals, dashboards, earnings, transactions, donations, offers) are always GBP: use `<FormatCurrency fixed />` or `formatGbp` from `useCurrency`.
+
+Browsing prices use `<FormatCurrency withGbp />` (or `ProductPrice` on product cards): the preferred-currency amount with `≈` and a small exact GBP line. Checkout uses `<FormatCurrency fixed estimate />` per line and `CheckoutTotal` for the total, the "Pay £x" button and the GBP charge notice. `GbpChargeNote` shows "Charged in GBP…" when the currency is not GBP. The backend has no currency field on products or donations; every stored amount is GBP.
+
+Any input whose value is sent to the API as money must use `GbpInput` (`src/components/shared/GbpInput.tsx`): it shows `£` and `GBP`, and renders `ConvertedEstimate` (`≈ $12.70 USD (estimate)`) under the field when the preferred currency is not GBP.
 
 ## UI layer
 

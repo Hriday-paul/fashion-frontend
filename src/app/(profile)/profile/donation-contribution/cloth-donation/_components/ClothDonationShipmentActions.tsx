@@ -1,5 +1,6 @@
 "use client";
 
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -205,7 +206,7 @@ export default function ClothDonationShipmentActions({
                         )}
                       </div>
                       <p className="text-lg font-bold text-primary-black">
-                        ${rate?.total_charge?.toFixed(2)}
+                        <FormatCurrency fixed amount={rate?.total_charge} decimals={2} />
                       </p>
                       <p className="text-primary-black font-medium">
                         {rate?.courier_service?.name}

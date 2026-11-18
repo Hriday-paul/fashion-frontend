@@ -1,4 +1,5 @@
 "use client"
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import { Button } from "@/components/ui/button";
 import CustomAvatar from "@/components/ui/custom-avatar";
 import { CartIcon } from "@/icons";
@@ -8,7 +9,6 @@ import Image from "next/image";
 import Link from "next/link";
 import DltCart from "./DltCart";
 import { useGetMyCartItemsQuery } from "@/redux/api/cart.api";
-import { useCurrency } from "@/hooks/useCurrency";
 import React, { useState } from "react";
 
 import {
@@ -63,7 +63,6 @@ export default function CartDropDown() {
 
 const CartProds = ({ cart, closeMenu }: { cart: ICartGroup[], closeMenu: () => void; }) => {
 
-  const { format } = useCurrency();
 
   return <>
     {
@@ -115,16 +114,16 @@ const CartProds = ({ cart, closeMenu }: { cart: ICartGroup[], closeMenu: () => v
                               href={`/shop/${item?.product?.id}`}
                               onClick={closeMenu}
                               className="cursor-pointer shrink-0"
-                            ><Image src={item?.product?.images?.[0]?.url || defaultImg?.product} alt={item?.product?.title} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} width={1000} height={1000} className="size-28 object-cover" />
+                            ><Image src={item?.product?.images?.[0]?.url || defaultImg?.product} alt={item?.product?.title} placeholder="blur" blurDataURL={defaultImg?.placeholderImg} width={1000} height={1000} className="w-28 h-30 object-cover" />
                             </Link>
                             <div>
                               <Link
                                 href={`/shop/${item?.product?.id}`}
-                                className="space-y-0.5"
+                                className="block space-y-0.5"
                                 onClick={closeMenu}
                               >
                                 <p className="text-base font-medium line-clamp-1 text-gray-800">{item?.product?.title}</p>
-                                <p className="text-lg font-semibold">{format(item?.product?.finalPrice)}</p>
+                                <p className="text-lg font-semibold"><FormatCurrency withGbp amount={item?.product?.finalPrice} /></p>
                                 <p className="text-sm text-gray-800">{item?.product?.size?.title}</p>
                               </Link>
                               <DltCart cartItemId={item?.id} productId={item?.product?.id} />

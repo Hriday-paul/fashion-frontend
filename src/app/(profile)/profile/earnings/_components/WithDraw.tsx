@@ -10,7 +10,7 @@ import z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Input } from '@/components/ui/input';
+import GbpInput from '@/components/shared/GbpInput';
 import { Button } from '@/components/ui/button';
 import { useRequestWithdrawMutation } from '@/redux/api/userApi';
 import { toast } from 'sonner';
@@ -131,13 +131,11 @@ const WithdrawForm = ({ setWithdrawOpen, setOpenSuccess }: { setWithdrawOpen: Re
                     name="amount"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Amount</FormLabel>
+                            <FormLabel>Amount (£ GBP)</FormLabel>
                             <FormControl>
-                                <Input
-                                    placeholder="Write amount to withdraw"
+                                <GbpInput
+                                    placeholder="Write amount to withdraw in GBP"
                                     {...field}
-                                    className="bg-white border-[#e1e1e1] rounded shadow-none focus-visible:ring-0 focus:ring-0 focus:border focus-visible:border-primary-black !text-base !py-5 px-3"
-                                    type='number'
                                 />
                             </FormControl>
                             <FormMessage />

@@ -1,5 +1,6 @@
 "use client";
 
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import React from "react";
 import { formatSize } from "@/lib/formatSize";
 import Image from "next/image";
@@ -67,7 +68,7 @@ export function OrderItemsList({ items = [] }: OrderItemsListProps) {
 
                 <div className="flex items-center justify-between pt-0.5">
                   <span className="text-[11px] text-neutral-500">Qty: {item.quantity || 1}</span>
-                  <span className="text-xs font-bold text-neutral-900">${itemPrice.toFixed(2)}</span>
+                  <span className="text-xs font-bold text-neutral-900"><FormatCurrency fixed amount={itemPrice} decimals={2} /></span>
                 </div>
 
               </div>

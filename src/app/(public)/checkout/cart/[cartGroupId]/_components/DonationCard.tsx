@@ -1,4 +1,6 @@
 "use client";
+import ConvertedEstimate from "@/components/shared/ConvertedEstimate";
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,7 +83,7 @@ export default function DonationCard({ cartGroupId }: { cartGroupId: string }) {
             </h2>
             {isGifted && (
               <p className="text-sm text-green-600 mt-1">
-                ✓ {defaultTreeCount} trees gifted (${defaultTreeCostTotal.toFixed(2)})
+                ✓ {defaultTreeCount} trees gifted (<FormatCurrency fixed amount={defaultTreeCostTotal} decimals={2} />)
               </p>
             )}
           </div>
@@ -131,10 +133,11 @@ export default function DonationCard({ cartGroupId }: { cartGroupId: string }) {
           {/* Price Display */}
           <div className="pt-2 flex items-center justify-between">
             <p className="text-xl font-semibold text-gray-900">
-              ${totalPrice.toFixed(2)} USD
+              <FormatCurrency fixed amount={totalPrice} decimals={2} /> GBP
+              <ConvertedEstimate amount={totalPrice} className="font-medium text-gray-600 mt-0" />
             </p>
             <p className="text-sm text-gray-500">
-              {treeCount} tree{treeCount !== 1 ? "s" : ""} × ${PRICE_PER_TREE}
+              {treeCount} tree{treeCount !== 1 ? "s" : ""} × £{PRICE_PER_TREE}
             </p>
           </div>
 

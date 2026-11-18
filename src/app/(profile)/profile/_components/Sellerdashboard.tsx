@@ -1,5 +1,7 @@
 "use client";
 
+import { useCurrency } from "@/hooks/useCurrency";
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import React, { useMemo, useState } from "react";
 import {
   useGetSellerStatsQuery,
@@ -50,6 +52,7 @@ function formatAmount(value: string | number | undefined): string {
 }
 
 function Sellerdashboard() {
+  const { formatGbp: format } = useCurrency();
   const currentYear = new Date().getFullYear();
   const [sellsYear, setSellsYear] = useState<string>(String(currentYear));
 
@@ -104,7 +107,7 @@ function Sellerdashboard() {
               <Skeleton className="h-8 w-28 rounded-md" />
             ) : (
               <p className="text-2xl md:text-3xl font-semibold tracking-tight text-gray-900">
-                ${formatAmount(stats?.totalSellsAmount)}
+                <FormatCurrency fixed amount={stats?.totalSellsAmount} />
               </p>
             )}
             <p className="text-xs text-muted-foreground">
@@ -126,7 +129,7 @@ function Sellerdashboard() {
               <Skeleton className="h-8 w-28 rounded-md" />
             ) : (
               <p className="text-2xl md:text-3xl font-semibold tracking-tight text-gray-900">
-                ${formatAmount(stats?.balance)}
+                <FormatCurrency fixed amount={stats?.balance} />
               </p>
             )}
             <p className="text-xs text-muted-foreground">
@@ -196,7 +199,7 @@ function Sellerdashboard() {
                     tickLine={false}
                     axisLine={false}
                     tick={{ fontSize: 12, fill: "#6b7280" }}
-                    tickFormatter={(value) => `$${value}`}
+                    tickFormatter={(value) => format(value, { decimals: 0 })}
                   />
                   <Tooltip
                     cursor={{ fill: "rgba(0, 0, 0, 0.04)" }}
@@ -221,7 +224,7 @@ function Sellerdashboard() {
                                 {entry.name}:
                               </span>
                               <span className="font-medium text-gray-900">
-                                ${formatAmount(entry.value as number)}
+                                <FormatCurrency fixed amount={entry.value as number} />
                               </span>
                             </div>
                           ))}

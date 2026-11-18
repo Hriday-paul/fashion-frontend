@@ -1,4 +1,5 @@
 "use client"
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import { IOrder, OrderStatus } from '@/types'
 import React, { useState } from 'react'
 import moment from "moment"
@@ -112,7 +113,7 @@ function PurchaseItem({ order }: { order: IOrder }) {
 
                 <div className="">
                     <p className="text-gray-900 text-sm font-medium">{order?.orderNumber}</p>
-                    <p className="text-primary-black text-base font-medium">USD ${order?.totalPrice.toFixed(2)}</p>
+                    <p className="text-primary-black text-base font-medium">USD <FormatCurrency fixed amount={order?.totalPrice} decimals={2} /></p>
                 </div>
 
                 {selectedItemIds.size > 0 && (
@@ -186,9 +187,9 @@ function PurchaseItem({ order }: { order: IOrder }) {
                                         Size <span className="font-semibold text-foreground">{item.product?.size?.title}</span>
                                     </p>
                                     <p className={cn("text-sm text-muted-foreground", item?.isCancelled ? "line-through" : "")}>
-                                        Price <span className="font-semibold text-foreground">${item.unitAllocatedPrice}</span>
-                                        {item?.unitAllocatedPrice !== item?.unitPrice && <span className="font-semibold text-xs text-gray-600 line-through ml-1">${item.unitPrice}</span>}
-                                        {item?.extra_donation > 0 && <span className="font-semibold text-xs text-green-700 ml-1">+ ${item?.extra_donation} extra donated</span>}
+                                        Price <span className="font-semibold text-foreground"><FormatCurrency fixed amount={item.unitAllocatedPrice} /></span>
+                                        {item?.unitAllocatedPrice !== item?.unitPrice && <span className="font-semibold text-xs text-gray-600 line-through ml-1"><FormatCurrency fixed amount={item.unitPrice} /></span>}
+                                        {item?.extra_donation > 0 && <span className="font-semibold text-xs text-green-700 ml-1">+ <FormatCurrency fixed amount={item?.extra_donation} /> extra donated</span>}
                                     </p>
 
                                     {
@@ -290,10 +291,10 @@ function PurchaseItem({ order }: { order: IOrder }) {
                                 {
                                     order?.pricingSource == "BUNDLE" ? <div className="flex justify-between text-sm">
                                         <p className="text-gray-700">Items Total:</p>
-                                        <p className="font-medium">${itemsBaseTotal?.toFixed(2)}</p>
+                                        <p className="font-medium"><FormatCurrency fixed amount={itemsBaseTotal} decimals={2} /></p>
                                     </div> : <div className="flex justify-between text-sm">
                                         <p className="text-gray-700">Offer Price:</p>
-                                        <p className="font-medium">${order?.itemsTotal?.toFixed(2)}</p>
+                                        <p className="font-medium"><FormatCurrency fixed amount={order?.itemsTotal} decimals={2} /></p>
                                     </div>
                                 }
 
@@ -303,33 +304,33 @@ function PurchaseItem({ order }: { order: IOrder }) {
                                             <span className="bg-green-600/20 text-green-600 rounded px-1 py-0.5 ml-1 text-sm">
                                                 {order?.bundleDiscountPercent}%
                                             </span> :</p>
-                                        <p className="font-medium text-green-600">-${(itemsBaseTotal * order?.bundleDiscountPercent / 100).toFixed(2)}</p>
+                                        <p className="font-medium text-green-600">-<FormatCurrency fixed amount={(itemsBaseTotal * order?.bundleDiscountPercent / 100)} decimals={2} /></p>
                                     </div>
                                 )}
 
                                 <div className="flex justify-between text-sm">
                                     <p className="text-gray-700">Extra Donation:</p>
-                                    <p className="font-medium">${totalExtraDonation?.toFixed(2)}</p>
+                                    <p className="font-medium"><FormatCurrency fixed amount={totalExtraDonation} decimals={2} /></p>
                                 </div>
 
                                 <div className="flex justify-between text-sm">
                                     <p className="text-gray-700 flex flex-row gap-x-1 items-center">Service Fee :
                                     </p>
-                                    <p className="font-medium">${order?.serviceFee?.toFixed(2)}</p>
+                                    <p className="font-medium"><FormatCurrency fixed amount={order?.serviceFee} decimals={2} /></p>
                                 </div>
                                 {order?.authenticationFee > 0 && <div className="flex justify-between text-sm">
                                     <p className="text-gray-700">Verify & Authentication of Goods:</p>
-                                    <p className="font-medium">${order?.authenticationFee?.toFixed(2)}</p>
+                                    <p className="font-medium"><FormatCurrency fixed amount={order?.authenticationFee} decimals={2} /></p>
                                 </div>}
                                 {order?.treeCredit > 0 && <div className="flex justify-between text-sm">
                                     <p className="text-gray-700">Gift Trees:</p>
-                                    <p className="font-medium">${order?.treeCredit?.toFixed(2)}</p>
+                                    <p className="font-medium"><FormatCurrency fixed amount={order?.treeCredit} decimals={2} /></p>
                                 </div>}
 
                                 {order?.totalDelivery > 0 && <div className="flex justify-between text-sm">
                                     <p className="text-gray-700 flex flex-row gap-x-1 items-center">Shipping :
                                     </p>
-                                    <p className="font-medium">${order?.totalDelivery?.toFixed(2)}</p>
+                                    <p className="font-medium"><FormatCurrency fixed amount={order?.totalDelivery} decimals={2} /></p>
                                 </div>}
 
                                 {/* <hr />
@@ -344,7 +345,7 @@ function PurchaseItem({ order }: { order: IOrder }) {
                                 <div className="flex justify-between text-sm">
                                     <p className="text-gray-800 font-semibold text-base">Total:</p>
 
-                                    <p className="font-semibold text-base">${order?.totalPrice.toFixed(2)}</p>
+                                    <p className="font-semibold text-base"><FormatCurrency fixed amount={order?.totalPrice} decimals={2} /></p>
                                 </div>
                             </div>
                         </div>

@@ -18,7 +18,9 @@ interface RateState {
   },
   user: {
     rate: "GBP" | "EUR" | "USD",
-    country: string
+    country: string,
+    /** true while the currency is the default or auto-detected, false once the user picked it */
+    isDefault: boolean
   },
   configured: boolean;
 }
@@ -45,8 +47,9 @@ const initialState: RateState = {
     }
   },
   user: {
-    rate: "USD",
-    country: "United States"
+    rate: "GBP",
+    country: "United Kingdom",
+    isDefault: true
   },
   configured: false
 };
@@ -73,9 +76,10 @@ const rateSlice = createSlice({
         }
       };
     },
-    setUserRate: (state, action: PayloadAction<{ rate: "GBP" | "EUR" | "USD"; country: string }>) => {
+    setUserRate: (state, action: PayloadAction<{ rate: "GBP" | "EUR" | "USD"; country: string; isDefault?: boolean }>) => {
       state.user.rate = action.payload.rate;
       state.user.country = action.payload.country;
+      state.user.isDefault = action.payload.isDefault ?? false;
       state.configured = true;
     },
 

@@ -24,6 +24,7 @@ import { DonationFromProfile } from '@/app/(public)/member/[username]/_component
 import DonationsRaisedDialog from '../Modal/Donation/DonationsRaisedDialog';
 import userBannerPlaceholder from "@/assets/banner/user-placeholder.png";
 import ClothesDonationDialog from '../Modal/clothesDonation/ClothesDonationDialog';
+import FormatCurrency from '../FormatCurrency';
 
 type User = {
   data:
@@ -46,7 +47,7 @@ type User = {
 
 export default function SellerProfile({ user, isCharity, isCharityShop }: { user: User, isCharity: boolean, isCharityShop: boolean }) {
 
-  const { format, symbol } = useCurrency();
+  const { formatGbp: format } = useCurrency();
 
   const userData = user?.data?.user;
 
@@ -207,9 +208,8 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
                     type="button"
                     className="text-left cursor-pointer group transition-opacity hover:opacity-85"
                   >
-                    <p className="font-semibold">
-                      {format(user?.data?.totalRaisedDonation || 0, { decimals: 1 })}
-                    </p>
+                    <FormatCurrency fixed amount={user?.data?.totalRaisedDonation} decimals={2}className='font-semibold' />
+
                     <p className="text-gray-700">
                       Raised
                     </p>
@@ -218,7 +218,7 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
               )}
 
               {!(isCharityShop || isCharity) && <Link href={`/member/${userData?.userName}/donations`} className=''>
-                <p className='font-semibold'>{user?.data?.totalDonation}</p>
+                <FormatCurrency fixed amount={user?.data?.totalDonation} decimals={2} className='font-semibold' />
                 <p className='text-gray-700'>Donated</p>
               </Link>}
 

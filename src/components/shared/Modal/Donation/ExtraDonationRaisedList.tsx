@@ -1,5 +1,6 @@
 "use client";
 
+import FormatCurrency from "@/components/shared/FormatCurrency";
 import React, { useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -161,7 +162,7 @@ export default function ExtraDonationRaisedList({
             {/* Right: Amount */}
             <div className="text-right shrink-0">
               <p className="text-base sm:text-lg font-bold tabular-nums text-green-700">
-                ${extraAmount.toFixed(2)}
+                <FormatCurrency fixed amount={extraAmount} decimals={2} />
               </p>
               <span className="text-[11px] text-muted-foreground">
                 Extra Donation

@@ -179,6 +179,7 @@ export const useAutoSelectCountry = (
               setUserRate({
                 country: matched.name,
                 rate: getCurrencyForCountry(matched.code),
+                isDefault: true,
               })
             );
           }
