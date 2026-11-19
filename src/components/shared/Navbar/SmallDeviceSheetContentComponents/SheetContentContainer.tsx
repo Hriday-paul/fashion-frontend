@@ -98,7 +98,7 @@ const navLinksFotProfileIcon: NavLink[] = [
   {
     icon: <Heart className="size-5" />,
     name: "Favorites",
-    link: "/wishlist",
+    link: "/favourites",
     roles: SELLER_ROLES,
   },
   {

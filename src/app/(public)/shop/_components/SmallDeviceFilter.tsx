@@ -28,12 +28,13 @@ export function SmallDeviceFilter({ categoryId, sspResult }: { categoryId?: stri
   const colors = searchParams.get("color")?.split(",") || [];
   const materials = searchParams.get("material")?.split(",").filter(Boolean) || [];
   const conditions = searchParams.get("condition")?.split(",") || [];
+  const search = searchParams.get("search");
 
   const updateParams = useUpdateSearchParams();
-  const hasFilters = Boolean(category) || brands.length > 0 || sizes.length > 0 || colors.length > 0 || materials.length > 0 || conditions.length > 0 || Boolean(minPrice) || Boolean(maxPrice);
+  const hasFilters = Boolean(category) || brands.length > 0 || sizes.length > 0 || colors.length > 0 || materials.length > 0 || conditions.length > 0 || Boolean(minPrice) || Boolean(maxPrice) || Boolean(search);
 
   const handleClear = () => {
-    updateParams({ category: null, brand: null, priceMin: null, priceMax: null, size: null, color: null, material: null, condition: null });
+    updateParams({ category: null, brand: null, priceMin: null, priceMax: null, size: null, color: null, material: null, condition: null, search: null });
   };
 
   const options = [

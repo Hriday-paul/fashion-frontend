@@ -6,6 +6,8 @@ import { Facebook, Instagram, Youtube } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import CountryCurrencyModal from "./CountryCurrencyModal";
+import SellFooterColumn from "./SellFooterColumn";
+import { FooterColumn } from "./FooterColumn";
 
 const BuyLinks = [
   {
@@ -84,27 +86,6 @@ const socialIcons = [
   { icon: Instagram, label: "Instagram" }
 ];
 
-function FooterColumn({ links, title }: { title: string, links: { name: string; link: string, id: number, prefetch?: boolean }[] }) {
-  return (
-    <div>
-      <h3 className="text-white text-lg font-bold mb-4">{title}</h3>
-      <ul className="space-y-2.5">
-        {links.map((link) => (
-          <li key={link?.id}>
-            <Link
-              href={link?.link}
-              prefetch={link?.prefetch}
-              className="text-gray-400 hover:text-white transition-colors text-base"
-            >
-              {link?.name}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 const Footer = () => {
   return (
     <footer className="bg-neutral-950 text-gray-300" >
@@ -134,7 +115,7 @@ const Footer = () => {
               </div>
 
               <FooterColumn title="Buy" links={BuyLinks} />
-              <FooterColumn title="Sell" links={SellLinks} />
+              <SellFooterColumn links={SellLinks} />
               <FooterColumn title="Pages" links={pagesLinks} />
             </div>
           </div>

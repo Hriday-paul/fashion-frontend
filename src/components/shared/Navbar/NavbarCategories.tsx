@@ -19,8 +19,6 @@ interface Category {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const COLLAPSE_THRESHOLD = 6;
-
 const categoryHref = (id: string) => `/shop?category=${id}`;
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -47,8 +45,7 @@ function LeafItem({
 }
 
 /**
- * Renders a list of leaf children with a "See X more / See less" toggle
- * when the count exceeds COLLAPSE_THRESHOLD.
+ * Renders a list of leaf children in two columns.
  */
 function CollapsibleLeafList({
   items,
@@ -88,7 +85,7 @@ function MobileCategorySheet({
 }) {
   const router = useRouter();
   const [path, setPath] = React.useState<Category[]>([root]);
-  const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [selectedId, setSelectedId] = React.useState<string | null>(root.id);
 
   const current = path[path.length - 1];
 
@@ -104,7 +101,6 @@ function MobileCategorySheet({
       onClose={onClose}
       onBack={path.length > 1 ? () => setPath((p) => p.slice(0, -1)) : undefined}
       onShowResults={handleShowResults}
-      hideShowResults={!selectedId}
     >
       <div className="flex flex-col">
         {/* "All": all items under the current category */}
@@ -120,7 +116,10 @@ function MobileCategorySheet({
           item.children.length > 0 ? (
             <button
               key={item.id}
-              onClick={() => setPath((p) => [...p, item])}
+              onClick={() => {
+                setPath((p) => [...p, item]);
+                setSelectedId(item.id);
+              }}
               className="w-full flex justify-between items-center py-4 px-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100 text-left"
             >
               <span className="text-base">{item.name}</span>

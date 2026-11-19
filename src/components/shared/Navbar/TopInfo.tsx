@@ -1,4 +1,8 @@
+"use client";
 import React from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { UserRole } from "@/types";
 import Container from "../Container";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -23,6 +27,11 @@ const quickLink = [
 ];
 
 const TopInfo = () => {
+  const role = useSelector((state: RootState) => state.auth.user?.auth?.role);
+  const links = quickLink.filter(
+    (link) => !(link.href === "/sell" && role === UserRole.CHARITABLE_ORGANIZATION)
+  );
+
   return (
     <header className="bg-primary-black text-primary-white py-2  hidden md:block">
       <Container className="flex justify-between items-center text-sm gap-x-2 ">
@@ -33,7 +42,7 @@ const TopInfo = () => {
 
         <div className="xl:space-x-4 space-x-1 hidden md:block lg:text-base md:text-xs">
           <CharityDonationFormDialog />
-          {quickLink.map((link, index) => (
+          {links.map((link, index) => (
             <Link
               key={index}
               href={link.href}

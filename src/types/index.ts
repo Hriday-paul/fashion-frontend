@@ -232,8 +232,6 @@ export interface IUser {
   ambassador: Ambassador | null;
   professionalSeller: ProfessionalSeller | null;
 
-  bannerUrl: string | null
-  bannerKey: string | null
 }
 
 

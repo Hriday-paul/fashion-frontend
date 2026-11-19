@@ -5,6 +5,9 @@ import { TextAnimation } from "@/animations/TextAnimation";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { UserRole } from "@/types";
 
 export default function PhilanthropistBox({
   className,
@@ -13,6 +16,9 @@ export default function PhilanthropistBox({
   className?: string;
   btnClassName?: string;
 }) {
+  const user = useSelector((state: RootState) => state.auth.user);
+  const isCharityOrg = user?.auth?.role === UserRole.CHARITABLE_ORGANIZATION;
+
   return (
     <Card
       className={cn(
@@ -39,7 +45,8 @@ export default function PhilanthropistBox({
           </h2> */}
 
           <TextAnimation
-            text="Join the Fashion Philanthropist Community!"
+            key={isCharityOrg ? "charity" : "default"}
+            text={isCharityOrg ? "Your charity on FASHI-ON" : "Join the Fashion Philanthropist Community!"}
             className=" lg:text-2xl md:text-xl text-lg  font-medium "
             initialDelay={0.5}
           />
@@ -53,7 +60,9 @@ export default function PhilanthropistBox({
             }}
             className="  leading-relaxed md:text-sm"
           >
-            Earn more and help make a change with us
+            {isCharityOrg
+              ? "Manage your charity profile and view your donations."
+              : "Earn more and help make a change with us"}
           </motion.p>
 
           {/* Call to Action Button */}
@@ -65,7 +74,7 @@ export default function PhilanthropistBox({
             }}
             className="pt-2 flex justify-end"
           >
-            <Link href="/sell" prefetch={false}>
+            <Link href={isCharityOrg ? "/profile" : "/sell"} prefetch={false}>
               <Button
                 variant={"outline"}
                 size="sm"
@@ -74,7 +83,7 @@ export default function PhilanthropistBox({
                   btnClassName
                 )}
               >
-                Start selling
+                {isCharityOrg ? "Go to charity dashboard" : "Start selling"}
               </Button>
             </Link>
           </motion.div>

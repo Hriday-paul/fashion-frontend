@@ -17,7 +17,7 @@ export interface ProfileRoute {
 }
 
 // Reusable role groups
-const SELLER_ROLES = [
+export const SELLER_ROLES = [
     UserRole.INDIVIDUAL_USER,
     UserRole.CHARITY_SHOP,
     UserRole.ECO_FRIENDLY_STORE,

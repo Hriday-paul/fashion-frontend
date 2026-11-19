@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { UserRole } from "@/types";
 
-const SELLER_ROLES = [
+const BUYER_ROLES = [
   UserRole.INDIVIDUAL_USER,
   UserRole.CELEBRITY,
   UserRole.AMBASSADOR,
@@ -19,7 +19,7 @@ const SearchAndNavIcon = () => {
 
   const user = useSelector((state: RootState) => state?.auth?.user);
 
-  const haveAccessCart = user?.auth?.role ? SELLER_ROLES.includes(user?.auth?.role) : false;
+  const haveAccessCart = user?.auth?.role ? BUYER_ROLES.includes(user?.auth?.role) : false;
 
   return (
     <div className="flex flex-row items-center gap-x-1">
@@ -28,7 +28,7 @@ const SearchAndNavIcon = () => {
         <MessageDropDown />
       </div>
 
-      {<WishListDropDown />}
+      {haveAccessCart && <WishListDropDown />}
 
 
       <NotificationIcon />

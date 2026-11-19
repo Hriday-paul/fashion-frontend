@@ -15,7 +15,6 @@ export default function SmPopup({
   onBack,
   onShowResults,
   onClear,
-  hideShowResults = false,
   children,
 }: {
   open: boolean;
@@ -26,7 +25,6 @@ export default function SmPopup({
   onShowResults?: () => void;
   /** When set, a "Clear" button is shown beside "Show results" */
   onClear?: () => void;
-  hideShowResults?: boolean;
   children: React.ReactNode;
 }) {
   useEffect(() => {
@@ -65,7 +63,7 @@ export default function SmPopup({
       <div className="flex-1 overflow-auto px-3 pb-4">{children}</div>
 
       {/* ==========show results========= */}
-      {!hideShowResults && <div className="shrink-0 flex flex-row gap-2 border-t border-gray-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div className="shrink-0 flex flex-row gap-2 border-t border-gray-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         {onClear && (
           <Button
             variant="outline"
@@ -81,7 +79,7 @@ export default function SmPopup({
         >
           Show results
         </Button>
-      </div>}
+      </div>
     </div>
   );
 }

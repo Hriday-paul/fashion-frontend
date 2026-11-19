@@ -67,7 +67,7 @@ function CharityProfile1({ user }: { user: User }) {
 
     const emptySocialLinks = socialLinks.length === 0;
 
-    const bannerSrc = (userData?.bannerUrl && userData.bannerUrl.trim()) ? userData.bannerUrl : userBannerPlaceholder;
+    const bannerSrc = userData?.charityThumbnail?.url?.trim() ? userData.charityThumbnail.url : userBannerPlaceholder;
     const isPlaceholder = bannerSrc === userBannerPlaceholder;
 
     const iscurrentUser = user?.data?.isCurrentUser;

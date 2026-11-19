@@ -1,6 +1,6 @@
 "use client"
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { IBadge, IUser } from '@/types'
+import { IBadge, IUser, UserRole } from '@/types'
 import { notFound } from 'next/navigation'
 import { Rating } from "@/components/ui/rating";
 import moment from 'moment'
@@ -67,14 +67,17 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
     { name: 'Website', url: userData?.website, icon: wb },
   ].filter((link) => link.url);
 
-  const bannerSrc = (userData?.bannerUrl && userData.bannerUrl.trim()) ? userData.bannerUrl : userBannerPlaceholder;
+  // banner is only for charity, charity shop and eco-friendly store (charityThumbnail)
+  const role = userData?.auth?.role;
+  const showBanner = role === UserRole.CHARITABLE_ORGANIZATION || role === UserRole.CHARITY_SHOP || role === UserRole.ECO_FRIENDLY_STORE;
+  const bannerSrc = userData?.charityThumbnail?.url?.trim() ? userData.charityThumbnail.url : userBannerPlaceholder;
   const isPlaceholder = bannerSrc === userBannerPlaceholder;
 
   return (
     <div className='pt-5'>
 
       {/* Profile Banner */}
-      <div className="relative w-full h-44 sm:h-56 md:h-64 lg:h-72 rounded-2xl overflow-hidden bg-muted mb-6">
+      {showBanner && <div className="relative w-full h-44 sm:h-56 md:h-64 lg:h-72 rounded-2xl overflow-hidden bg-muted mb-6">
         <Image
           src={bannerSrc}
           alt={`${userData?.userName || "User"} banner`}
@@ -85,7 +88,7 @@ export default function SellerProfile({ user, isCharity, isCharityShop }: { user
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 1200px, 1400px"
           className="object-cover"
         />
-      </div>
+      </div>}
 
       {!isCharity ? <>
         {/* Profile Header Section */}
