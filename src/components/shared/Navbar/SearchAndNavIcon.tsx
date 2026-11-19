@@ -28,7 +28,7 @@ const SearchAndNavIcon = () => {
         <MessageDropDown />
       </div>
 
-      {haveAccessCart && <WishListDropDown />}
+      {<WishListDropDown />}
 
 
       <NotificationIcon />
